@@ -1,0 +1,8 @@
+{
+  "profiles": {
+    "ConfigCodeGenConsole": {
+      "commandName": "Project",
+      "commandLineArgs": "D:\\Desktop\\Workshop\\Others\\ConfigCodeGenSolution\\config.json D:\\Desktop\\Workshop\\Others\\ConfigCodeGenSolution\\Example\\ConfigOriginal\\AutoPickupConfig.csv"
+    }
+  }
+}

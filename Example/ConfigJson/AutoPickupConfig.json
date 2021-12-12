@@ -1,0 +1,99 @@
+
+{
+    "ConfigName" : "AutoPickupConfig",
+    "Usage"      : [
+    ],
+    "Attributes" : [
+        {
+            "AttributeName" : "Id",
+            "ValueType"     : "",
+            "CollectionType" : "",
+            "Usage"          : [
+            ]
+        },
+        {
+            "AttributeName" : "Desc",
+            "ValueType"     : "",
+            "CollectionType" : "",
+            "Usage"          : [
+            ]
+        },
+        {
+            "AttributeName" : "ItemType",
+            "ValueType"     : "",
+            "CollectionType" : "",
+            "Usage"          : [
+            ]
+        },
+        {
+            "AttributeName" : "ItemSubType",
+            "ValueType"     : "",
+            "CollectionType" : "",
+            "Usage"          : [
+            ]
+        },
+        {
+            "AttributeName" : "MenuType",
+            "ValueType"     : "",
+            "CollectionType" : "",
+            "Usage"          : [
+            ]
+        },
+        {
+            "AttributeName" : "itemid",
+            "ValueType"     : "",
+            "CollectionType" : "",
+            "Usage"          : [
+            ]
+        },
+        {
+            "AttributeName" : "Text",
+            "ValueType"     : "",
+            "CollectionType" : "",
+            "Usage"          : [
+            ]
+        },
+        {
+            "AttributeName" : "IsOpen",
+            "ValueType"     : "",
+            "CollectionType" : "",
+            "Usage"          : [
+            ]
+        },
+        {
+            "AttributeName" : "InitialOrder",
+            "ValueType"     : "",
+            "CollectionType" : "",
+            "Usage"          : [
+            ]
+        },
+        {
+            "AttributeName" : "InitialNum",
+            "ValueType"     : "",
+            "CollectionType" : "",
+            "Usage"          : [
+            ]
+        },
+        {
+            "AttributeName" : "PickupMin",
+            "ValueType"     : "",
+            "CollectionType" : "",
+            "Usage"          : [
+            ]
+        },
+        {
+            "AttributeName" : "PickupMax",
+            "ValueType"     : "",
+            "CollectionType" : "",
+            "Usage"          : [
+            ]
+        },
+        {
+            "AttributeName" : "Unit",
+            "ValueType"     : "",
+            "CollectionType" : "",
+            "Usage"          : [
+            ]
+        }
+    ]
+}
