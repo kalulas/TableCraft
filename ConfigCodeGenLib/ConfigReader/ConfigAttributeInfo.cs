@@ -10,12 +10,12 @@ namespace ConfigCodeGenLib.ConfigReader
     /// </summary>
     public class ConfigAttributeInfo
     {
+        private readonly List<string> m_Usage = new List<string>();
         public int Index { get; private set; }
         public string AttributeName { get; private set; }
         public string Comment { get; private set; }
         public string ValueType { get; private set; } = string.Empty;
         public string CollectionType { get; private set; } = string.Empty;
-        public List<string> Usage { get; private set; } = new List<string>();
 
         /// AttributeName & Comment can be read from config file (for example the first line and the second line of csv file)
         public ConfigAttributeInfo SetConfigFileInfo(int index, string attributeName, string comment)
@@ -37,7 +37,7 @@ namespace ConfigCodeGenLib.ConfigReader
             writer.Write(CollectionType);
             writer.WritePropertyName("Usage");
             writer.WriteArrayStart();
-            foreach (var _usage in Usage)
+            foreach (var _usage in m_Usage)
             {
                 writer.Write(_usage);
             }

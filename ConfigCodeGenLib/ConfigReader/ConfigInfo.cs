@@ -14,17 +14,21 @@ namespace ConfigCodeGenLib.ConfigReader
         private bool m_HasJsonConfig;
         protected string m_ConfigFilePath;
         protected string m_RelatedJsonFilePath;
-        public Dictionary<string, ConfigAttributeInfo> m_Attribtues = new Dictionary<string, ConfigAttributeInfo>();
+        protected List<string> m_Usage;
+        /// <summary>
+        /// AttributeName -> AttributeInfo instance
+        /// </summary>
+        protected Dictionary<string, ConfigAttributeInfo> m_Attribtues;
         public string ConfigName { get; private set; }
         public EConfigType ConfigType { get; private set; }
-        public List<string> Usage { get; private set; }
 
 
         public ConfigInfo(EConfigType configType, string configName, string configFilePath, string relatedJsonFilePath)
         {
             ConfigType = configType;
             ConfigName = configName;
-            Usage = new List<string>();
+            m_Usage = new List<string>();
+            m_Attribtues = new Dictionary<string, ConfigAttributeInfo>();
             m_ConfigFilePath = configFilePath;
             m_RelatedJsonFilePath = relatedJsonFilePath;
             if (!File.Exists(m_ConfigFilePath))
@@ -81,7 +85,7 @@ namespace ConfigCodeGenLib.ConfigReader
 
             writer.WritePropertyName("Usage");
             writer.WriteArrayStart();
-            foreach (var _usage in Usage)
+            foreach (var _usage in m_Usage)
             {
                 writer.Write(_usage);
             }
