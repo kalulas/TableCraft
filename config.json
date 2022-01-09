@@ -1,5 +1,5 @@
 {
-    "DataValueType": ["int", "float", "boolean", "string"],
+    "DataValueType": ["int", "uint", "float", "boolean", "string"],
     "DataCollectionType": ["none", "array", "list"],
     "ConfigJsonPath": "Example\\ConfigJson\\",
     "CodeTemplatePath": "Example\\CodeTemplate\\",

@@ -10,12 +10,46 @@ namespace ConfigCodeGenLib.ConfigReader
     /// </summary>
     public class ConfigAttributeInfo
     {
+        public const string ATTRIBUTE_NAME_KEY = "AttributeName";
+        private const string VALUE_TYPE_KEY = "ValueType";
+        private const string COLLECTION_TYPE_KEY = "CollectionType";
+        private const string USAGE_KEY = "Usage";
+
         private readonly List<string> m_Usage = new List<string>();
+        private string m_ValueType = string.Empty;
+        private string m_CollectionType = string.Empty;
+
         public int Index { get; private set; }
         public string AttributeName { get; private set; }
         public string Comment { get; private set; }
-        public string ValueType { get; private set; } = string.Empty;
-        public string CollectionType { get; private set; } = string.Empty;
+        public string ValueType { get
+            {
+                return m_ValueType;
+            }
+            private set
+            {
+                var valid = Configuration.IsValueTypeValid(value);
+                m_ValueType = valid ? value : string.Empty;
+                if (!valid)
+                {
+                    // TODO error log
+                }
+            }
+        }
+        public string CollectionType { get
+            {
+                return m_CollectionType;
+            }
+            private set
+            {
+                var valid = Configuration.IsCollectionTypeValid(value);
+                m_CollectionType = valid ? value : string.Empty;
+                if (!valid)
+                {
+                    // TODO error log
+                }
+            }
+        }
 
         /// AttributeName & Comment can be read from config file (for example the first line and the second line of csv file)
         public ConfigAttributeInfo SetConfigFileInfo(int index, string attributeName, string comment)
@@ -26,16 +60,41 @@ namespace ConfigCodeGenLib.ConfigReader
             return this;
         }
 
+        public bool SetJsonFileInfo(JsonData jsonData)
+        {
+            try
+            {
+                ValueType = jsonData[VALUE_TYPE_KEY].ToString();
+                CollectionType = jsonData[COLLECTION_TYPE_KEY].ToString();
+                foreach (var usage in jsonData[USAGE_KEY])
+                {
+                    var valid = Configuration.IsUsageValid(usage.ToString());
+                    var result = valid ? usage.ToString() : string.Empty;
+                    if (!valid)
+                    {
+                        // TODO error log
+                    }
+                    m_Usage.Add(result);
+                }
+            }
+            catch (Exception)
+            {
+                throw;
+            }
+
+            return true;
+        }
+
         public void WriteToJson(JsonWriter writer)
         {
             writer.WriteObjectStart();
-            writer.WritePropertyName("AttributeName");
+            writer.WritePropertyName(ATTRIBUTE_NAME_KEY);
             writer.Write(AttributeName);
-            writer.WritePropertyName("ValueType");
+            writer.WritePropertyName(VALUE_TYPE_KEY);
             writer.Write(ValueType);
-            writer.WritePropertyName("CollectionType");
+            writer.WritePropertyName(COLLECTION_TYPE_KEY);
             writer.Write(CollectionType);
-            writer.WritePropertyName("Usage");
+            writer.WritePropertyName(USAGE_KEY);
             writer.WriteArrayStart();
             foreach (var _usage in m_Usage)
             {

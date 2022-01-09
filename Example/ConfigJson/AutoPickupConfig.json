@@ -6,93 +6,117 @@
     "Attributes" : [
         {
             "AttributeName" : "Id",
-            "ValueType"     : "",
-            "CollectionType" : "",
+            "ValueType"     : "uint",
+            "CollectionType" : "none",
             "Usage"          : [
+                "client",
+                "server"
             ]
         },
         {
             "AttributeName" : "Desc",
-            "ValueType"     : "",
-            "CollectionType" : "",
+            "ValueType"     : "string",
+            "CollectionType" : "none",
             "Usage"          : [
+                "client"
             ]
         },
         {
             "AttributeName" : "ItemType",
-            "ValueType"     : "",
-            "CollectionType" : "",
+            "ValueType"     : "int",
+            "CollectionType" : "none",
             "Usage"          : [
+                "client",
+                "server"
             ]
         },
         {
             "AttributeName" : "ItemSubType",
-            "ValueType"     : "",
-            "CollectionType" : "",
+            "ValueType"     : "uint",
+            "CollectionType" : "array",
             "Usage"          : [
+                "client",
+                "server"
             ]
         },
         {
             "AttributeName" : "MenuType",
-            "ValueType"     : "",
-            "CollectionType" : "",
+            "ValueType"     : "uint",
+            "CollectionType" : "array",
             "Usage"          : [
+                "client",
+                "server"
             ]
         },
         {
             "AttributeName" : "itemid",
-            "ValueType"     : "",
-            "CollectionType" : "",
+            "ValueType"     : "uint",
+            "CollectionType" : "none",
             "Usage"          : [
+                "client",
+                "server"
             ]
         },
         {
             "AttributeName" : "Text",
-            "ValueType"     : "",
-            "CollectionType" : "",
+            "ValueType"     : "string",
+            "CollectionType" : "none",
             "Usage"          : [
+                "client"
             ]
         },
         {
             "AttributeName" : "IsOpen",
-            "ValueType"     : "",
-            "CollectionType" : "",
+            "ValueType"     : "boolean",
+            "CollectionType" : "none",
             "Usage"          : [
+                "client",
+                "server"
             ]
         },
         {
             "AttributeName" : "InitialOrder",
-            "ValueType"     : "",
-            "CollectionType" : "",
+            "ValueType"     : "int",
+            "CollectionType" : "none",
             "Usage"          : [
+                "client",
+                "server"
             ]
         },
         {
             "AttributeName" : "InitialNum",
-            "ValueType"     : "",
-            "CollectionType" : "",
+            "ValueType"     : "int",
+            "CollectionType" : "none",
             "Usage"          : [
+                "client",
+                "server"
             ]
         },
         {
             "AttributeName" : "PickupMin",
-            "ValueType"     : "",
-            "CollectionType" : "",
+            "ValueType"     : "int",
+            "CollectionType" : "none",
             "Usage"          : [
+                "client",
+                "server"
             ]
         },
         {
             "AttributeName" : "PickupMax",
-            "ValueType"     : "",
-            "CollectionType" : "",
+            "ValueType"     : "int",
+            "CollectionType" : "none",
             "Usage"          : [
+                "client",
+                "server"
             ]
         },
         {
             "AttributeName" : "Unit",
-            "ValueType"     : "",
-            "CollectionType" : "",
+            "ValueType"     : "uint",
+            "CollectionType" : "none",
             "Usage"          : [
+                "client",
+                "server"
             ]
         }
     ]

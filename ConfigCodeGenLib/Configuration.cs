@@ -124,5 +124,24 @@ namespace ConfigCodeGenLib
             m_IsInited = true;
         }
 
+        #region Validation
+
+        internal static bool IsValueTypeValid(string valueType)
+        {
+            return !string.IsNullOrEmpty(valueType) && m_DataValueType.Contains(valueType);
+        }
+
+        internal static bool IsCollectionTypeValid(string collectionType)
+        {
+            return !string.IsNullOrEmpty(collectionType) && m_DataCollectionType.Contains(collectionType);
+        }
+
+        internal static bool IsUsageValid(string usage)
+        {
+            return !string.IsNullOrEmpty(usage) && m_ConfigUsageType.Contains(usage);
+        }
+
+        #endregion
+
     }
 }

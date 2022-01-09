@@ -11,6 +11,8 @@ namespace ConfigCodeGenLib.ConfigReader
     /// </summary>
     public abstract class ConfigInfo
     {
+        private const string ATTRIBUTES_KEY = "Attributes";
+
         private bool m_HasJsonConfig;
         protected string m_ConfigFilePath;
         protected string m_RelatedJsonFilePath;
@@ -61,7 +63,31 @@ namespace ConfigCodeGenLib.ConfigReader
         /// </summary>
         protected void ReadJsonFileAttributes()
         {
-            // TODO
+            var jsonContent = File.ReadAllText(m_RelatedJsonFilePath, Encoding.UTF8);
+            var jsonData = JsonMapper.ToObject(jsonContent);
+            if (!jsonData.ContainsKey(ATTRIBUTES_KEY))
+            {
+                // TODO Error Log
+                return;
+            }
+
+            var attributesJsonData = jsonData["Attributes"];
+            foreach (var attributeJson in attributesJsonData)
+            {
+                var attributeJsonData = attributeJson as JsonData;
+                if (attributeJsonData == null)
+                {
+                    continue;
+                }
+                var name = attributeJsonData[ConfigAttributeInfo.ATTRIBUTE_NAME_KEY].ToString();
+                if (!m_Attribtues.ContainsKey(name))
+                {
+                    // TODO error log
+                    continue;
+                }
+
+                m_Attribtues[name].SetJsonFileInfo(attributeJsonData);
+            }
         }
 
         #endregion
