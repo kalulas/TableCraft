@@ -18,7 +18,8 @@ namespace ConfigCodeGenConsole
             Configuration.ReadConfigurationFromJson(args[0]);
             ConfigManager.singleton.ReadComment = true;
             // pass config file with absolute path
-            ConfigManager.singleton.Process(args[1], ConfigCodeGenLib.ConfigReader.EConfigType.CSV);
+            var configInfo = ConfigManager.singleton.Process(args[1], ConfigCodeGenLib.ConfigReader.EConfigType.CSV);
+            ConfigManager.singleton.GenerateCode(configInfo.ConfigName, "client");
         }
     }
 }

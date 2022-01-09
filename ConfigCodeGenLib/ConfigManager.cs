@@ -45,20 +45,35 @@ namespace ConfigCodeGenLib
         /// <param> generated information of all attributes in this config file </param>
         /// </summary>
         /// <param name="configFilePath"></param>
-        public void Process(string configFilePath, EConfigType configType, bool refresh=false)
+        public ConfigInfo Process(string configFilePath, EConfigType configType, bool refresh=false)
         {
             var configName = Path.GetFileNameWithoutExtension(configFilePath);
             if (ConfigInfoDict.ContainsKey(configName) && !refresh)
             {
                 Debugger.LogWarningFormat("[ConfigManager.Process] {0} is already processed! set refresh to \'true\'");
-                return;
+                return ConfigInfoDict[configName];
             }
 
             var configInfo = ConfigInfo.CreateConfigInfo(configType, configFilePath, true);
 
             ConfigInfoDict.Remove(configName);
             ConfigInfoDict.Add(configName, configInfo);
+            return configInfo;
+        }
 
+        public bool GenerateCode(string configName, string usage)
+        {
+            if (!ConfigInfoDict.ContainsKey(configName))
+            {
+                Debugger.LogErrorFormat("unknown configName '{0}', try Process() first", configName);
+                return false;
+            }
+
+            // TODO usage validation
+
+            var configInfo = ConfigInfoDict[configName];
+            CodeGenerate.Generator.Process(configInfo, usage);
+            return true;
         }
     }
 }
