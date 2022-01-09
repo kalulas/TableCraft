@@ -1,4 +1,5 @@
 ﻿using System;
+using ConfigCodeGenLib;
 
 namespace ConfigCodeGenConsole
 {
@@ -12,9 +13,11 @@ namespace ConfigCodeGenConsole
                 return;
             }
 
-            ConfigCodeGenLib.Configuration.ReadConfigurationFromJson(args[0]);
-            ConfigCodeGenLib.ConfigManager.singleton.ReadComment = true;
-            ConfigCodeGenLib.ConfigManager.singleton.Process(args[1], ConfigCodeGenLib.ConfigReader.EConfigType.CSV);
+
+            Debugger.InitialCustomLogger(Console.WriteLine);
+            Configuration.ReadConfigurationFromJson(args[0]);
+            ConfigManager.singleton.ReadComment = true;
+            ConfigManager.singleton.Process(args[1], ConfigCodeGenLib.ConfigReader.EConfigType.CSV);
         }
     }
 }

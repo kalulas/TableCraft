@@ -35,7 +35,7 @@ namespace ConfigCodeGenLib.ConfigReader
             m_RelatedJsonFilePath = relatedJsonFilePath;
             if (!File.Exists(m_ConfigFilePath))
             {
-                Console.WriteLine("[ConfigReader.ConfigInfo] {0} file not found", m_ConfigFilePath);
+                Debugger.LogErrorFormat("[ConfigReader.ConfigInfo] {0} file not found", m_ConfigFilePath);
                 return;
             }
 
@@ -145,7 +145,7 @@ namespace ConfigCodeGenLib.ConfigReader
         {
             var configName = Path.GetFileNameWithoutExtension(configFilePath);
             var relatedJsonPath = Configuration.ConfigJsonPath + configName + ".json";
-            Console.WriteLine("\'{0}\' related json file is \'{1}\'", configName, relatedJsonPath);
+            Debugger.LogFormat("\'{0}\' related json file is \'{1}\'", configName, relatedJsonPath);
             ConfigInfo configInfo = null;
             switch (configType)
             {
@@ -153,7 +153,7 @@ namespace ConfigCodeGenLib.ConfigReader
                     configInfo = new CSVConfigInfo(configType, configName, configFilePath, relatedJsonPath);
                     break;
                 default:
-                    Console.WriteLine("[ConfigInfo.CreateConfigInfo] no supoorted config type!");
+                    Debugger.LogFormat("[ConfigInfo.CreateConfigInfo] no supoorted config type!");
                     break;
             }
 

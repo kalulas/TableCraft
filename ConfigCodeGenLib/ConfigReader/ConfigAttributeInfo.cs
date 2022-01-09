@@ -32,7 +32,7 @@ namespace ConfigCodeGenLib.ConfigReader
                 m_ValueType = valid ? value : string.Empty;
                 if (!valid)
                 {
-                    // TODO error log
+                    Debugger.LogErrorFormat("value type '{0}' is not valid", value);
                 }
             }
         }
@@ -46,7 +46,7 @@ namespace ConfigCodeGenLib.ConfigReader
                 m_CollectionType = valid ? value : string.Empty;
                 if (!valid)
                 {
-                    // TODO error log
+                    Debugger.LogErrorFormat("collection type '{0}' is not valid", value);
                 }
             }
         }
@@ -69,12 +69,14 @@ namespace ConfigCodeGenLib.ConfigReader
                 foreach (var usage in jsonData[USAGE_KEY])
                 {
                     var valid = Configuration.IsUsageValid(usage.ToString());
-                    var result = valid ? usage.ToString() : string.Empty;
                     if (!valid)
                     {
-                        // TODO error log
+                        Debugger.LogErrorFormat("usage '{0}' is not valid", usage.ToString());
                     }
-                    m_Usage.Add(result);
+                    else
+                    {
+                        m_Usage.Add(usage.ToString());
+                    }
                 }
             }
             catch (Exception)

@@ -15,7 +15,7 @@ namespace ConfigCodeGenLib
         {
             if (!Configuration.IsInited)
             {
-                Console.WriteLine("[ConfigManager] Configuration not setup yet! run Configuration.ReadConfigurationFromJson() first");
+                Debugger.LogErrorFormat("[ConfigManager] Configuration not setup yet! run Configuration.ReadConfigurationFromJson() first");
             }
         }
 
@@ -50,7 +50,7 @@ namespace ConfigCodeGenLib
             var configName = Path.GetFileNameWithoutExtension(configFilePath);
             if (ConfigInfoDict.ContainsKey(configName) && !refresh)
             {
-                Console.WriteLine("[ConfigManager.Process] {0} is already processed! set refresh to \'true\'");
+                Debugger.LogWarningFormat("[ConfigManager.Process] {0} is already processed! set refresh to \'true\'");
                 return;
             }
 

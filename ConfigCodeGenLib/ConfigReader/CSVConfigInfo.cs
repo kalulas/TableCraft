@@ -45,7 +45,7 @@ namespace ConfigCodeGenLib.ConfigReader
                 var comment = ConfigManager.singleton.ReadComment && i < comments.Length ? comments[i] : string.Empty;
                 if (m_Attribtues.ContainsKey(header))
                 {
-                    Console.WriteLine("[CSVConfigInfo.ReadConfigFileAttributes] duplicate key \'{0}\', skip", header);
+                    Debugger.LogFormat("[CSVConfigInfo.ReadConfigFileAttributes] duplicate key \'{0}\', skip", header);
                     continue;
                 }
 

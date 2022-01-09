@@ -60,7 +60,7 @@ namespace ConfigCodeGenLib
             }
             else
             {
-                Console.WriteLine("[ReadStringArrayFromJson] key \'{0}\' not found in json config", key);
+                Debugger.LogErrorFormat("[ReadStringArrayFromJson] key \'{0}\' not found in json config", key);
             }
 
         }
@@ -74,7 +74,7 @@ namespace ConfigCodeGenLib
         {
             if (m_ConfigUsageType.Contains(usage))
             {
-                Console.WriteLine($"[AddConfigUsageType] usage \'{usage}\' is already defined.");
+                Debugger.LogWarningFormat($"[AddConfigUsageType] usage \'{usage}\' is already defined.");
                 return;
             }
 
@@ -92,7 +92,7 @@ namespace ConfigCodeGenLib
         {
             if (m_IsInited)
             {
-                Console.WriteLine("[ReadConfigurationFromJson] already inited! exit");
+                Debugger.LogFormat("[ReadConfigurationFromJson] already inited! exit");
                 return;
             }
 
@@ -116,9 +116,9 @@ namespace ConfigCodeGenLib
 
             #region Test Code
             //var clientTemplateFullPath = CodeTemplatePath + m_UsageToInformation["client"].CodeTemplateName;
-            //Console.WriteLine("client code template full path {0}", clientTemplateFullPath);
+            //Debugger.LogForamt("client code template full path {0}", clientTemplateFullPath);
             //var content = File.ReadAllText(clientTemplateFullPath);
-            //Console.WriteLine(content);
+            //Debugger.LogForamt(content);
             #endregion
 
             m_IsInited = true;
