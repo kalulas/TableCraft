@@ -1,8 +1,6 @@
 
 {
     "ConfigName" : "AutoPickupConfig",
-    "Usage"      : [
-    ],
     "Attributes" : [
         {
             "AttributeName" : "Id",
@@ -11,6 +9,9 @@
             "Usage"          : [
                 "client",
                 "server"
+            ],
+            "Tag"            : [
+                "primary"
             ]
         },
         {
@@ -19,6 +20,8 @@
             "CollectionType" : "none",
             "Usage"          : [
                 "client"
+            ],
+            "Tag"            : [
             ]
         },
         {
@@ -28,6 +31,8 @@
             "Usage"          : [
                 "client",
                 "server"
+            ],
+            "Tag"            : [
             ]
         },
         {
@@ -37,6 +42,8 @@
             "Usage"          : [
                 "client",
                 "server"
+            ],
+            "Tag"            : [
             ]
         },
         {
@@ -46,6 +53,8 @@
             "Usage"          : [
                 "client",
                 "server"
+            ],
+            "Tag"            : [
             ]
         },
         {
@@ -55,6 +64,10 @@
             "Usage"          : [
                 "client",
                 "server"
+            ],
+            "Tag"            : [
+                "foreign",
+                "ItemTable"
             ]
         },
         {
@@ -63,6 +76,8 @@
             "CollectionType" : "none",
             "Usage"          : [
                 "client"
+            ],
+            "Tag"            : [
             ]
         },
         {
@@ -72,6 +87,8 @@
             "Usage"          : [
                 "client",
                 "server"
+            ],
+            "Tag"            : [
             ]
         },
         {
@@ -81,6 +98,8 @@
             "Usage"          : [
                 "client",
                 "server"
+            ],
+            "Tag"            : [
             ]
         },
         {
@@ -90,6 +109,8 @@
             "Usage"          : [
                 "client",
                 "server"
+            ],
+            "Tag"            : [
             ]
         },
         {
@@ -99,6 +120,8 @@
             "Usage"          : [
                 "client",
                 "server"
+            ],
+            "Tag"            : [
             ]
         },
         {
@@ -108,6 +131,8 @@
             "Usage"          : [
                 "client",
                 "server"
+            ],
+            "Tag"            : [
             ]
         },
         {
@@ -117,6 +142,8 @@
             "Usage"          : [
                 "client",
                 "server"
+            ],
+            "Tag"            : [
             ]
         }
     ]

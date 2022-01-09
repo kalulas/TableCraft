@@ -14,10 +14,12 @@ namespace ConfigCodeGenLib.ConfigReader
         private const string VALUE_TYPE_KEY = "ValueType";
         private const string COLLECTION_TYPE_KEY = "CollectionType";
         private const string USAGE_KEY = "Usage";
+        private const string TAG_KEY = "Tag";
 
-        private readonly List<string> m_Usage = new List<string>();
         private string m_ValueType = string.Empty;
         private string m_CollectionType = string.Empty;
+        private readonly List<string> m_Usage = new List<string>();
+        private readonly List<string> m_TagList = new List<string>();
 
         public int Index { get; private set; }
         public string AttributeName { get; private set; }
@@ -66,6 +68,7 @@ namespace ConfigCodeGenLib.ConfigReader
             {
                 ValueType = jsonData[VALUE_TYPE_KEY].ToString();
                 CollectionType = jsonData[COLLECTION_TYPE_KEY].ToString();
+                m_Usage.Clear();
                 foreach (var usage in jsonData[USAGE_KEY])
                 {
                     var valid = Configuration.IsUsageValid(usage.ToString());
@@ -77,6 +80,12 @@ namespace ConfigCodeGenLib.ConfigReader
                     {
                         m_Usage.Add(usage.ToString());
                     }
+                }
+
+                m_TagList.Clear();
+                foreach (var tag in jsonData[TAG_KEY])
+                {
+                    m_TagList.Add(tag.ToString());
                 }
             }
             catch (Exception)
@@ -98,9 +107,16 @@ namespace ConfigCodeGenLib.ConfigReader
             writer.Write(CollectionType);
             writer.WritePropertyName(USAGE_KEY);
             writer.WriteArrayStart();
-            foreach (var _usage in m_Usage)
+            foreach (var usage in m_Usage)
             {
-                writer.Write(_usage);
+                writer.Write(usage);
+            }
+            writer.WriteArrayEnd();
+            writer.WritePropertyName(TAG_KEY);
+            writer.WriteArrayStart();
+            foreach (var tag in m_TagList)
+            {
+                writer.Write(tag);
             }
             writer.WriteArrayEnd();
             writer.WriteObjectEnd();

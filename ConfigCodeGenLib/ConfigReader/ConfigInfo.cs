@@ -12,11 +12,12 @@ namespace ConfigCodeGenLib.ConfigReader
     public abstract class ConfigInfo
     {
         private const string ATTRIBUTES_KEY = "Attributes";
+        private const string CONFIG_NAME_KEY = "ConfigName";
 
         private bool m_HasJsonConfig;
         protected string m_ConfigFilePath;
         protected string m_RelatedJsonFilePath;
-        protected List<string> m_Usage;
+        //protected List<string> m_Usage;
         /// <summary>
         /// AttributeName -> AttributeInfo instance
         /// </summary>
@@ -29,7 +30,7 @@ namespace ConfigCodeGenLib.ConfigReader
         {
             ConfigType = configType;
             ConfigName = configName;
-            m_Usage = new List<string>();
+            //m_Usage = new List<string>();
             m_Attribtues = new Dictionary<string, ConfigAttributeInfo>();
             m_ConfigFilePath = configFilePath;
             m_RelatedJsonFilePath = relatedJsonFilePath;
@@ -67,11 +68,11 @@ namespace ConfigCodeGenLib.ConfigReader
             var jsonData = JsonMapper.ToObject(jsonContent);
             if (!jsonData.ContainsKey(ATTRIBUTES_KEY))
             {
-                // TODO Error Log
+                Debugger.LogErrorFormat("'{0}' not found in json file {1}", ATTRIBUTES_KEY, m_RelatedJsonFilePath);
                 return;
             }
 
-            var attributesJsonData = jsonData["Attributes"];
+            var attributesJsonData = jsonData[ATTRIBUTES_KEY];
             foreach (var attributeJson in attributesJsonData)
             {
                 var attributeJsonData = attributeJson as JsonData;
@@ -82,7 +83,7 @@ namespace ConfigCodeGenLib.ConfigReader
                 var name = attributeJsonData[ConfigAttributeInfo.ATTRIBUTE_NAME_KEY].ToString();
                 if (!m_Attribtues.ContainsKey(name))
                 {
-                    // TODO error log
+                    Debugger.LogErrorFormat("attribute '{0}' not found in config file {1}", name, m_ConfigFilePath);
                     continue;
                 }
 
@@ -103,29 +104,29 @@ namespace ConfigCodeGenLib.ConfigReader
             };
 
             writer.WriteObjectStart();
-            writer.WritePropertyName("ConfigName");
+            writer.WritePropertyName(CONFIG_NAME_KEY);
             writer.Write(ConfigName);
             // NOTE: type is user-specified
             //writer.WritePropertyName("ConfigType");
             //writer.Write((int)ConfigType);
 
-            writer.WritePropertyName("Usage");
-            writer.WriteArrayStart();
-            foreach (var _usage in m_Usage)
-            {
-                writer.Write(_usage);
-            }
-            writer.WriteArrayEnd();
+            //writer.WritePropertyName("Usage");
+            //writer.WriteArrayStart();
+            //foreach (var _usage in m_Usage)
+            //{
+            //    writer.Write(_usage);
+            //}
+            //writer.WriteArrayEnd();
 
-            writer.WritePropertyName("Attributes");
+            writer.WritePropertyName(ATTRIBUTES_KEY);
             writer.WriteArrayStart();
             foreach (var attribute in m_Attribtues)
             {
                 attribute.Value.WriteToJson(writer);
             }
             writer.WriteArrayEnd();
-
             writer.WriteObjectEnd();
+
             var dataBytes = Encoding.UTF8.GetBytes(builder.ToString());
             using (var fs = File.Open(m_RelatedJsonFilePath, FileMode.Create))
             {

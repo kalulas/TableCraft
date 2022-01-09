@@ -13,10 +13,11 @@ namespace ConfigCodeGenConsole
                 return;
             }
 
-
             Debugger.InitialCustomLogger(Console.WriteLine);
+            // pass json file with absolute path
             Configuration.ReadConfigurationFromJson(args[0]);
             ConfigManager.singleton.ReadComment = true;
+            // pass config file with absolute path
             ConfigManager.singleton.Process(args[1], ConfigCodeGenLib.ConfigReader.EConfigType.CSV);
         }
     }
