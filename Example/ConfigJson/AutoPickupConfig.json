@@ -27,7 +27,7 @@
         {
             "AttributeName" : "ItemType",
             "ValueType"     : "int",
-            "CollectionType" : "none",
+            "CollectionType" : "array",
             "Usage"          : [
                 "client",
                 "server"

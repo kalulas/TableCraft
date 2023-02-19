@@ -122,5 +122,9 @@ namespace ConfigCodeGenLib.ConfigReader
             writer.WriteObjectEnd();
         }
 
+        public bool HasTag(string tag)
+        {
+            return m_TagList.Contains(tag);
+        }
     }
 }

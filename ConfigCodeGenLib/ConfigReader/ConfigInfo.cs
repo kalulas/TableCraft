@@ -25,6 +25,8 @@ namespace ConfigCodeGenLib.ConfigReader
         public string ConfigName { get; private set; }
         public EConfigType ConfigType { get; private set; }
 
+        public ICollection<ConfigAttributeInfo> AttributeInfos => m_Attribtues.Values;
+
 
         public ConfigInfo(EConfigType configType, string configName, string configFilePath, string relatedJsonFilePath)
         {

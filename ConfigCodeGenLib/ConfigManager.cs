@@ -50,7 +50,7 @@ namespace ConfigCodeGenLib
             var configName = Path.GetFileNameWithoutExtension(configFilePath);
             if (ConfigInfoDict.ContainsKey(configName) && !refresh)
             {
-                Debugger.LogWarningFormat("[ConfigManager.Process] {0} is already processed! set refresh to \'true\'");
+                Debugger.LogWarningFormat("[ConfigManager.Process] {0} is already processed! set refresh to \'true\'", configName);
                 return ConfigInfoDict[configName];
             }
 
