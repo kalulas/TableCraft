@@ -12,8 +12,13 @@ namespace ConfigCodeGenLib.ConfigReader
     {
         public CSVConfigInfo(EConfigType configType, string configName, string configFilePath, string relatedJsonFilePath) : base(configType, configName, configFilePath, relatedJsonFilePath) { }
 
-        protected override void ReadConfigFileAttributes()
+        public override bool ReadConfigFileAttributes()
         {
+            if (!File.Exists(m_ConfigFilePath))
+            {
+                return false;
+            }
+            
             var count = 0;
             string[] headers = new string[1];
             string[] comments = new string[1];
@@ -38,19 +43,21 @@ namespace ConfigCodeGenLib.ConfigReader
                 }
             }
 
-            m_Attribtues.Clear();
+            ConfigAttributeDict.Clear();
             for (int i = 0; i < headers.Length; i++)
             {
                 var header = headers[i];
                 var comment = ConfigManager.singleton.ReadComment && i < comments.Length ? comments[i] : string.Empty;
-                if (m_Attribtues.ContainsKey(header))
+                if (ConfigAttributeDict.ContainsKey(header))
                 {
-                    Debugger.LogFormat("[CSVConfigInfo.ReadConfigFileAttributes] duplicate key \'{0}\', skip", header);
+                    Debugger.Log("[CSVConfigInfo.ReadConfigFileAttributes] duplicate key \'{0}\', skip", header);
                     continue;
                 }
 
-                m_Attribtues.Add(header, new ConfigAttributeInfo().SetConfigFileInfo(i, header, comment));
+                ConfigAttributeDict.Add(header, new ConfigAttributeInfo().SetConfigFileInfo(i, header, comment));
             }
+
+            return true;
         }
     }
 }

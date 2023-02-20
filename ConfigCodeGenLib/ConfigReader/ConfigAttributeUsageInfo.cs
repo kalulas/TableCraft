@@ -27,7 +27,7 @@ namespace ConfigCodeGenLib.ConfigReader
             Usage = jsonData[USAGE_KEY].ToString();
             if (!Configuration.IsUsageValid(Usage))
             {
-                Debugger.LogErrorFormat("usage '{0}' is not valid", Usage);
+                Debugger.LogError("usage '{0}' is not valid", Usage);
                 return null;
             }
             

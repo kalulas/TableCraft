@@ -10,6 +10,8 @@ namespace ConfigCodeGenLib.ConfigReader
     /// </summary>
     public class ConfigAttributeInfo
     {
+        #region Fields
+
         public const string ATTRIBUTE_NAME_KEY = "AttributeName";
         private const string COMMENT_KEY = "Comment";
         private const string VALUE_TYPE_KEY = "ValueType";
@@ -20,59 +22,44 @@ namespace ConfigCodeGenLib.ConfigReader
 
         private string m_ValueType;
         private string m_CollectionType;
-        private string m_DefaultValue;
         private readonly List<ConfigAttributeUsageInfo> m_UsageList;
         private readonly HashSet<string> m_TagList;
+
+        #endregion
+
+        #region Properties
 
         public int Index { get; private set; }
         public string AttributeName { get; private set; }
         public string Comment { get; private set; }
-        public string ValueType { 
-            get
-            {
-                return m_ValueType;
-            }
+        public string DefaultValue { get; private set; }
+
+        public string ValueType
+        {
+            get => m_ValueType;
             private set
             {
                 var valid = Configuration.IsValueTypeValid(value);
                 m_ValueType = valid ? value : string.Empty;
-                // if (!valid)
-                // {
-                //     Debugger.LogErrorFormat("value type '{0}' is not valid", value);
-                // }
             }
         }
-        public string CollectionType { 
-            get
-            {
-                return m_CollectionType;
-            }
+
+        public string CollectionType
+        {
+            get => m_CollectionType;
             private set
             {
                 var valid = Configuration.IsCollectionTypeValid(value);
                 m_CollectionType = valid ? value : string.Empty;
-                // if (!valid)
-                // {
-                //     Debugger.LogErrorFormat("collection type '{0}' is not valid", value);
-                // }
             }
         }
 
-        public string DefaultValue { 
-            get 
-            { 
-                return m_DefaultValue; 
-            } 
-            private set 
-            { 
-                m_DefaultValue = value; 
-            } 
-        }
+        #endregion
 
         public ConfigAttributeInfo()
         {
             m_ValueType = string.Empty;
-            m_DefaultValue = string.Empty;
+            DefaultValue = string.Empty;
             m_CollectionType = Configuration.DefaultCollectionType;
             m_UsageList = new List<ConfigAttributeUsageInfo>();
             m_TagList = new HashSet<string>();
@@ -89,40 +76,33 @@ namespace ConfigCodeGenLib.ConfigReader
 
         public bool SetJsonFileInfo(JsonData jsonData)
         {
-            try
+            ValueType = jsonData[VALUE_TYPE_KEY].ToString();
+            DefaultValue = jsonData[DEFAULT_VALUE_KEY].ToString();
+            CollectionType = jsonData[COLLECTION_TYPE_KEY].ToString();
+            Comment = jsonData[COMMENT_KEY].ToString();
+            m_UsageList.Clear();
+            if (jsonData[USAGE_KEY].IsArray)
             {
-                ValueType = jsonData[VALUE_TYPE_KEY].ToString();
-                m_DefaultValue = jsonData[DEFAULT_VALUE_KEY].ToString();
-                CollectionType = jsonData[COLLECTION_TYPE_KEY].ToString();
-                Comment = jsonData[COMMENT_KEY].ToString();
-                m_UsageList.Clear();
-                if (jsonData[USAGE_KEY].IsArray)
+                foreach (var usage in jsonData[USAGE_KEY])
                 {
-                    foreach (var usage in jsonData[USAGE_KEY])
+                    if (!(usage is JsonData usageJsonData))
                     {
-                        if (!(usage is JsonData usageJsonData))
-                        {
-                            continue;
-                        }
-                        
-                        var newUsageInfo = new ConfigAttributeUsageInfo().ReadFromJson(usageJsonData);
-                        if (newUsageInfo != null)
-                        {
-                            m_UsageList.Add(newUsageInfo);
-                        }
+                        continue;
+                    }
+
+                    var newUsageInfo = new ConfigAttributeUsageInfo().ReadFromJson(usageJsonData);
+                    if (newUsageInfo != null)
+                    {
+                        m_UsageList.Add(newUsageInfo);
                     }
                 }
-                
-
-                m_TagList.Clear();
-                foreach (var tag in jsonData[TAG_KEY])
-                {
-                    m_TagList.Add(tag.ToString());
-                }
             }
-            catch (Exception)
+
+
+            m_TagList.Clear();
+            foreach (var tag in jsonData[TAG_KEY])
             {
-                throw;
+                m_TagList.Add(tag.ToString());
             }
 
             return true;
@@ -138,7 +118,7 @@ namespace ConfigCodeGenLib.ConfigReader
             writer.WritePropertyName(VALUE_TYPE_KEY);
             writer.Write(ValueType);
             writer.WritePropertyName(DEFAULT_VALUE_KEY);
-            writer.Write(m_DefaultValue);
+            writer.Write(DefaultValue);
             writer.WritePropertyName(COLLECTION_TYPE_KEY);
             writer.Write(CollectionType);
             writer.WritePropertyName(USAGE_KEY);
@@ -147,7 +127,7 @@ namespace ConfigCodeGenLib.ConfigReader
             {
                 usage.WriteToJson(writer);
             }
-            
+
             writer.WriteArrayEnd();
             writer.WritePropertyName(TAG_KEY);
             writer.WriteArrayStart();
@@ -155,7 +135,7 @@ namespace ConfigCodeGenLib.ConfigReader
             {
                 writer.Write(tag);
             }
-            
+
             writer.WriteArrayEnd();
             writer.WriteObjectEnd();
         }
@@ -176,7 +156,7 @@ namespace ConfigCodeGenLib.ConfigReader
                     return true;
                 }
             }
-            
+
             return false;
         }
 

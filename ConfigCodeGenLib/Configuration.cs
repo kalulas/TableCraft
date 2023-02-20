@@ -61,7 +61,7 @@ namespace ConfigCodeGenLib
             }
             else
             {
-                Debugger.LogErrorFormat("[ReadStringArrayFromJson] key \'{0}\' not found in json config", key);
+                Debugger.LogError("[ReadStringArrayFromJson] key \'{0}\' not found in json config", key);
             }
 
         }
@@ -75,7 +75,7 @@ namespace ConfigCodeGenLib
         {
             if (m_ConfigUsageType.Contains(usage))
             {
-                Debugger.LogWarningFormat($"[AddConfigUsageType] usage \'{usage}\' is already defined.");
+                Debugger.LogWarning($"[AddConfigUsageType] usage \'{usage}\' is already defined.");
                 return;
             }
 
@@ -93,7 +93,7 @@ namespace ConfigCodeGenLib
         {
             if (m_IsInited)
             {
-                Debugger.LogFormat("[ReadConfigurationFromJson] already inited! exit");
+                Debugger.Log("[ReadConfigurationFromJson] already inited! exit");
                 return;
             }
 

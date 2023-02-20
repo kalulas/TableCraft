@@ -36,7 +36,7 @@ namespace ConfigCodeGenLib
             Console.WriteLine(formatStr, param);
         }
 
-        private static void LogFormatInternal(string formatStr, params object[] param)
+        private static void LogInternal(string formatStr, params object[] param)
         {
             if (!m_IsCustomize)
             {
@@ -52,22 +52,22 @@ namespace ConfigCodeGenLib
             m_CustomLogger(formatStr, param);
         }
 
-        public static void LogFormat(string formatStr, params object[] param)
+        public static void Log(string formatStr, params object[] param)
         {
             formatStr = LOG_IDENTIFIER + formatStr;
-            LogFormatInternal(formatStr, param);
+            LogInternal(formatStr, param);
         }
 
-        public static void LogWarningFormat(string formatStr, params object[] param)
+        public static void LogWarning(string formatStr, params object[] param)
         {
             formatStr = WARNING_IDENTIFIER + formatStr;
-            LogFormat(formatStr, param);
+            Log(formatStr, param);
         }
 
-        public static void LogErrorFormat(string formatStr, params object[] param)
+        public static void LogError(string formatStr, params object[] param)
         {
             formatStr = ERROR_IDENTIFIER + formatStr;
-            LogFormat(formatStr, param);
+            Log(formatStr, param);
         }
     }
 }

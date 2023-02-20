@@ -25,18 +25,12 @@ namespace ConfigCodeGenConsole
 
             ConfigManager.singleton.ReadComment = true;
             var identifier = ConfigManager.singleton.GetConfigIdentifier(targetCsvConfigFilePath);
-            if (!ConfigManager.singleton.IsRelatedJsonFileExists(identifier))
+            var configInfo = ConfigManager.singleton.AddNewConfigInfo(targetCsvConfigFilePath, ConfigCodeGenLib.ConfigReader.EConfigType.CSV);
+            if (!configInfo.HasJsonConfig)
             {
-                Debugger.LogFormat($"{identifier} related json file not found, create a new one");
-                var configInfo = ConfigManager.singleton.AddNewConfigInfo(targetCsvConfigFilePath, ConfigCodeGenLib.ConfigReader.EConfigType.CSV);
+                Debugger.Log($"{identifier} related json file not found, create a new one");
                 configInfo.SaveJsonFile();
-                return;
             }
-
-            // pass config file with absolute path
-            Debugger.LogFormat($"{identifier} related json file found");
-            ConfigManager.singleton.AddNewConfigInfo(targetCsvConfigFilePath, ConfigCodeGenLib.ConfigReader.EConfigType.CSV);
-            //ConfigManager.singleton.GenerateCode(configInfo.ConfigName, "client");
         }
     }
 }

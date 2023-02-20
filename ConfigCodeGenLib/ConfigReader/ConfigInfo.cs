@@ -11,45 +11,39 @@ namespace ConfigCodeGenLib.ConfigReader
     /// </summary>
     public abstract class ConfigInfo
     {
+        #region Fields
+
         private const string ATTRIBUTES_KEY = "Attributes";
         private const string CONFIG_NAME_KEY = "ConfigName";
+        
+        protected readonly string m_ConfigFilePath;
+        protected readonly string m_RelatedJsonFilePath;
 
-        private bool m_HasJsonConfig;
-        protected string m_ConfigFilePath;
-        protected string m_RelatedJsonFilePath;
+        #endregion
+
+        #region Properties
+        
+        public bool HasJsonConfig { get; private set; }
+
+        public string ConfigName { get; }
+        public EConfigType ConfigType { get; }
+
         /// <summary>
         /// AttributeName -> AttributeInfo instance
         /// </summary>
-        protected Dictionary<string, ConfigAttributeInfo> m_Attribtues;
-        public string ConfigName { get; private set; }
-        public EConfigType ConfigType { get; private set; }
+        protected readonly Dictionary<string, ConfigAttributeInfo> ConfigAttributeDict;
 
-        public bool HasJsonConfig => m_HasJsonConfig;
+        public ICollection<ConfigAttributeInfo> AttributeInfos => ConfigAttributeDict.Values;
 
-        public ICollection<ConfigAttributeInfo> AttributeInfos => m_Attribtues.Values;
+        #endregion
 
         public ConfigInfo(EConfigType configType, string configName, string configFilePath, string relatedJsonFilePath)
         {
             ConfigType = configType;
             ConfigName = configName;
-            //m_Usage = new List<string>();
-            m_Attribtues = new Dictionary<string, ConfigAttributeInfo>();
+            ConfigAttributeDict = new Dictionary<string, ConfigAttributeInfo>();
             m_ConfigFilePath = configFilePath;
             m_RelatedJsonFilePath = relatedJsonFilePath;
-            if (!File.Exists(m_ConfigFilePath))
-            {
-                Debugger.LogErrorFormat("[ConfigReader.ConfigInfo] {0} file not found", m_ConfigFilePath);
-                return;
-            }
-
-            ReadConfigFileAttributes();
-            m_HasJsonConfig = File.Exists(m_RelatedJsonFilePath);
-            if (!m_HasJsonConfig)
-            {
-                return;
-            }
-
-            ReadJsonFileAttributes();
         }
 
         #region LOAD ATTRIBUTES FROM CONFIG & JSON
@@ -57,18 +51,24 @@ namespace ConfigCodeGenLib.ConfigReader
         /// <summary>
         /// NOTICE: clean up attributes first
         /// </summary>
-        protected abstract void ReadConfigFileAttributes();
+        public abstract bool ReadConfigFileAttributes();
 
         /// <summary>
         /// add json related information to attributes
         /// </summary>
-        protected void ReadJsonFileAttributes()
+        public void ReadJsonFileAttributes()
         {
+            HasJsonConfig = File.Exists(m_RelatedJsonFilePath);
+            if (!HasJsonConfig)
+            {
+                return;
+            }
+            
             var jsonContent = File.ReadAllText(m_RelatedJsonFilePath, Encoding.UTF8);
             var jsonData = JsonMapper.ToObject(jsonContent);
             if (!jsonData.ContainsKey(ATTRIBUTES_KEY))
             {
-                Debugger.LogErrorFormat("'{0}' not found in json file {1}", ATTRIBUTES_KEY, m_RelatedJsonFilePath);
+                Debugger.LogError("'{0}' not found in json file {1}", ATTRIBUTES_KEY, m_RelatedJsonFilePath);
                 return;
             }
 
@@ -80,14 +80,15 @@ namespace ConfigCodeGenLib.ConfigReader
                 {
                     continue;
                 }
+
                 var name = attributeJsonData[ConfigAttributeInfo.ATTRIBUTE_NAME_KEY].ToString();
-                if (!m_Attribtues.ContainsKey(name))
+                if (!ConfigAttributeDict.ContainsKey(name))
                 {
-                    Debugger.LogErrorFormat("attribute '{0}' not found in config file {1}", name, m_ConfigFilePath);
+                    Debugger.LogError("attribute '{0}' not found in config file {1}", name, m_ConfigFilePath);
                     continue;
                 }
 
-                m_Attribtues[name].SetJsonFileInfo(attributeJsonData);
+                ConfigAttributeDict[name].SetJsonFileInfo(attributeJsonData);
             }
         }
 
@@ -109,10 +110,11 @@ namespace ConfigCodeGenLib.ConfigReader
 
             writer.WritePropertyName(ATTRIBUTES_KEY);
             writer.WriteArrayStart();
-            foreach (var attribute in m_Attribtues)
+            foreach (var attribute in ConfigAttributeDict)
             {
                 attribute.Value.WriteToJson(writer);
             }
+
             writer.WriteArrayEnd();
             writer.WriteObjectEnd();
 
@@ -125,35 +127,9 @@ namespace ConfigCodeGenLib.ConfigReader
                 }
             }
 
-            m_HasJsonConfig = true;
+            HasJsonConfig = true;
         }
 
         #endregion
-
-        /// <summary>
-        /// Factory Method Example
-        /// </summary>
-        /// <param name="configType"></param>
-        /// <param name="configFilePath"></param>
-        /// <param name="createJsonFile"></param>
-        /// <returns></returns>
-        public static ConfigInfo CreateConfigInfo(EConfigType configType, string configFilePath)
-        {
-            var configName = Path.GetFileNameWithoutExtension(configFilePath);
-            var relatedJsonPath = Configuration.ConfigJsonPath + configName + ".json";
-            Debugger.LogFormat("\'{0}\' related json file is \'{1}\'", configName, relatedJsonPath);
-            ConfigInfo configInfo = null;
-            switch (configType)
-            {
-                case EConfigType.CSV:
-                    configInfo = new CSVConfigInfo(configType, configName, configFilePath, relatedJsonPath);
-                    break;
-                default:
-                    Debugger.LogFormat("[ConfigInfo.CreateConfigInfo] not supported config type!");
-                    break;
-            }
-
-            return configInfo;
-        }
     }
 }

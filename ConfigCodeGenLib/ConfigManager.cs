@@ -15,9 +15,11 @@ namespace ConfigCodeGenLib
         {
             if (!Configuration.IsInited)
             {
-                Debugger.LogErrorFormat("[ConfigManager] Configuration not setup yet! run Configuration.ReadConfigurationFromJson() first");
+                Debugger.LogError("[ConfigManager] Configuration not setup yet! run Configuration.ReadConfigurationFromJson() first");
             }
         }
+
+        #region Singleton
 
         private static ConfigManager m_Singleton;
 
@@ -34,16 +36,27 @@ namespace ConfigCodeGenLib
             }
         }
 
+        #endregion
+
+        #region Fields
+
         /// <summary>
         /// try getting comments from second line if true
         /// </summary>
         public bool ReadComment;
-        public Dictionary<string, ConfigInfo> ConfigInfoDict = new Dictionary<string, ConfigInfo>();
+
+        private readonly Dictionary<string, ConfigInfo> m_ConfigInfoDict = new Dictionary<string, ConfigInfo>();
+
+        #endregion
+
+        #region Private Methods
 
         private string GetConfigIdentifierInternal(string configFilePath)
         {
             return Path.GetFileNameWithoutExtension(configFilePath);
         }
+
+        #endregion
 
         #region Public API
 
@@ -56,13 +69,13 @@ namespace ConfigCodeGenLib
         public ConfigInfo AddNewConfigInfo(string configFilePath, EConfigType configType)
         {
             var identifier = GetConfigIdentifierInternal(configFilePath);
-            if (ConfigInfoDict.Remove(identifier))
+            if (m_ConfigInfoDict.Remove(identifier))
             {
-                Debugger.LogWarningFormat("[ConfigManager.AddNewConfigInfo] previous {0} ConfigInfo instance is removed", identifier);
+                Debugger.LogWarning("[ConfigManager.AddNewConfigInfo] previous {0} ConfigInfo instance is removed", identifier);
             }
             
-            var configInfo = ConfigInfo.CreateConfigInfo(configType, configFilePath);
-            ConfigInfoDict[identifier] = configInfo;
+            var configInfo = ConfigInfoFactory.CreateConfigInfo(configType, configFilePath);
+            m_ConfigInfoDict[identifier] = configInfo;
             return configInfo;
         }
 
@@ -74,7 +87,7 @@ namespace ConfigCodeGenLib
         /// <returns></returns>
         public bool GetConfigInfo(string identifier, out ConfigInfo configInfo)
         {
-            return ConfigInfoDict.TryGetValue(identifier, out configInfo);
+            return m_ConfigInfoDict.TryGetValue(identifier, out configInfo);
         }
 
         /// <summary>
@@ -84,7 +97,7 @@ namespace ConfigCodeGenLib
         /// <returns> true if found and saved </returns>
         public bool SaveConfigInfoJsonFile(string identifier)
         {
-            if (!ConfigInfoDict.TryGetValue(identifier, out var configInfo))
+            if (!m_ConfigInfoDict.TryGetValue(identifier, out var configInfo))
             {
                 return false;
             }
