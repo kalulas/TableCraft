@@ -51,17 +51,17 @@ namespace ConfigCodeGenLib.ConfigReader
         /// <summary>
         /// NOTICE: clean up attributes first
         /// </summary>
-        public abstract bool ReadConfigFileAttributes();
+        public abstract ConfigInfo ReadConfigFileAttributes();
 
         /// <summary>
         /// add json related information to attributes
         /// </summary>
-        public void ReadJsonFileAttributes()
+        public ConfigInfo ReadJsonFileAttributes()
         {
             HasJsonConfig = File.Exists(m_RelatedJsonFilePath);
             if (!HasJsonConfig)
             {
-                return;
+                return this;
             }
             
             var jsonContent = File.ReadAllText(m_RelatedJsonFilePath, Encoding.UTF8);
@@ -69,7 +69,7 @@ namespace ConfigCodeGenLib.ConfigReader
             if (!jsonData.ContainsKey(ATTRIBUTES_KEY))
             {
                 Debugger.LogError("'{0}' not found in json file {1}", ATTRIBUTES_KEY, m_RelatedJsonFilePath);
-                return;
+                return this;
             }
 
             var attributesJsonData = jsonData[ATTRIBUTES_KEY];
@@ -90,11 +90,13 @@ namespace ConfigCodeGenLib.ConfigReader
 
                 ConfigAttributeDict[name].SetJsonFileInfo(attributeJsonData);
             }
+
+            return this;
         }
 
         #endregion
 
-        #region SAVE JSON
+        #region Seriailize
 
         public void SaveJsonFile()
         {

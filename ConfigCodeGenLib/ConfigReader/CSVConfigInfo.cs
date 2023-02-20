@@ -12,11 +12,12 @@ namespace ConfigCodeGenLib.ConfigReader
     {
         public CSVConfigInfo(EConfigType configType, string configName, string configFilePath, string relatedJsonFilePath) : base(configType, configName, configFilePath, relatedJsonFilePath) { }
 
-        public override bool ReadConfigFileAttributes()
+        public override ConfigInfo ReadConfigFileAttributes()
         {
             if (!File.Exists(m_ConfigFilePath))
             {
-                return false;
+                Debugger.LogError($"[ConfigInfo.ReadConfigFileAttributes] '{m_ConfigFilePath}' not found!");
+                return null;
             }
             
             var count = 0;
@@ -57,7 +58,7 @@ namespace ConfigCodeGenLib.ConfigReader
                 ConfigAttributeDict.Add(header, new ConfigAttributeInfo().SetConfigFileInfo(i, header, comment));
             }
 
-            return true;
+            return this;
         }
     }
 }
