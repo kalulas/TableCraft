@@ -66,9 +66,31 @@ namespace ConfigCodeGenLib
             return configInfo;
         }
 
+        /// <summary>
+        /// A simple getter
+        /// </summary>
+        /// <param name="identifier"></param>
+        /// <param name="configInfo"></param>
+        /// <returns></returns>
         public bool GetConfigInfo(string identifier, out ConfigInfo configInfo)
         {
             return ConfigInfoDict.TryGetValue(identifier, out configInfo);
+        }
+
+        /// <summary>
+        /// Try get ConfigInfo and save to json file
+        /// </summary>
+        /// <param name="identifier"></param>
+        /// <returns> true if found and saved </returns>
+        public bool SaveConfigInfoJsonFile(string identifier)
+        {
+            if (!ConfigInfoDict.TryGetValue(identifier, out var configInfo))
+            {
+                return false;
+            }
+            
+            configInfo.SaveJsonFile();
+            return true;
         }
 
         public string GetConfigIdentifier(string configFilePath)
