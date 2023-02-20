@@ -12,20 +12,4 @@
     <Service Include="{508349b6-6b84-4df5-91f0-309beebad82d}" />
   </ItemGroup>
 
-  <ItemGroup>
-    <Compile Update="Templates\COW.CSVBaseDataTemplate.cs">
-      <DesignTime>True</DesignTime>
-      <AutoGen>True</AutoGen>
-      <DependentUpon>COW.CSVBaseDataTemplate.tt</DependentUpon>
-    </Compile>
-  </ItemGroup>
-
-  <ItemGroup>
-    <None Update="Templates\COW.CSVBaseDataTemplate.tt">
-      <LastGenOutput>COW.CSVBaseDataTemplate.cs</LastGenOutput>
-      <Generator>TextTemplatingFileGenerator</Generator>
-      <CustomToolNamespace></CustomToolNamespace>
-    </None>
-  </ItemGroup>
-
 </Project>
