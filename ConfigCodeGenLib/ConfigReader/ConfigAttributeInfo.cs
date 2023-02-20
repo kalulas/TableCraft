@@ -15,16 +15,14 @@ namespace ConfigCodeGenLib.ConfigReader
         private const string VALUE_TYPE_KEY = "ValueType";
         private const string DEFAULT_VALUE_KEY = "DefaultValue";
         private const string COLLECTION_TYPE_KEY = "CollectionType";
-        private const string USAGE_KEY = "Usage";
+        private const string USAGE_KEY = "Usages";
         private const string TAG_KEY = "Tag";
 
         private string m_ValueType;
         private string m_CollectionType;
         private string m_DefaultValue;
-        // TODO To hashset?
-        private readonly List<string> m_Usage;
-        // TODO To hashset?
-        private readonly List<string> m_TagList;
+        private readonly List<ConfigAttributeUsageInfo> m_UsageList;
+        private readonly HashSet<string> m_TagList;
 
         public int Index { get; private set; }
         public string AttributeName { get; private set; }
@@ -38,10 +36,10 @@ namespace ConfigCodeGenLib.ConfigReader
             {
                 var valid = Configuration.IsValueTypeValid(value);
                 m_ValueType = valid ? value : string.Empty;
-                if (!valid)
-                {
-                    Debugger.LogErrorFormat("value type '{0}' is not valid", value);
-                }
+                // if (!valid)
+                // {
+                //     Debugger.LogErrorFormat("value type '{0}' is not valid", value);
+                // }
             }
         }
         public string CollectionType { 
@@ -53,10 +51,10 @@ namespace ConfigCodeGenLib.ConfigReader
             {
                 var valid = Configuration.IsCollectionTypeValid(value);
                 m_CollectionType = valid ? value : string.Empty;
-                if (!valid)
-                {
-                    Debugger.LogErrorFormat("collection type '{0}' is not valid", value);
-                }
+                // if (!valid)
+                // {
+                //     Debugger.LogErrorFormat("collection type '{0}' is not valid", value);
+                // }
             }
         }
 
@@ -76,8 +74,8 @@ namespace ConfigCodeGenLib.ConfigReader
             m_ValueType = string.Empty;
             m_DefaultValue = string.Empty;
             m_CollectionType = Configuration.DefaultCollectionType;
-            m_Usage = new List<string>();
-            m_TagList = new List<string>();
+            m_UsageList = new List<ConfigAttributeUsageInfo>();
+            m_TagList = new HashSet<string>();
         }
 
         /// AttributeName & Comment can be read from config file (for example the first line and the second line of csv file)
@@ -97,19 +95,24 @@ namespace ConfigCodeGenLib.ConfigReader
                 m_DefaultValue = jsonData[DEFAULT_VALUE_KEY].ToString();
                 CollectionType = jsonData[COLLECTION_TYPE_KEY].ToString();
                 Comment = jsonData[COMMENT_KEY].ToString();
-                m_Usage.Clear();
-                foreach (var usage in jsonData[USAGE_KEY])
+                m_UsageList.Clear();
+                if (jsonData[USAGE_KEY].IsArray)
                 {
-                    var valid = Configuration.IsUsageValid(usage.ToString());
-                    if (!valid)
+                    foreach (var usage in jsonData[USAGE_KEY])
                     {
-                        Debugger.LogErrorFormat("usage '{0}' is not valid", usage.ToString());
-                    }
-                    else
-                    {
-                        m_Usage.Add(usage.ToString());
+                        if (!(usage is JsonData usageJsonData))
+                        {
+                            continue;
+                        }
+                        
+                        var newUsageInfo = new ConfigAttributeUsageInfo().ReadFromJson(usageJsonData);
+                        if (newUsageInfo != null)
+                        {
+                            m_UsageList.Add(newUsageInfo);
+                        }
                     }
                 }
+                
 
                 m_TagList.Clear();
                 foreach (var tag in jsonData[TAG_KEY])
@@ -140,10 +143,11 @@ namespace ConfigCodeGenLib.ConfigReader
             writer.Write(CollectionType);
             writer.WritePropertyName(USAGE_KEY);
             writer.WriteArrayStart();
-            foreach (var usage in m_Usage)
+            foreach (var usage in m_UsageList)
             {
-                writer.Write(usage);
+                usage.WriteToJson(writer);
             }
+            
             writer.WriteArrayEnd();
             writer.WritePropertyName(TAG_KEY);
             writer.WriteArrayStart();
@@ -151,6 +155,7 @@ namespace ConfigCodeGenLib.ConfigReader
             {
                 writer.Write(tag);
             }
+            
             writer.WriteArrayEnd();
             writer.WriteObjectEnd();
         }
@@ -164,7 +169,26 @@ namespace ConfigCodeGenLib.ConfigReader
 
         public bool HasUsage(string usage)
         {
-            return m_Usage.Contains(usage);
+            foreach (var usageInfo in m_UsageList)
+            {
+                if (usageInfo.Usage == usage)
+                {
+                    return true;
+                }
+            }
+            
+            return false;
+        }
+
+        public string GetUsageFieldName(string usage)
+        {
+            var targetUsage = m_UsageList.Find(info => info.Usage == usage);
+            if (targetUsage != null)
+            {
+                return targetUsage.FieldName;
+            }
+
+            return string.Empty;
         }
 
         /// <summary>

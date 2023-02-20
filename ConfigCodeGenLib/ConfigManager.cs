@@ -53,6 +53,8 @@ namespace ConfigCodeGenLib
         /// <para> generated information of all attributes in this config file </para>
         /// </summary>
         /// <param name="configFilePath"></param>
+        /// <param name="configType"></param>
+        /// <param name="refresh"></param>
         public ConfigInfo ProcessWithExisted(string configFilePath, EConfigType configType, bool refresh=false)
         {
             var identifier = GetConfigIdentifierInternal(configFilePath);
@@ -62,7 +64,7 @@ namespace ConfigCodeGenLib
                 return ConfigInfoDict[identifier];
             }
 
-            var configInfo = ConfigInfo.CreateConfigInfo(configType, configFilePath, false);
+            var configInfo = ConfigInfo.CreateConfigInfo(configType, configFilePath);
 
             ConfigInfoDict.Remove(identifier);
             ConfigInfoDict.Add(identifier, configInfo);

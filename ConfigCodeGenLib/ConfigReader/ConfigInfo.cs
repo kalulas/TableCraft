@@ -146,6 +146,7 @@ namespace ConfigCodeGenLib.ConfigReader
         /// </summary>
         /// <param name="configType"></param>
         /// <param name="configFilePath"></param>
+        /// <param name="createJsonFile"></param>
         /// <returns></returns>
         public static ConfigInfo CreateConfigInfo(EConfigType configType, string configFilePath, bool createJsonFile = false)
         {
@@ -159,11 +160,11 @@ namespace ConfigCodeGenLib.ConfigReader
                     configInfo = new CSVConfigInfo(configType, configName, configFilePath, relatedJsonPath);
                     break;
                 default:
-                    Debugger.LogFormat("[ConfigInfo.CreateConfigInfo] no supoorted config type!");
+                    Debugger.LogFormat("[ConfigInfo.CreateConfigInfo] not supported config type!");
                     break;
             }
 
-            if (createJsonFile)
+            if (createJsonFile && configInfo != null)
             {
                 configInfo.SaveJsonFile();
             }
