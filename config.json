@@ -1,6 +1,7 @@
 {
     "DataValueType": ["int", "uint", "float", "boolean", "string"],
     "DataCollectionType": ["none", "array", "list"],
+    "DefaultCollectionType": "none",
     "ConfigJsonPath": "Example\\ConfigJson\\",
     "CodeTemplatePath": "Example\\CodeTemplate\\",
     "ConfigUsageType":{

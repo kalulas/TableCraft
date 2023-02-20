@@ -40,24 +40,52 @@ namespace ConfigCodeGenLib
         public bool ReadComment;
         public Dictionary<string, ConfigInfo> ConfigInfoDict = new Dictionary<string, ConfigInfo>();
 
+        private string GetConfigIdentifierInternal(string configFilePath)
+        {
+            return Path.GetFileNameWithoutExtension(configFilePath);
+        }
+
+        #region Public API
+
         /// <summary>
-        /// <param> Add a config file to manager, automatically search for a json file with the same name</param>
-        /// <param> generated information of all attributes in this config file </param>
+        /// <para> Add a config file to manager, automatically search for a json file with the same name</para>
+        /// <para> An existed json file is required, call <see cref="IsRelatedJsonFileExists(string)"/> first </para>
+        /// <para> generated information of all attributes in this config file </para>
         /// </summary>
         /// <param name="configFilePath"></param>
-        public ConfigInfo Process(string configFilePath, EConfigType configType, bool refresh=false)
+        public ConfigInfo ProcessWithExisted(string configFilePath, EConfigType configType, bool refresh=false)
         {
-            var configName = Path.GetFileNameWithoutExtension(configFilePath);
-            if (ConfigInfoDict.ContainsKey(configName) && !refresh)
+            var identifier = GetConfigIdentifierInternal(configFilePath);
+            if (ConfigInfoDict.ContainsKey(identifier) && !refresh)
             {
-                Debugger.LogWarningFormat("[ConfigManager.Process] {0} is already processed! set refresh to \'true\'", configName);
-                return ConfigInfoDict[configName];
+                Debugger.LogWarningFormat("[ConfigManager.ProcessWithExisted] {0} is already processed! set refresh to \'true\'", identifier);
+                return ConfigInfoDict[identifier];
+            }
+
+            var configInfo = ConfigInfo.CreateConfigInfo(configType, configFilePath, false);
+
+            ConfigInfoDict.Remove(identifier);
+            ConfigInfoDict.Add(identifier, configInfo);
+            return configInfo;
+        }
+
+        /// <summary>
+        /// <para> Create a configInfo instance and related json file. </para>
+        /// <para> Call this when related json file is not existed yet. </para>
+        /// </summary>
+        /// <param name="configFilePath"></param>
+        /// <param name="configType"></param>
+        /// <returns></returns>
+        public ConfigInfo CreateRelatedJson(string configFilePath, EConfigType configType)
+        {
+            var identifier = GetConfigIdentifierInternal(configFilePath);
+            if (ConfigInfoDict.Remove(identifier))
+            {
+                Debugger.LogWarningFormat("[ConfigManager.CreateRelatedJson] previous {0} is removed");
             }
 
             var configInfo = ConfigInfo.CreateConfigInfo(configType, configFilePath, true);
-
-            ConfigInfoDict.Remove(configName);
-            ConfigInfoDict.Add(configName, configInfo);
+            ConfigInfoDict[identifier] = configInfo;
             return configInfo;
         }
 
@@ -72,8 +100,26 @@ namespace ConfigCodeGenLib
             // TODO usage validation
 
             var configInfo = ConfigInfoDict[configName];
-            CodeGenerate.Generator.Process(configInfo, usage);
+            //CodeGenerate.Generator.Process(configInfo, usage);
             return true;
         }
+
+        public string GetConfigIdentifier(string configFilePath)
+        {
+            return GetConfigIdentifierInternal(configFilePath);
+        }
+
+        public bool IsRelatedJsonFileExists(string configIdentifier)
+        {
+            if (!Configuration.IsInited)
+            {
+                return false;
+            }
+
+            var relatedJsonFilePath = Configuration.ConfigJsonPath + configIdentifier + ".json";
+            return File.Exists(relatedJsonFilePath);
+        }
+
+        #endregion
     }
 }

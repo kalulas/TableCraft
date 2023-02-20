@@ -129,10 +129,13 @@ namespace ConfigCodeGenLib.ConfigReader
             writer.WriteArrayEnd();
             writer.WriteObjectEnd();
 
-            var dataBytes = Encoding.UTF8.GetBytes(builder.ToString());
+            var utf8 = new UTF8Encoding(false);
             using (var fs = File.Open(m_RelatedJsonFilePath, FileMode.Create))
             {
-                fs.Write(dataBytes, 0, dataBytes.Length);
+                using (var sw = new StreamWriter(fs, utf8))
+                {
+                    sw.Write(builder.ToString());
+                }
             }
         }
 

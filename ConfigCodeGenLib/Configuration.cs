@@ -44,6 +44,7 @@ namespace ConfigCodeGenLib
 
         public static string CodeTemplatePath { get; private set; }
         public static string ConfigJsonPath { get; private set; }
+        public static string DefaultCollectionType { get; private set; }
 
         private static bool m_IsInited;
         public static bool IsInited => m_IsInited;
@@ -104,6 +105,7 @@ namespace ConfigCodeGenLib
             ReadStringArrayFromJson(configData, "DataValueType", m_DataValueType);
             ReadStringArrayFromJson(configData, "DataCollectionType", m_DataCollectionType);
 
+            DefaultCollectionType = configData["DefaultCollectionType"].ToString();
             CodeTemplatePath = configFileDirectory + configData["CodeTemplatePath"].ToString();
             ConfigJsonPath = configFileDirectory + configData["ConfigJsonPath"].ToString();
 
