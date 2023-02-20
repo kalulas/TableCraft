@@ -28,13 +28,14 @@ namespace ConfigCodeGenConsole
             if (!ConfigManager.singleton.IsRelatedJsonFileExists(identifier))
             {
                 Debugger.LogFormat($"{identifier} related json file not found, create a new one");
-                ConfigManager.singleton.CreateRelatedJson(targetCsvConfigFilePath, ConfigCodeGenLib.ConfigReader.EConfigType.CSV);
+                var configInfo = ConfigManager.singleton.AddNewConfigInfo(targetCsvConfigFilePath, ConfigCodeGenLib.ConfigReader.EConfigType.CSV);
+                configInfo.SaveJsonFile();
                 return;
             }
 
             // pass config file with absolute path
             Debugger.LogFormat($"{identifier} related json file found");
-            ConfigManager.singleton.ProcessWithExisted(targetCsvConfigFilePath, ConfigCodeGenLib.ConfigReader.EConfigType.CSV);
+            ConfigManager.singleton.AddNewConfigInfo(targetCsvConfigFilePath, ConfigCodeGenLib.ConfigReader.EConfigType.CSV);
             //ConfigManager.singleton.GenerateCode(configInfo.ConfigName, "client");
         }
     }

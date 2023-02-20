@@ -17,7 +17,6 @@ namespace ConfigCodeGenLib.ConfigReader
         private bool m_HasJsonConfig;
         protected string m_ConfigFilePath;
         protected string m_RelatedJsonFilePath;
-        //protected List<string> m_Usage;
         /// <summary>
         /// AttributeName -> AttributeInfo instance
         /// </summary>
@@ -25,8 +24,9 @@ namespace ConfigCodeGenLib.ConfigReader
         public string ConfigName { get; private set; }
         public EConfigType ConfigType { get; private set; }
 
-        public ICollection<ConfigAttributeInfo> AttributeInfos => m_Attribtues.Values;
+        public bool HasJsonConfig => m_HasJsonConfig;
 
+        public ICollection<ConfigAttributeInfo> AttributeInfos => m_Attribtues.Values;
 
         public ConfigInfo(EConfigType configType, string configName, string configFilePath, string relatedJsonFilePath)
         {
@@ -57,8 +57,6 @@ namespace ConfigCodeGenLib.ConfigReader
         /// <summary>
         /// NOTICE: clean up attributes first
         /// </summary>
-        /// <param name="configInfo"></param>
-        /// <param name="attibutes"></param>
         protected abstract void ReadConfigFileAttributes();
 
         /// <summary>
@@ -108,17 +106,6 @@ namespace ConfigCodeGenLib.ConfigReader
             writer.WriteObjectStart();
             writer.WritePropertyName(CONFIG_NAME_KEY);
             writer.Write(ConfigName);
-            // NOTE: type is user-specified
-            //writer.WritePropertyName("ConfigType");
-            //writer.Write((int)ConfigType);
-
-            //writer.WritePropertyName("Usage");
-            //writer.WriteArrayStart();
-            //foreach (var _usage in m_Usage)
-            //{
-            //    writer.Write(_usage);
-            //}
-            //writer.WriteArrayEnd();
 
             writer.WritePropertyName(ATTRIBUTES_KEY);
             writer.WriteArrayStart();
@@ -137,6 +124,8 @@ namespace ConfigCodeGenLib.ConfigReader
                     sw.Write(builder.ToString());
                 }
             }
+
+            m_HasJsonConfig = true;
         }
 
         #endregion
@@ -148,7 +137,7 @@ namespace ConfigCodeGenLib.ConfigReader
         /// <param name="configFilePath"></param>
         /// <param name="createJsonFile"></param>
         /// <returns></returns>
-        public static ConfigInfo CreateConfigInfo(EConfigType configType, string configFilePath, bool createJsonFile = false)
+        public static ConfigInfo CreateConfigInfo(EConfigType configType, string configFilePath)
         {
             var configName = Path.GetFileNameWithoutExtension(configFilePath);
             var relatedJsonPath = Configuration.ConfigJsonPath + configName + ".json";
@@ -162,11 +151,6 @@ namespace ConfigCodeGenLib.ConfigReader
                 default:
                     Debugger.LogFormat("[ConfigInfo.CreateConfigInfo] not supported config type!");
                     break;
-            }
-
-            if (createJsonFile && configInfo != null)
-            {
-                configInfo.SaveJsonFile();
             }
 
             return configInfo;
