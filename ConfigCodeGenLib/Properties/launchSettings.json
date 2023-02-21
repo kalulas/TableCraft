@@ -1,6 +1,6 @@
 {
   "profiles": {
-    "ConfigCodeGenConsole": {
+    "ConfigCodeGenLib": {
       "commandName": "Project"
     }
   }
