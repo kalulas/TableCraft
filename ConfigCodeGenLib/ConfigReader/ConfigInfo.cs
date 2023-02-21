@@ -120,6 +120,8 @@ namespace ConfigCodeGenLib.ConfigReader
             writer.WriteArrayEnd();
             writer.WriteObjectEnd();
 
+            // make sure the directory existed
+            Directory.CreateDirectory(Path.GetDirectoryName(m_RelatedJsonFilePath));
             var utf8 = new UTF8Encoding(false);
             using (var fs = File.Open(m_RelatedJsonFilePath, FileMode.Create))
             {
