@@ -5,5 +5,24 @@
         mc:Ignorable="d" d:DesignWidth="800" d:DesignHeight="450"
         x:Class="ConfigEditor.MainWindow"
         Title="ConfigEditor">
-    Welcome to Avalonia!
+    
+    <StackPanel>
+        <Grid Background="#BE8FED" RowDefinitions="Auto">
+            <TextBlock HorizontalAlignment="Center" VerticalAlignment="Center" Grid.Column="0" FontSize="32" Margin="12">
+                Welcome to the ConfigEditor!
+            </TextBlock>
+        </Grid>
+        
+        <Grid RowDefinitions="Auto,Auto">
+            <TextBlock HorizontalAlignment="Center" VerticalAlignment="Center" Grid.Row="0" Grid.Column="0">
+                This is config file information area of the config file
+            </TextBlock>
+            <TextBlock HorizontalAlignment="Center" VerticalAlignment="Center" Text="{Binding LibEnvFilePath}" Grid.Row="1" Grid.Column="0"></TextBlock>
+        </Grid>
+        
+        <Grid RowDefinitions="Auto" ColumnDefinitions="*,*">
+            <TextBlock Grid.Column="0"> Config files list ScrollView Area</TextBlock>
+            <TextBlock Grid.Column="1"> Config file details</TextBlock>
+        </Grid>
+    </StackPanel>
 </Window>

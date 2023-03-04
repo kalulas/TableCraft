@@ -29,17 +29,17 @@ namespace ConfigCodeGenLib
         /// <summary>
         /// define legal data value type
         /// </summary>
-        private readonly static List<string> m_DataValueType = new List<string>();
+        private static readonly List<string> m_DataValueType = new List<string>();
         /// <summary>
         /// define legal data container type
         /// </summary>
-        private readonly static List<string> m_DataCollectionType = new List<string>();
+        private static readonly List<string> m_DataCollectionType = new List<string>();
         /// <summary>
         /// define usages like 'client', 'server'
         /// </summary>
-        private readonly static List<string> m_ConfigUsageType = new List<string>();
+        private static readonly List<string> m_ConfigUsageType = new List<string>();
 
-        private readonly static Dictionary<string, ConfigUsageInformation> m_UsageToInformation = new Dictionary<string, ConfigUsageInformation>();
+        private static readonly Dictionary<string, ConfigUsageInformation> m_UsageToInformation = new Dictionary<string, ConfigUsageInformation>();
 
         public static string CodeTemplatePath { get; private set; }
         public static string DefaultCollectionType { get; private set; }

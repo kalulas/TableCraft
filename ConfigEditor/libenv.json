@@ -1,0 +1,16 @@
+{
+    "DataValueType": ["int", "uint", "float", "boolean", "string"],
+    "DataCollectionType": ["none", "array", "list"],
+    "DefaultCollectionType": "none",
+    "CodeTemplatePath": "CodeTemplate",
+    "ConfigUsageType":{
+        "client":{
+            "CodeTemplateName": "csharp.txt",
+            "TargetFileType": ".cs"
+        },
+        "server":{
+            "CodeTemplateName": "go.txt",
+            "TargetFileType": ".go"
+        }
+    }
+}
