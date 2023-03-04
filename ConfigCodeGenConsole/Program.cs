@@ -14,6 +14,7 @@ namespace ConfigCodeGenConsole
             var host = Host.CreateDefaultBuilder(args).Build();
             var config = host.Services.GetRequiredService<IConfiguration>();
             var targetCsvConfigFilePath = config.GetValue<string>("CsvFilePath");
+            var jsonHomeDir = config.GetValue<string>("JsonDirectory");
 
             if (string.IsNullOrEmpty(targetCsvConfigFilePath))
             {
@@ -31,11 +32,12 @@ namespace ConfigCodeGenConsole
 
             ConfigManager.singleton.ReadComment = true;
             var identifier = ConfigManager.singleton.GetConfigIdentifier(targetCsvConfigFilePath);
-            var configInfo = ConfigManager.singleton.AddNewConfigInfo(targetCsvConfigFilePath, ConfigCodeGenLib.ConfigReader.EConfigType.CSV);
+            var relatedJsonFilePath = $"{jsonHomeDir}\\{identifier}.json";
+            var configInfo = ConfigManager.singleton.AddNewConfigInfo(targetCsvConfigFilePath, relatedJsonFilePath, ConfigCodeGenLib.ConfigReader.EConfigType.CSV);
             if (!configInfo.HasJsonConfig)
             {
                 Debugger.Log($"{identifier} related json file not found, create a new one");
-                configInfo.SaveJsonFile();
+                ConfigManager.singleton.SaveConfigInfoJsonFile(identifier, relatedJsonFilePath);
             }
         }
     }

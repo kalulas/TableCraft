@@ -58,7 +58,7 @@ namespace ConfigCodeGenLib.ConfigReader
         /// </summary>
         public ConfigInfo ReadJsonFileAttributes()
         {
-            HasJsonConfig = File.Exists(m_RelatedJsonFilePath);
+            HasJsonConfig = !string.IsNullOrEmpty(m_RelatedJsonFilePath) && File.Exists(m_RelatedJsonFilePath);
             if (!HasJsonConfig)
             {
                 return this;
@@ -98,7 +98,7 @@ namespace ConfigCodeGenLib.ConfigReader
 
         #region Seriailize
 
-        public void SaveJsonFile()
+        internal void SaveJsonFile(string jsonFilePath)
         {
             var builder = new StringBuilder();
             var writer = new JsonWriter(builder)
@@ -121,9 +121,9 @@ namespace ConfigCodeGenLib.ConfigReader
             writer.WriteObjectEnd();
 
             // make sure the directory existed
-            Directory.CreateDirectory(Path.GetDirectoryName(m_RelatedJsonFilePath));
+            Directory.CreateDirectory(Path.GetDirectoryName(jsonFilePath));
             var utf8 = new UTF8Encoding(false);
-            using (var fs = File.Open(m_RelatedJsonFilePath, FileMode.Create))
+            using (var fs = File.Open(jsonFilePath, FileMode.Create))
             {
                 using (var sw = new StreamWriter(fs, utf8))
                 {

@@ -20,7 +20,6 @@ namespace ConfigCodeGenLib
             /// .txt file
             /// </summary>
             public string CodeTemplateName { get; set; }
-            public string TargetPath { get; set; }
             /// <summary>
             /// example: ".cs"
             /// </summary>
@@ -43,7 +42,6 @@ namespace ConfigCodeGenLib
         private readonly static Dictionary<string, ConfigUsageInformation> m_UsageToInformation = new Dictionary<string, ConfigUsageInformation>();
 
         public static string CodeTemplatePath { get; private set; }
-        public static string ConfigJsonPath { get; private set; }
         public static string DefaultCollectionType { get; private set; }
 
         private static bool m_IsInited;
@@ -82,14 +80,13 @@ namespace ConfigCodeGenLib
             m_ConfigUsageType.Add(usage);
             m_UsageToInformation.Remove(usage);
             m_UsageToInformation.Add(usage, JsonMapper.ToObject<ConfigUsageInformation>(information.ToJson()));
-            m_UsageToInformation[usage].TargetPath = CodeTemplatePath + m_UsageToInformation[usage].TargetPath;
         }
 
         /// <summary>
         /// execute only once
         /// </summary>
-        /// <param name="jsonFilePath">absolute path</param>
-        public static void ReadConfigurationFromJson(string jsonFilePath)
+        /// <param name="libEnvJsonFile">absolute path</param>
+        public static void ReadConfigurationFromJson(string libEnvJsonFile)
         {
             if (m_IsInited)
             {
@@ -97,17 +94,16 @@ namespace ConfigCodeGenLib
                 return;
             }
 
-            var configFileDirectory = Path.GetDirectoryName(jsonFilePath) + '\\';
+            var libEnvDir = Path.GetDirectoryName(libEnvJsonFile) + '\\';
 
-            var jsonContent = File.ReadAllText(jsonFilePath, Encoding.UTF8);
+            var jsonContent = File.ReadAllText(libEnvJsonFile, Encoding.UTF8);
             var configData = JsonMapper.ToObject(jsonContent);
 
             ReadStringArrayFromJson(configData, "DataValueType", m_DataValueType);
             ReadStringArrayFromJson(configData, "DataCollectionType", m_DataCollectionType);
 
             DefaultCollectionType = configData["DefaultCollectionType"].ToString();
-            CodeTemplatePath = configFileDirectory + configData["CodeTemplatePath"].ToString();
-            ConfigJsonPath = configFileDirectory + configData["ConfigJsonPath"].ToString();
+            CodeTemplatePath = libEnvDir + configData["CodeTemplatePath"].ToString();
 
             m_ConfigUsageType.Clear();
             foreach (var usageConfig in configData["ConfigUsageType"])

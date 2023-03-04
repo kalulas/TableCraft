@@ -2,17 +2,14 @@
     "DataValueType": ["int", "uint", "float", "boolean", "string"],
     "DataCollectionType": ["none", "array", "list"],
     "DefaultCollectionType": "none",
-    "ConfigJsonPath": "ConfigJson\\",
-    "CodeTemplatePath": "CodeTemplate\\",
+    "CodeTemplatePath": "CodeTemplate",
     "ConfigUsageType":{
         "client":{
             "CodeTemplateName": "csharp.txt",
-            "TargetPath": "Generated-C#\\",
             "TargetFileType": ".cs"
         },
         "server":{
             "CodeTemplateName": "go.txt",
-            "TargetPath": "Generated-go\\",
             "TargetFileType": ".go"
         }
     }
