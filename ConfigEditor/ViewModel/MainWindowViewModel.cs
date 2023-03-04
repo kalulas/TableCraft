@@ -1,16 +1,13 @@
-﻿using System;
-using System.ComponentModel;
+﻿using System.ComponentModel;
+using Microsoft.Extensions.Configuration;
+using Microsoft.Extensions.DependencyInjection;
+
 namespace ConfigEditor.ViewModel;
 
 public class MainWindowViewModel : INotifyPropertyChanged
 {
     public MainWindowViewModel()
     {
-        if (Program.ServiceProvider == null)
-        {
-            return;
-        }
-        
         if (!ConfigCodeGenLib.Configuration.IsInited)
         {
             System.Diagnostics.Trace.TraceError("Initialize ConfigCodeGenLib failed!");
@@ -18,11 +15,33 @@ public class MainWindowViewModel : INotifyPropertyChanged
         }
     }
 
-    public string LibEnvFilePath
+    public string ConfigHomePath
     {
         get
         {
-            return AppContext.BaseDirectory + "libenv.json";
+            if (Program.ServiceProvider == null)
+            {
+                return string.Empty;
+            }
+
+            var config = Program.ServiceProvider.Services.GetRequiredService<IConfiguration>();
+            var path = config.GetValue<string>("ConfigHomePath");
+            return path ?? string.Empty;
+        }
+    }
+    
+    public string JsonHomePath
+    {
+        get
+        {
+            if (Program.ServiceProvider == null)
+            {
+                return string.Empty;
+            }
+
+            var config = Program.ServiceProvider.Services.GetRequiredService<IConfiguration>();
+            var path = config.GetValue<string>("JsonHomePath");
+            return path ?? string.Empty;
         }
     }
 

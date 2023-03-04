@@ -2,22 +2,28 @@
         xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
         xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+        xmlns:vm="using:ConfigEditor.ViewModel"
         mc:Ignorable="d" d:DesignWidth="800" d:DesignHeight="450"
         x:Class="ConfigEditor.MainWindow"
+        x:DataType="vm:MainWindowViewModel"
+        x:CompileBindings="True"
         Title="ConfigEditor">
     
     <StackPanel>
         <Grid Background="#BE8FED" RowDefinitions="Auto">
             <TextBlock HorizontalAlignment="Center" VerticalAlignment="Center" Grid.Column="0" FontSize="32" Margin="12">
-                Welcome to the ConfigEditor!
+                Welcome to the ConfigEditor
             </TextBlock>
         </Grid>
         
-        <Grid RowDefinitions="Auto,Auto">
-            <TextBlock HorizontalAlignment="Center" VerticalAlignment="Center" Grid.Row="0" Grid.Column="0">
-                This is config file information area of the config file
+        <Grid RowDefinitions="Auto,Auto" Margin="16,20,16,20">
+            <TextBlock Grid.Row="0" FontSize="24">
+                Configuration of ConfigEditor:
             </TextBlock>
-            <TextBlock HorizontalAlignment="Center" VerticalAlignment="Center" Text="{Binding LibEnvFilePath}" Grid.Row="1" Grid.Column="0"></TextBlock>
+            <StackPanel Grid.Row="1">
+                <TextBlock Text="{Binding ConfigHomePath}"></TextBlock>
+                <TextBlock Text="{Binding JsonHomePath}"></TextBlock>
+            </StackPanel>
         </Grid>
         
         <Grid RowDefinitions="Auto" ColumnDefinitions="*,*">
