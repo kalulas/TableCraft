@@ -32,16 +32,24 @@
         </Grid>
         
         <Grid RowDefinitions="Auto" ColumnDefinitions="*,*,*" Margin="16,10,16,10">
-            <TextBlock Grid.Column="0" 
-                       IsVisible="{Binding !ElementList.Count}"
-                       Text="{Binding ListJsonFilename, StringFormat='no element found in {0}'}">
-            </TextBlock>
+            <StackPanel Grid.Column="0">
+                <TextBlock
+                           IsVisible="{Binding !ElementList.Count}"
+                           Text="{Binding ListJsonFilename, StringFormat='No element found in {0}'}">
+                </TextBlock>
+                
+                <TextBlock
+                           IsVisible="{Binding ElementList.Count}">
+                    Elements
+                </TextBlock>
 
-            <ListBox Grid.Column="0" 
-                     IsVisible="{Binding ElementList.Count}" 
-                     Items="{Binding ElementList}" 
-                     SelectedItem="{Binding SelectedConfigFileElement}">
-            </ListBox>
+                <ListBox
+                         IsVisible="{Binding ElementList.Count}" 
+                         Items="{Binding ElementList}" 
+                         SelectedItem="{Binding SelectedConfigFileElement}">
+                </ListBox>
+            </StackPanel>
+
             
             <TextBlock Grid.Column="1"> Attributes </TextBlock>
             <TextBlock Grid.Column="2"> Attribute Information </TextBlock>
