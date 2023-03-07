@@ -12,6 +12,8 @@ public class ConfigFileElement
     public readonly string ConfigFileRelativePath;
     public readonly string JsonFileRelativePath;
 
+    public string Identifier => Path.GetFileNameWithoutExtension(ConfigFileRelativePath);
+
     public string ConfigFilePath => Path.Combine(Program.GetConfigHomePath(), ConfigFileRelativePath);
 
     public string JsonFilePath => Path.Combine(Program.GetJsonHomePath(), JsonFileRelativePath);

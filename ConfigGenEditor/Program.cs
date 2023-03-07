@@ -2,7 +2,6 @@
 using Avalonia.ReactiveUI;
 using System;
 using System.IO;
-using ConfigGenEditor.Models;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
@@ -12,8 +11,9 @@ namespace ConfigGenEditor;
 class Program
 {
     public const string ListJsonFilename = "list.json";
+    public const string LibEnvJsonFilename = "libenv.json";
+    
     private static IHost? ServiceProvider { get; set; }
-    private const string m_LibEnvJsonFilename = "libenv.json";
     
     // Initialization code. Don't use any Avalonia, third-party APIs or any
     // SynchronizationContext-reliant code before AppMain is called: things aren't initialized
@@ -23,20 +23,12 @@ class Program
     {
         ServiceProvider = Host.CreateDefaultBuilder(args).Build();
 
-        var libEnvJsonFilePath = AppContext.BaseDirectory + m_LibEnvJsonFilename;
+        var libEnvJsonFilePath = AppContext.BaseDirectory + LibEnvJsonFilename;
         if (File.Exists(libEnvJsonFilePath))
         {
             ConfigCodeGenLib.Configuration.ReadConfigurationFromJson(libEnvJsonFilePath);
         }
 
-        // load list.json to ConfigFileContext
-        var listJsonFilePath = AppContext.BaseDirectory + ListJsonFilename;
-        if (File.Exists(listJsonFilePath))
-        {
-            var succeed = ConfigFileContext.Load(listJsonFilePath);
-            // TODO error log if failed
-        }
-        
         BuildAvaloniaApp().StartWithClassicDesktopLifetime(args);
     }
 

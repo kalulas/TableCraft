@@ -1,4 +1,5 @@
-﻿using System.IO;
+﻿using System;
+using System.IO;
 using System.Text;
 using LitJson;
 
@@ -7,6 +8,7 @@ namespace ConfigGenEditor.Models;
 /// <summary>
 /// Store all path information for user-created config files
 /// </summary>
+[Obsolete("use ConfigFileElementListViewModel instead", true)]
 public static class ConfigFileContext
 {
     private static ConfigFileElement[]? m_Elements;

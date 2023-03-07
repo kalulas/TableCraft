@@ -1,6 +1,8 @@
+using System;
 using Avalonia;
 using Avalonia.Controls.ApplicationLifetimes;
 using Avalonia.Markup.Xaml;
+using ConfigGenEditor.Services;
 using ConfigGenEditor.ViewModels;
 using ConfigGenEditor.Views;
 
@@ -17,9 +19,11 @@ public partial class App : Application
     {
         if (ApplicationLifetime is IClassicDesktopStyleApplicationLifetime desktop)
         {
+            var db = new FakeDatabase(AppContext.BaseDirectory + Program.ListJsonFilename);
+            
             desktop.MainWindow = new MainWindow
             {
-                DataContext = new MainWindowViewModel(),
+                DataContext = new MainWindowViewModel(db),
             };
         }
 
