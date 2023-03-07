@@ -94,7 +94,7 @@ namespace ConfigCodeGenLib
                 return;
             }
 
-            var libEnvDir = Path.GetDirectoryName(libEnvJsonFile) + '\\';
+            var libEnvDir = Path.GetDirectoryName(libEnvJsonFile) ?? string.Empty;
 
             var jsonContent = File.ReadAllText(libEnvJsonFile, Encoding.UTF8);
             var configData = JsonMapper.ToObject(jsonContent);
@@ -103,7 +103,7 @@ namespace ConfigCodeGenLib
             ReadStringArrayFromJson(configData, "DataCollectionType", m_DataCollectionType);
 
             DefaultCollectionType = configData["DefaultCollectionType"].ToString();
-            CodeTemplatePath = libEnvDir + configData["CodeTemplatePath"].ToString();
+            CodeTemplatePath = Path.Combine(libEnvDir, configData["CodeTemplatePath"].ToString());
 
             m_ConfigUsageType.Clear();
             foreach (var usageConfig in configData["ConfigUsageType"])

@@ -1,6 +1,4 @@
 ﻿using System.ComponentModel;
-using Microsoft.Extensions.Configuration;
-using Microsoft.Extensions.DependencyInjection;
 
 namespace ConfigEditor.ViewModel;
 
@@ -15,35 +13,9 @@ public class MainWindowViewModel : INotifyPropertyChanged
         }
     }
 
-    public string ConfigHomePath
-    {
-        get
-        {
-            if (Program.ServiceProvider == null)
-            {
-                return string.Empty;
-            }
+    public string ConfigHomePath => Program.GetConfigHomePath();
 
-            var config = Program.ServiceProvider.Services.GetRequiredService<IConfiguration>();
-            var path = config.GetValue<string>("ConfigHomePath");
-            return path ?? string.Empty;
-        }
-    }
-    
-    public string JsonHomePath
-    {
-        get
-        {
-            if (Program.ServiceProvider == null)
-            {
-                return string.Empty;
-            }
-
-            var config = Program.ServiceProvider.Services.GetRequiredService<IConfiguration>();
-            var path = config.GetValue<string>("JsonHomePath");
-            return path ?? string.Empty;
-        }
-    }
+    public string JsonHomePath => Program.GetJsonHomePath();
 
     public event PropertyChangedEventHandler? PropertyChanged;
 }
