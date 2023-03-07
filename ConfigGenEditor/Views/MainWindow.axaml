@@ -1,0 +1,46 @@
+<Window xmlns="https://github.com/avaloniaui"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:vm="using:ConfigGenEditor.ViewModels"
+        xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+        xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+        mc:Ignorable="d" d:DesignWidth="800" d:DesignHeight="450"
+        x:Class="ConfigGenEditor.Views.MainWindow"
+        Icon="/Assets/avalonia-logo.ico"
+        Title="ConfigGenEditor">
+
+    <Design.DataContext>
+        <!-- This only sets the DataContext for the previewer in an IDE,
+             to set the actual DataContext for runtime, set the DataContext property in code (look at App.axaml.cs) -->
+        <vm:MainWindowViewModel/>
+    </Design.DataContext>
+    
+    <StackPanel>
+        <Grid Background="#BE8FED" RowDefinitions="Auto">
+            <TextBlock HorizontalAlignment="Center" VerticalAlignment="Center" Grid.Column="0" FontSize="32" Margin="12">
+                Welcome to the ConfigGenEditor!
+            </TextBlock>
+        </Grid>
+        
+        <Grid RowDefinitions="Auto,Auto" Margin="16,10,16,10">
+            <TextBlock Grid.Row="0" FontSize="24">
+                Configuration of ConfigEditor:
+            </TextBlock>
+            <StackPanel Grid.Row="1">
+                <TextBlock Text="{Binding ConfigHomePath}"></TextBlock>
+                <TextBlock Text="{Binding JsonHomePath}"></TextBlock>
+            </StackPanel>
+        </Grid>
+        
+        <Grid RowDefinitions="Auto" ColumnDefinitions="*,*" Margin="16,10,16,10">
+            <StackPanel Grid.Column="0">
+                <TextBlock IsVisible="{Binding !SavedConfigFileElements.Length}" 
+                           Text="{Binding ListJsonFilename, StringFormat='no element found in {0}'}">
+                </TextBlock>
+                <Button Command="{Binding AddConfigFileElement}">new</Button>
+            </StackPanel>
+            
+            <TextBlock Grid.Column="1"> Attributes </TextBlock>
+        </Grid>
+    </StackPanel>
+
+</Window>

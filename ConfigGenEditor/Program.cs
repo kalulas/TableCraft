@@ -1,20 +1,20 @@
 ﻿using Avalonia;
+using Avalonia.ReactiveUI;
 using System;
 using System.IO;
-using Avalonia.Logging;
-using ConfigEditor.Model;
+using ConfigGenEditor.Models;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 
-namespace ConfigEditor;
+namespace ConfigGenEditor;
 
 class Program
 {
+    public const string ListJsonFilename = "list.json";
     private static IHost? ServiceProvider { get; set; }
     private const string m_LibEnvJsonFilename = "libenv.json";
-    private const string m_ListJsonFilename = "list.json";
-
+    
     // Initialization code. Don't use any Avalonia, third-party APIs or any
     // SynchronizationContext-reliant code before AppMain is called: things aren't initialized
     // yet and stuff might break.
@@ -30,7 +30,7 @@ class Program
         }
 
         // load list.json to ConfigFileContext
-        var listJsonFilePath = AppContext.BaseDirectory + m_ListJsonFilename;
+        var listJsonFilePath = AppContext.BaseDirectory + ListJsonFilename;
         if (File.Exists(listJsonFilePath))
         {
             var succeed = ConfigFileContext.Load(listJsonFilePath);
@@ -44,8 +44,9 @@ class Program
     public static AppBuilder BuildAvaloniaApp()
         => AppBuilder.Configure<App>()
             .UsePlatformDetect()
-            .LogToTrace(LogEventLevel.Debug);
-
+            .LogToTrace()
+            .UseReactiveUI();
+    
     #region Application Setting
 
     // TODO to singleton later?

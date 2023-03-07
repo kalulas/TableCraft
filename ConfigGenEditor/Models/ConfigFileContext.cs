@@ -2,7 +2,7 @@
 using System.Text;
 using LitJson;
 
-namespace ConfigEditor.Model;
+namespace ConfigGenEditor.Models;
 
 /// <summary>
 /// Store all path information for user-created config files
@@ -10,6 +10,11 @@ namespace ConfigEditor.Model;
 public static class ConfigFileContext
 {
     private static ConfigFileElement[]? m_Elements;
+
+    public static ConfigFileElement[] GetSavedElements()
+    {
+        return m_Elements ?? System.Array.Empty<ConfigFileElement>();
+    }
     
     /// <summary>
     /// Called once, read relative directory information for all existed files

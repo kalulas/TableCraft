@@ -1,13 +1,11 @@
 using Avalonia.Controls;
-using ConfigEditor.ViewModel;
 
-namespace ConfigEditor;
+namespace ConfigGenEditor.Views;
 
 public partial class MainWindow : Window
 {
     public MainWindow()
     {
         InitializeComponent();
-        DataContext = new MainWindowViewModel();
     }
 }

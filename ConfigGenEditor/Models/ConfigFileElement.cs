@@ -1,6 +1,6 @@
 ﻿using Path = System.IO.Path;
 
-namespace ConfigEditor.Model;
+namespace ConfigGenEditor.Models;
 
 /// <summary>
 /// <para> File information for an existed config file(data source) </para>
