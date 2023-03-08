@@ -1,4 +1,5 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.Linq;
 using System.Threading.Tasks;
@@ -6,11 +7,9 @@ using System.Windows.Input;
 using Avalonia;
 using Avalonia.Controls;
 using Avalonia.Controls.ApplicationLifetimes;
-using Avalonia.Controls.Shapes;
 using Avalonia.Logging;
 using ConfigGenEditor.Models;
 using ConfigGenEditor.Services;
-using Microsoft.Extensions.Hosting.Internal;
 using ReactiveUI;
 using Path = System.IO.Path;
 
@@ -35,15 +34,20 @@ public class MainWindowViewModel : ViewModelBase
     
     public ObservableCollection<ConfigFileElementViewModel>? TableList { get; private set; }
 
-    private FakeDatabase m_Database;
+    private readonly FakeDatabase m_Database;
 
     public MainWindowViewModel(FakeDatabase db)
     {
         m_Database = db;
         if (!EnvironmentCheck())
         {
-            // System.Diagnostics.Trace.TraceError("Initialize ConfigCodeGenLib failed!");
-            // TODO show error popup window
+            if (Application.Current?.ApplicationLifetime is IControlledApplicationLifetime desktop)
+            {
+                // TODO show error popup window, shutdown on confirm
+                desktop.Shutdown();
+            }
+            
+            // This is not supposed to happen ...
             return;
         }
 
@@ -67,7 +71,7 @@ public class MainWindowViewModel : ViewModelBase
     private void CreateSubViewModels(FakeDatabase fakeDatabase)
     {
         TableList = new ObservableCollection<ConfigFileElementViewModel>();
-        foreach (var tableElement in fakeDatabase.GetTableElements())
+        foreach (var tableElement in fakeDatabase.ReadTableElements())
         {
             TableList.Add(new ConfigFileElementViewModel(tableElement));
         }
@@ -85,6 +89,7 @@ public class MainWindowViewModel : ViewModelBase
             return m_NewTableFileFilters;
         }
         
+        // TODO maybe move this to ConfigCodeGenLib ...
         var extensions = new List<string>
         {
             "csv",
@@ -107,12 +112,30 @@ public class MainWindowViewModel : ViewModelBase
             return;
         }
         
+        // TODO uniqueness check, popup message if duplicate
         var tableFileRelative = Path.GetRelativePath(ConfigHomePath, newTableFilePath);
         // imported table file, without json file
         var tableElement = new ConfigFileElement(tableFileRelative);
-        var tableViewModel = new ConfigFileElementViewModel(tableElement);
-        TableList.Add(tableViewModel);
+        var createdTableViewModel = new ConfigFileElementViewModel(tableElement);
 
+        var insertAt = TableList.Count;
+        for (var index = 0; index < TableList.Count; index++)
+        {
+            var tableVm = TableList[index];
+            if (string.Compare(tableVm.ConfigFileRelativePath, createdTableViewModel.ConfigFileRelativePath, 
+                    StringComparison.Ordinal) <= 0) continue;
+            insertAt = index;
+            break;
+        }
+        
+        TableList.Insert(insertAt, createdTableViewModel);
+        
+        // select new added
+        SelectedTable = createdTableViewModel;
+        
+        // TODO create ConfigCodeGenLib.ConfigReader.ConfigInfo and related ViewModel
+        
+        // write to local file, we make it async
         var updatedTableList = TableList.Select(viewModel => viewModel.GetElement()).ToList();
         m_Database.WriteTableElements(updatedTableList);
     }
@@ -136,7 +159,7 @@ public class MainWindowViewModel : ViewModelBase
             if (result != null)
             {
                 var selected = result[0];
-                Logger.TryGet(LogEventLevel.Debug, LogArea.Control)?.Log(this, selected);
+                Logger.TryGet(LogEventLevel.Debug, LogArea.Control)?.Log(this, $"Selected file from dialog: {selected}");
                 AddNewSelectedTableFile(selected);
             }
         }

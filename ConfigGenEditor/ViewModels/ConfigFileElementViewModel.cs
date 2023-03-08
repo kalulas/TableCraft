@@ -7,11 +7,13 @@ public class ConfigFileElementViewModel : ViewModelBase
 {
     private readonly ConfigFileElement m_Element;
 
-    public string Identifier => Path.GetFileNameWithoutExtension(m_Element.ConfigFileRelativePath);
-    
-    public string ConfigFilePath => m_Element.ConfigFilePath;
+    public bool IsJsonDescriptionFound => File.Exists(JsonFilePath);
 
-    public string JsonFilePath => m_Element.JsonFilePath;
+    public string ConfigFileRelativePath => m_Element.ConfigFileRelativePath;
+    
+    public string ConfigFilePath => m_Element.GetConfigFileFullPath();
+
+    public string JsonFilePath => m_Element.GetJsonFileFullPath();
 
     public ConfigFileElementViewModel(ConfigFileElement element)
     {

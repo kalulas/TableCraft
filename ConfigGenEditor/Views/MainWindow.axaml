@@ -18,13 +18,13 @@
     <StackPanel>
         <Grid Background="#BE8FED" RowDefinitions="Auto">
             <TextBlock HorizontalAlignment="Center" VerticalAlignment="Center" Grid.Column="0" FontSize="32" Margin="12">
-                Welcome to the ConfigGenEditor!
+                Welcome to the ConfigGenEditor
             </TextBlock>
         </Grid>
         
         <Grid RowDefinitions="Auto,Auto" Margin="16,10,16,10">
             <TextBlock Grid.Row="0" FontSize="24">
-                Configuration of ConfigEditor:
+                Environment
             </TextBlock>
             <StackPanel Grid.Row="1">
                 <TextBlock Text="{Binding ConfigHomePath}"></TextBlock>
@@ -35,20 +35,22 @@
         <Grid RowDefinitions="Auto" ColumnDefinitions="*,*,*" Margin="16,10,16,10">
             <StackPanel Grid.Column="0">
                 <TextBlock
-                           IsVisible="{Binding !TableList.Count}"
-                           Text="{Binding ListJsonFilename, StringFormat='No table found in {0}'}">
+                    IsVisible="{Binding !TableList.Count}"
+                    Text="{Binding ListJsonFilename, StringFormat='No table found in {0}'}"
+                    FontSize="20">
                 </TextBlock>
                 
                 <TextBlock
-                           IsVisible="{Binding TableList.Count}">
+                    Name="TablesTitle"
+                    IsVisible="{Binding TableList.Count}"
+                    FontSize="20">
                     Tables
                 </TextBlock>
 
                 <ListBox
-                         IsVisible="{Binding TableList.Count}" 
-                         Items="{Binding TableList}" 
-                         SelectedItem="{Binding SelectedTable}"
-                         Height="512">
+                    Items="{Binding TableList}" 
+                    SelectedItem="{Binding SelectedTable}"
+                    Height="512">
                 </ListBox>
                 
                 <WrapPanel HorizontalAlignment="Right" Margin="0 10 0 0">
@@ -57,8 +59,8 @@
             </StackPanel>
 
             
-            <TextBlock Grid.Column="1"> Attributes </TextBlock>
-            <TextBlock Grid.Column="2"> Attribute Information </TextBlock>
+            <TextBlock Grid.Column="1" FontSize="20"> Attributes </TextBlock>
+            <TextBlock Grid.Column="2" FontSize="20"> Attribute Information </TextBlock>
         </Grid>
     </StackPanel>
 

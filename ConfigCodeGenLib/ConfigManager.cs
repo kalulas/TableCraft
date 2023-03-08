@@ -42,6 +42,7 @@ namespace ConfigCodeGenLib
 
         /// <summary>
         /// try getting comments from second line if true
+        /// TODO this should be moved to libenv.json, specific line number
         /// </summary>
         public bool ReadComment;
 

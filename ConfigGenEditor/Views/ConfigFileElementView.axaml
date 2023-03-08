@@ -11,5 +11,10 @@
         <vm:ConfigFileElementViewModel/>
     </Design.DataContext>
     
-    <TextBlock Text="{Binding Identifier}" HorizontalAlignment="Center"/>
+    <StackPanel>
+        <TextBlock Text="{Binding ConfigFileRelativePath}" HorizontalAlignment="Center"/>
+        <TextBlock IsVisible="{Binding !IsJsonDescriptionFound}" 
+                   Text="(no json found)" FontSize="12" 
+                   HorizontalAlignment="Center"/>
+    </StackPanel>
 </UserControl>

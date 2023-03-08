@@ -3,6 +3,7 @@ using Avalonia.ReactiveUI;
 using System;
 using System.IO;
 using Avalonia.Logging;
+using ConfigCodeGenLib;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
@@ -27,7 +28,9 @@ class Program
         var libEnvJsonFilePath = AppContext.BaseDirectory + LibEnvJsonFilename;
         if (File.Exists(libEnvJsonFilePath))
         {
-            ConfigCodeGenLib.Configuration.ReadConfigurationFromJson(libEnvJsonFilePath);
+            // TODO ReadComment to libenv.json
+            ConfigManager.singleton.ReadComment = true;
+            Configuration.ReadConfigurationFromJson(libEnvJsonFilePath);
         }
 
         BuildAvaloniaApp().StartWithClassicDesktopLifetime(args);

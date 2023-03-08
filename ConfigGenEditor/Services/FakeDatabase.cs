@@ -1,7 +1,10 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.IO;
+using System.Linq;
 using System.Text;
+using System.Threading.Tasks;
+using Avalonia.Logging;
 using ConfigGenEditor.Models;
 using LitJson;
 
@@ -20,7 +23,7 @@ public class FakeDatabase
     /// Read relative directory information for all existed files
     /// </summary>
     /// <returns></returns>
-    public IEnumerable<ConfigFileElement> GetTableElements()
+    public IEnumerable<ConfigFileElement> ReadTableElements()
     {
         if (!File.Exists(m_ListJsonFilePath))
         {
@@ -49,10 +52,11 @@ public class FakeDatabase
             elements.Add(element);
         }
 
+        elements.Sort();
         return elements;
     }
 
-    public void WriteTableElements(IEnumerable<ConfigFileElement> elements)
+    public async Task WriteTableElements(IEnumerable<ConfigFileElement> elements)
     {
         var builder = new StringBuilder();
         var writer = new JsonWriter(builder)
@@ -60,10 +64,14 @@ public class FakeDatabase
             PrettyPrint = true
         };
 
-        JsonMapper.ToJson(elements, writer);
+        var elementList = elements.ToList();
+        elementList.Sort();
+        
+        JsonMapper.ToJson(elementList, writer);
         var utf8NoBom = new UTF8Encoding(false);
-        using var fs = File.Open(m_ListJsonFilePath, FileMode.OpenOrCreate);
-        using var sw = new StreamWriter(fs, utf8NoBom);
-        sw.Write(builder.ToString());
+        await using var fs = File.Open(m_ListJsonFilePath, FileMode.OpenOrCreate);
+        await using var sw = new StreamWriter(fs, utf8NoBom);
+        await sw.WriteAsync(builder.ToString());
+        Logger.TryGet(LogEventLevel.Debug, LogArea.Control)?.Log(this, "write ListJsonFile finished");
     }
 }

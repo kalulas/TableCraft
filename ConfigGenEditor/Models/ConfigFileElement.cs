@@ -1,4 +1,5 @@
-﻿using Path = System.IO.Path;
+﻿using System;
+using Path = System.IO.Path;
 
 namespace ConfigGenEditor.Models;
 
@@ -6,15 +7,11 @@ namespace ConfigGenEditor.Models;
 /// <para> File information for an existed config file(data source) </para>
 /// <para> For LitJson reflection used </para>
 /// </summary>
-public class ConfigFileElement
+public class ConfigFileElement : IComparable<ConfigFileElement>
 {
-    // TODO to IJsonWriter, specify ToJson() content
     // CamelCase for LitJson reflection
     public readonly string ConfigFileRelativePath;
     public readonly string JsonFileRelativePath;
-    public string ConfigFilePath => Path.Combine(Program.GetConfigHomePath(), ConfigFileRelativePath);
-
-    public string JsonFilePath => Path.Combine(Program.GetJsonHomePath(), JsonFileRelativePath);
 
     public ConfigFileElement()
     {
@@ -26,5 +23,27 @@ public class ConfigFileElement
     {
         ConfigFileRelativePath = configFileRelativePath;
         JsonFileRelativePath = string.Empty;
+    }
+
+    public string GetConfigFileFullPath()
+    {
+        return Path.Combine(Program.GetConfigHomePath(), ConfigFileRelativePath);
+    }
+
+    public string GetJsonFileFullPath()
+    {
+        if (string.IsNullOrEmpty(JsonFileRelativePath))
+        {
+            return string.Empty;
+        }
+
+        return Path.Combine(Program.GetJsonHomePath(), JsonFileRelativePath);
+    }
+
+    public int CompareTo(ConfigFileElement? other)
+    {
+        if (ReferenceEquals(this, other)) return 0;
+        if (ReferenceEquals(null, other)) return 1;
+        return string.Compare(ConfigFileRelativePath, other.ConfigFileRelativePath, StringComparison.Ordinal);
     }
 }
