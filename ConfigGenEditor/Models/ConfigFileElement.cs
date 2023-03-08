@@ -8,12 +8,10 @@ namespace ConfigGenEditor.Models;
 /// </summary>
 public class ConfigFileElement
 {
+    // TODO to IJsonWriter, specify ToJson() content
     // CamelCase for LitJson reflection
     public readonly string ConfigFileRelativePath;
     public readonly string JsonFileRelativePath;
-
-    public string Identifier => Path.GetFileNameWithoutExtension(ConfigFileRelativePath);
-
     public string ConfigFilePath => Path.Combine(Program.GetConfigHomePath(), ConfigFileRelativePath);
 
     public string JsonFilePath => Path.Combine(Program.GetJsonHomePath(), JsonFileRelativePath);
@@ -21,6 +19,12 @@ public class ConfigFileElement
     public ConfigFileElement()
     {
         ConfigFileRelativePath = string.Empty;
+        JsonFileRelativePath = string.Empty;
+    }
+
+    public ConfigFileElement(string configFileRelativePath)
+    {
+        ConfigFileRelativePath = configFileRelativePath;
         JsonFileRelativePath = string.Empty;
     }
 }

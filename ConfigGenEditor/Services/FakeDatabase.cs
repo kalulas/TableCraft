@@ -20,14 +20,15 @@ public class FakeDatabase
     /// Read relative directory information for all existed files
     /// </summary>
     /// <returns></returns>
-    public IEnumerable<ConfigFileElement> GetElements()
+    public IEnumerable<ConfigFileElement> GetTableElements()
     {
         if (!File.Exists(m_ListJsonFilePath))
         {
             throw new FileNotFoundException(m_ListJsonFilePath + " not found");
         }
-        
-        var listJsonFileContent = File.ReadAllText(m_ListJsonFilePath, Encoding.UTF8);
+
+        var utf8NoBom = new UTF8Encoding(false);
+        var listJsonFileContent = File.ReadAllText(m_ListJsonFilePath, utf8NoBom);
         var jsonData = JsonMapper.ToObject(listJsonFileContent);
         if (!jsonData.IsArray)
         {
@@ -49,5 +50,20 @@ public class FakeDatabase
         }
 
         return elements;
+    }
+
+    public void WriteTableElements(IEnumerable<ConfigFileElement> elements)
+    {
+        var builder = new StringBuilder();
+        var writer = new JsonWriter(builder)
+        {
+            PrettyPrint = true
+        };
+
+        JsonMapper.ToJson(elements, writer);
+        var utf8NoBom = new UTF8Encoding(false);
+        using var fs = File.Open(m_ListJsonFilePath, FileMode.OpenOrCreate);
+        using var sw = new StreamWriter(fs, utf8NoBom);
+        sw.Write(builder.ToString());
     }
 }

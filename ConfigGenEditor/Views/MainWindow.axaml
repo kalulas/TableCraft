@@ -4,6 +4,7 @@
         xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
         mc:Ignorable="d" d:DesignWidth="800" d:DesignHeight="450"
+        SizeToContent="Height"
         x:Class="ConfigGenEditor.Views.MainWindow"
         Icon="/Assets/avalonia-logo.ico"
         Title="ConfigGenEditor">
@@ -34,20 +35,25 @@
         <Grid RowDefinitions="Auto" ColumnDefinitions="*,*,*" Margin="16,10,16,10">
             <StackPanel Grid.Column="0">
                 <TextBlock
-                           IsVisible="{Binding !ElementList.Count}"
-                           Text="{Binding ListJsonFilename, StringFormat='No element found in {0}'}">
+                           IsVisible="{Binding !TableList.Count}"
+                           Text="{Binding ListJsonFilename, StringFormat='No table found in {0}'}">
                 </TextBlock>
                 
                 <TextBlock
-                           IsVisible="{Binding ElementList.Count}">
-                    Elements
+                           IsVisible="{Binding TableList.Count}">
+                    Tables
                 </TextBlock>
 
                 <ListBox
-                         IsVisible="{Binding ElementList.Count}" 
-                         Items="{Binding ElementList}" 
-                         SelectedItem="{Binding SelectedConfigFileElement}">
+                         IsVisible="{Binding TableList.Count}" 
+                         Items="{Binding TableList}" 
+                         SelectedItem="{Binding SelectedTable}"
+                         Height="512">
                 </ListBox>
+                
+                <WrapPanel HorizontalAlignment="Right" Margin="0 10 0 0">
+                    <Button Content="Add" Command="{Binding AddNewTableFileCommand}"></Button>
+                </WrapPanel>
             </StackPanel>
 
             

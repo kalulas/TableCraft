@@ -11,7 +11,5 @@
         <vm:ConfigFileElementViewModel/>
     </Design.DataContext>
     
-    <StackPanel>
-        <TextBlock Text="{Binding Identifier}" HorizontalAlignment="Center"/>
-    </StackPanel>
+    <TextBlock Text="{Binding Identifier}" HorizontalAlignment="Center"/>
 </UserControl>

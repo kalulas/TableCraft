@@ -7,7 +7,7 @@ public class ConfigFileElementViewModel : ViewModelBase
 {
     private readonly ConfigFileElement m_Element;
 
-    public string Identifier => m_Element.Identifier;
+    public string Identifier => Path.GetFileNameWithoutExtension(m_Element.ConfigFileRelativePath);
     
     public string ConfigFilePath => m_Element.ConfigFilePath;
 
@@ -16,5 +16,10 @@ public class ConfigFileElementViewModel : ViewModelBase
     public ConfigFileElementViewModel(ConfigFileElement element)
     {
         m_Element = element;
+    }
+
+    public ConfigFileElement GetElement()
+    {
+        return m_Element;
     }
 }

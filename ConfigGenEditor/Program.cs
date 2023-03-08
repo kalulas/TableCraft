@@ -2,6 +2,7 @@
 using Avalonia.ReactiveUI;
 using System;
 using System.IO;
+using Avalonia.Logging;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
@@ -36,7 +37,7 @@ class Program
     public static AppBuilder BuildAvaloniaApp()
         => AppBuilder.Configure<App>()
             .UsePlatformDetect()
-            .LogToTrace()
+            .LogToTrace(LogEventLevel.Debug, LogArea.Control)
             .UseReactiveUI();
     
     #region Application Setting
