@@ -32,8 +32,8 @@
             </StackPanel>
         </Grid>
         
-        <Grid RowDefinitions="Auto" ColumnDefinitions="*,*,*" Margin="16,10,16,10">
-            <StackPanel Grid.Column="0">
+        <Grid RowDefinitions="Auto" ColumnDefinitions="10*,10*,20*" Margin="16,10,16,10">
+            <StackPanel Grid.Column="0" Margin="0,0,20,0">
                 <TextBlock
                     IsVisible="{Binding !TableList.Count}"
                     Text="{Binding ListJsonFilename, StringFormat='No table found in {0}'}"
@@ -50,7 +50,8 @@
                 <ListBox
                     Items="{Binding TableList}" 
                     SelectedItem="{Binding SelectedTable}"
-                    Height="512">
+                    SelectionChanged="SelectingTableItemsControl_OnSelectionChanged"
+                    MaxHeight="900">
                 </ListBox>
                 
                 <WrapPanel HorizontalAlignment="Right" Margin="0 10 0 0">
@@ -58,9 +59,23 @@
                 </WrapPanel>
             </StackPanel>
 
+            <StackPanel Grid.Column="1" Margin="0,0,20,0">
+                <TextBlock FontSize="20"> Attributes </TextBlock>
+                <ListBox 
+                    IsVisible="{Binding SelectedConfigInfo, Converter={x:Static ObjectConverters.IsNotNull}}"
+                    Items="{Binding SelectedConfigInfo.Attributes}"
+                    SelectionChanged="SelectingAttributeItemsControl_OnSelectionChanged"
+                    MaxHeight="900">
+                </ListBox>
+            </StackPanel>
             
-            <TextBlock Grid.Column="1" FontSize="20"> Attributes </TextBlock>
-            <TextBlock Grid.Column="2" FontSize="20"> Attribute Information </TextBlock>
+            <StackPanel Grid.Column="2">
+                <TextBlock FontSize="20"> Attribute Information </TextBlock>
+                <UserControl
+                    IsVisible="{Binding SelectedAttribute, Converter={x:Static ObjectConverters.IsNotNull}}"
+                    Content="{Binding SelectedAttribute}">
+                </UserControl>
+            </StackPanel>
         </Grid>
     </StackPanel>
 

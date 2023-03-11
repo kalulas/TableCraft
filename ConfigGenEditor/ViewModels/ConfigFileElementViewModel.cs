@@ -1,5 +1,7 @@
-﻿using ConfigGenEditor.Models;
+﻿using System;
+using ConfigGenEditor.Models;
 using System.IO;
+using ConfigCodeGenLib.ConfigReader;
 
 namespace ConfigGenEditor.ViewModels;
 
@@ -23,5 +25,17 @@ public class ConfigFileElementViewModel : ViewModelBase
     public ConfigFileElement GetElement()
     {
         return m_Element;
+    }
+
+    public EConfigType GetConfigType()
+    {
+        var extension = Path.GetExtension(m_Element.ConfigFileRelativePath);
+        switch (extension)
+        {
+            case ".csv":
+                return EConfigType.CSV;
+            default:
+                throw new Exception($"Unknown config type with path:{m_Element.ConfigFileRelativePath}");
+        }
     }
 }

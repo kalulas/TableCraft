@@ -4,20 +4,17 @@
              xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
              xmlns:vm="clr-namespace:ConfigGenEditor.ViewModels"
              mc:Ignorable="d" d:DesignWidth="800" d:DesignHeight="450"
-             x:Class="ConfigGenEditor.Views.ConfigFileElementView">
+             x:Class="ConfigGenEditor.Views.ConfigAttributeListItemView">
     <Design.DataContext>
         <!-- This only sets the DataContext for the previewer in an IDE,
              to set the actual DataContext for runtime, set the DataContext property in code (look at App.axaml.cs) -->
-        <vm:ConfigFileElementViewModel/>
+        <vm:ConfigAttributeListItemViewModel/>
     </Design.DataContext>
     
     <StackPanel>
-        <TextBlock Text="{Binding ConfigFileRelativePath}" HorizontalAlignment="Center"/>
-        <TextBlock IsVisible="{Binding !IsJsonDescriptionFound}" 
-                   Text="(no json found)" FontSize="12" 
-                   HorizontalAlignment="Center"/>
-        <TextBlock IsVisible="{Binding IsJsonDescriptionFound}" 
-                   Text="(json found)" FontSize="12" 
-                   HorizontalAlignment="Center"/>
+        <TextBlock Text="{Binding Name}"></TextBlock>
+        <TextBlock Text="{Binding Comment}" FontSize="12" 
+                   TextWrapping="Wrap" MaxLines="4">
+        </TextBlock>
     </StackPanel>
 </UserControl>
