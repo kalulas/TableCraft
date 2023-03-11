@@ -19,10 +19,10 @@ public class ConfigFileElement : IComparable<ConfigFileElement>
         JsonFileRelativePath = string.Empty;
     }
 
-    public ConfigFileElement(string configFileRelativePath)
+    public ConfigFileElement(string configFileRelativePath, string jsonFileRelativePath)
     {
         ConfigFileRelativePath = configFileRelativePath;
-        JsonFileRelativePath = string.Empty;
+        JsonFileRelativePath = jsonFileRelativePath;
     }
 
     public string GetConfigFileFullPath()
