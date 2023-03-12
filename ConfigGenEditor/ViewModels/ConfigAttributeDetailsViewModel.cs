@@ -29,8 +29,7 @@ public class ConfigAttributeDetailsViewModel : ViewModelBase
     public string ValueType
     {
         get => m_AttributeInfo.ValueType;
-        // TODO make it accessible 
-        // set => m_AttributeInfo.ValueType = value;
+        set => m_AttributeInfo.ValueType = value;
     }
 
     public string CollectionType

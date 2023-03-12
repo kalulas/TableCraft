@@ -37,20 +37,30 @@ namespace ConfigCodeGenLib.ConfigReader
         public string ValueType
         {
             get => m_ValueType;
-            private set
+            set
             {
                 var valid = Configuration.IsValueTypeValid(value);
-                m_ValueType = valid ? value : string.Empty;
+                if (!valid)
+                {
+                    throw new ArgumentException($"Illegal value type {value}");
+                }
+                
+                m_ValueType = value;
             }
         }
 
         public string CollectionType
         {
             get => m_CollectionType;
-            private set
+            set
             {
                 var valid = Configuration.IsCollectionTypeValid(value);
-                m_CollectionType = valid ? value : string.Empty;
+                if (!valid)
+                {
+                    throw new ArgumentException($"Illegal collection type {value}");
+                }
+                
+                m_CollectionType = value;
             }
         }
 

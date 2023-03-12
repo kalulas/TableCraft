@@ -43,6 +43,8 @@ namespace ConfigCodeGenLib
 
         public static string CodeTemplatePath { get; private set; }
         public static string DefaultCollectionType { get; private set; }
+        // TODO fix frequent gc alloc, list to array
+        public static string[] DataValueType => m_DataValueType.ToArray();
 
         private static bool m_IsInited;
         public static bool IsInited => m_IsInited;
