@@ -30,12 +30,14 @@
         <TextBlock Grid.Row="2" Grid.Column="0" FontWeight="Bold">ValueType: </TextBlock>
         <!-- <TextBlock Grid.Row="2" Grid.Column="1" Text="{Binding ValueType}"></TextBlock> -->
         <StackPanel Grid.Row="2" Grid.Column="1">
-            <ComboBox Name="ValueTypeComboBox" Items="{x:Static lib:Configuration.DataValueType}" SelectedItem="{Binding ValueType}">
-                <ComboBox.ItemTemplate>
-                    <DataTemplate>
-                        <TextBlock Text="{Binding}"/>
-                    </DataTemplate>
-                </ComboBox.ItemTemplate>
+            <ComboBox Name="ValueTypeComboBox" Items="{x:Static lib:Configuration.DataValueType}" 
+                      SelectedItem="{Binding ValueType}">
+                <!-- This is the default template -->
+                <!-- <ComboBox.ItemTemplate> -->
+                <!--     <DataTemplate> -->
+                <!--         <TextBlock Text="{Binding}"/> -->
+                <!--     </DataTemplate> -->
+                <!-- </ComboBox.ItemTemplate> -->
             </ComboBox>
         </StackPanel>
         
