@@ -3,6 +3,7 @@
              xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
              xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
              xmlns:vm="clr-namespace:ConfigGenEditor.ViewModels"
+             xmlns:views="using:ConfigGenEditor.Views"
              xmlns:lib="clr-namespace:ConfigCodeGenLib;assembly=ConfigCodeGenLib"
              mc:Ignorable="d" d:DesignWidth="800" d:DesignHeight="450"
              x:Class="ConfigGenEditor.Views.ConfigAttributeDetailsView">
@@ -48,14 +49,21 @@
                  Width="300" HorizontalAlignment="Left" Margin="0, 0, 0, 10"></TextBox>
         
         <TextBlock Grid.Row="5" Grid.Column="0" FontSize="16">Usage </TextBlock>
-        <!-- <WrapPanel Grid.Row="5" Grid.Column="1" Orientation="Horizontal"> -->
-        <!--     <StackPanel> -->
-        <!--         <ComboBox Items="{x:Static lib:Configuration.ConfigUsageType}" Width="150"> -->
-        <!--         </ComboBox> -->
-        <!--     </StackPanel> -->
-        <!--     <Button> Hello </Button> -->
-        <!-- </WrapPanel> -->
-        
+        <StackPanel Grid.Row="5" Grid.Column="1">
+            <StackPanel Orientation="Horizontal" Margin="0,0,0,5">
+                <StackPanel>
+                    <ComboBox Items="{x:Static lib:Configuration.ConfigUsageType}" 
+                              SelectedItem="{Binding SelectedUsageType}" Width="150">
+                    </ComboBox>
+                </StackPanel>
+                
+                <Button Margin="10, 0" Command="{Binding AddUsageCommand}">
+                     Add new usage
+                </Button>
+            </StackPanel>
+            
+            <ItemsControl Items="{Binding Usages}"></ItemsControl>
+        </StackPanel>
         
         <TextBlock Grid.Row="6" Grid.Column="0" FontSize="16">Tag </TextBlock>
         

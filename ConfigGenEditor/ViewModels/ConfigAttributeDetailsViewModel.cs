@@ -5,7 +5,10 @@
 // Description:
 #endregion
 
+using System.Collections.ObjectModel;
+using System.Windows.Input;
 using ConfigCodeGenLib.ConfigReader;
+using ReactiveUI;
 
 namespace ConfigGenEditor.ViewModels;
 
@@ -48,10 +51,71 @@ public class ConfigAttributeDetailsViewModel : ViewModelBase
         set => m_AttributeInfo.DefaultValue = value;
     }
 
-    #endregion
+    public string SelectedUsageType { get; set; } = string.Empty;
     
+    public ICommand AddUsageCommand { get; private set; }
+    
+    public ObservableCollection<ConfigAttributeUsageViewModel> Usages { get; }
+
+    #endregion
+
+    #region Constructors
+
     public ConfigAttributeDetailsViewModel(ConfigAttributeInfo attributeInfo)
     {
         m_AttributeInfo = attributeInfo;
+        Usages = new ObservableCollection<ConfigAttributeUsageViewModel>();
+        foreach (var usageInfo in m_AttributeInfo.AttributeUsageInfos)
+        {
+            Usages.Add(new ConfigAttributeUsageViewModel(usageInfo, this));
+        }
+        
+        AddUsageCommand = ReactiveCommand.Create(OnAddUsageBtnClicked);
     }
+
+    #endregion
+
+    #region Interaction
+
+    private void OnAddUsageBtnClicked()
+    {
+        foreach (var usage in Usages)
+        {
+            if (usage.Usage == SelectedUsageType)
+            {
+                // duplicated, do nothing
+                return;
+            }
+        }
+
+        var newUsageInfo = new ConfigAttributeUsageInfo
+        {
+            Usage = SelectedUsageType,
+            FieldName = m_AttributeInfo.AttributeName
+        };
+
+        if (!m_AttributeInfo.AddUsageInfo(newUsageInfo))
+        {
+            return;
+        }
+        
+        var newUsage = new ConfigAttributeUsageViewModel(newUsageInfo, this);
+        Usages.Add(newUsage);
+    }
+
+    #endregion
+
+    #region Public API
+
+    public void OnUsageRemoved(ConfigAttributeUsageViewModel usageViewModel)
+    {
+        if (!m_AttributeInfo.RemoveUsageInfo(usageViewModel.Usage))
+        {
+            return;
+        }
+
+        Usages.Remove(usageViewModel);
+    }
+
+    #endregion
 }

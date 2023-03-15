@@ -64,6 +64,8 @@ namespace ConfigCodeGenLib.ConfigReader
             }
         }
 
+        public ConfigAttributeUsageInfo[] AttributeUsageInfos => m_UsageList.ToArray();
+
         #endregion
 
         public ConfigAttributeInfo()
@@ -188,6 +190,39 @@ namespace ConfigCodeGenLib.ConfigReader
         public bool IsValid()
         {
             return !string.IsNullOrEmpty(AttributeName) && !string.IsNullOrEmpty(m_ValueType);
+        }
+
+        /// <summary>
+        /// Add new usage info into usage list
+        /// </summary>
+        /// <param name="usageInfo"></param>
+        /// <returns> True if not duplicated </returns>
+        public bool AddUsageInfo(ConfigAttributeUsageInfo usageInfo)
+        {
+            foreach (var attributeUsageInfo in m_UsageList)
+            {
+                if (attributeUsageInfo.Usage == usageInfo.Usage)
+                {
+                    return false;
+                }
+            }
+            
+            m_UsageList.Add(usageInfo);
+            return true;
+        }
+
+        public bool RemoveUsageInfo(string usageType)
+        {
+            foreach (var attributeUsageInfo in m_UsageList)
+            {
+                if (attributeUsageInfo.Usage == usageType)
+                {
+                    m_UsageList.Remove(attributeUsageInfo);
+                    return true;
+                }
+            }
+
+            return false;
         }
 
         #endregion

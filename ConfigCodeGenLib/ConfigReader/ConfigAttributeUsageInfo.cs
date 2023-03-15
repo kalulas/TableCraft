@@ -12,8 +12,8 @@ namespace ConfigCodeGenLib.ConfigReader
     {
         private const string USAGE_KEY = "Usage";
         private const string FIELD_NAME_KEY = "FieldName";
-        public string FieldName { get; private set; }
-        public string Usage { get; private set; }
+        public string FieldName { get; set; }
+        public string Usage { get; set; }
 
         public ConfigAttributeUsageInfo()
         {
