@@ -24,7 +24,11 @@ public class ConfigAttributeListItemViewModel : ViewModelBase
 
     public string Name => m_AttributeInfo.AttributeName;
 
-    public string Comment => m_AttributeInfo.Comment;
+    public string Comment
+    {
+        get => m_AttributeInfo.Comment;
+        set => m_AttributeInfo.Comment = value;
+    }
 
     #endregion
     

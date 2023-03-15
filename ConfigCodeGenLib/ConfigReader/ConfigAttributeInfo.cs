@@ -31,8 +31,8 @@ namespace ConfigCodeGenLib.ConfigReader
 
         public int Index { get; private set; }
         public string AttributeName { get; private set; }
-        public string Comment { get; private set; }
-        public string DefaultValue { get; private set; }
+        public string Comment { get; set; }
+        public string DefaultValue { get; set; }
 
         public string ValueType
         {
@@ -70,7 +70,7 @@ namespace ConfigCodeGenLib.ConfigReader
         {
             m_ValueType = string.Empty;
             DefaultValue = string.Empty;
-            m_CollectionType = Configuration.DefaultCollectionType;
+            m_CollectionType = string.Empty;
             m_UsageList = new List<ConfigAttributeUsageInfo>();
             m_TagList = new HashSet<string>();
         }

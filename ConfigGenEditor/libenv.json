@@ -1,10 +1,13 @@
 {
     "DataValueType": ["int", "uint", "float", "boolean", "string"],
-    "DataCollectionType": ["none", "array", "list"],
-    "DefaultCollectionType": "none",
+    "DataCollectionType": ["array", "list"],
     "CodeTemplatePath": "CodeTemplate",
     "ConfigUsageType":{
-        "client":{
+        "client0":{
+            "CodeTemplateName": "csharp.txt",
+            "TargetFileType": ".cs"
+        },
+        "client1":{
             "CodeTemplateName": "csharp.txt",
             "TargetFileType": ".cs"
         },

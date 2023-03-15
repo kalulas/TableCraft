@@ -25,7 +25,18 @@ namespace ConfigCodeGenLib
             /// </summary>
             public string TargetFileType { get; set; }
         }
+        
+        public static string CodeTemplatePath { get; private set; } 
+        
+        public static string[] DataValueType => m_DataValueType.ToArray();
 
+        public static string[] DataCollectionType => m_DataCollectionType.ToArray();
+
+        public static string[] ConfigUsageType => m_ConfigUsageType.ToArray();
+
+        private static bool m_IsInited;
+        public static bool IsInited => m_IsInited;
+        
         /// <summary>
         /// define legal data value type
         /// </summary>
@@ -39,15 +50,8 @@ namespace ConfigCodeGenLib
         /// </summary>
         private static readonly List<string> m_ConfigUsageType = new List<string>();
 
-        private static readonly Dictionary<string, ConfigUsageInformation> m_UsageToInformation = new Dictionary<string, ConfigUsageInformation>();
-
-        public static string CodeTemplatePath { get; private set; }
-        public static string DefaultCollectionType { get; private set; }
-        // TODO fix frequent gc alloc, list to array
-        public static string[] DataValueType => m_DataValueType.ToArray();
-
-        private static bool m_IsInited;
-        public static bool IsInited => m_IsInited;
+        private static readonly Dictionary<string, ConfigUsageInformation> m_UsageToInformation =
+            new Dictionary<string, ConfigUsageInformation>();
 
         private static void ReadStringArrayFromJson(JsonData data, string key, List<string> destination)
         {
@@ -103,8 +107,7 @@ namespace ConfigCodeGenLib
 
             ReadStringArrayFromJson(configData, "DataValueType", m_DataValueType);
             ReadStringArrayFromJson(configData, "DataCollectionType", m_DataCollectionType);
-
-            DefaultCollectionType = configData["DefaultCollectionType"].ToString();
+            
             CodeTemplatePath = Path.Combine(libEnvDir, configData["CodeTemplatePath"].ToString());
 
             m_ConfigUsageType.Clear();

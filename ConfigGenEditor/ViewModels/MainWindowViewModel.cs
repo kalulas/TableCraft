@@ -170,7 +170,9 @@ public class MainWindowViewModel : ViewModelBase
         
         // write to local file, we make it async
         var updatedTableList = TableList.Select(viewModel => viewModel.GetElement()).ToList();
+#pragma warning disable CS4014
         m_Database.WriteTableElements(updatedTableList);
+#pragma warning restore CS4014
     }
 
     private void UpdateSelectedConfigInfoWithTable(ConfigFileElementViewModel? selectedTable)

@@ -24,8 +24,12 @@ public class ConfigAttributeDetailsViewModel : ViewModelBase
 
     public string Name => m_AttributeInfo.AttributeName;
 
-    public string Comment => m_AttributeInfo.Comment;
-    
+    public string Comment
+    {
+        get => m_AttributeInfo.Comment;
+        set => m_AttributeInfo.Comment = value;
+    }
+
     public string ValueType
     {
         get => m_AttributeInfo.ValueType;
@@ -35,6 +39,13 @@ public class ConfigAttributeDetailsViewModel : ViewModelBase
     public string CollectionType
     {
         get => m_AttributeInfo.CollectionType;
+        set => m_AttributeInfo.CollectionType = value;
+    }
+
+    public string DefaultValue
+    {
+        get => m_AttributeInfo.DefaultValue;
+        set => m_AttributeInfo.DefaultValue = value;
     }
 
     #endregion
