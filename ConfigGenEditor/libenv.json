@@ -1,6 +1,7 @@
 {
     "DataValueType": ["int", "uint", "float", "boolean", "string"],
     "DataCollectionType": ["array", "list"],
+    "AttributeTag": ["primary", "comma-separate", "semicolon-separate"],
     "CodeTemplatePath": "CodeTemplate",
     "ConfigUsageType":{
         "client0":{

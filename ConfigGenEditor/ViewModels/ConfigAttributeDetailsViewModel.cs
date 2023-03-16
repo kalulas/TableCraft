@@ -52,10 +52,16 @@ public class ConfigAttributeDetailsViewModel : ViewModelBase
     }
 
     public string SelectedUsageType { get; set; } = string.Empty;
+
+    public string SelectedAttributeTag { get; set; } = string.Empty;
     
-    public ICommand AddUsageCommand { get; private set; }
+    public ICommand AddUsageCommand { get; }
+    
+    public ICommand AddTagCommand { get; }
     
     public ObservableCollection<ConfigAttributeUsageViewModel> Usages { get; }
+    
+    public ObservableCollection<ConfigAttributeTagViewModel> Tags { get; }
 
     #endregion
 
@@ -69,8 +75,15 @@ public class ConfigAttributeDetailsViewModel : ViewModelBase
         {
             Usages.Add(new ConfigAttributeUsageViewModel(usageInfo, this));
         }
+
+        Tags = new ObservableCollection<ConfigAttributeTagViewModel>();
+        foreach (var tag in m_AttributeInfo.Tags)
+        {
+            Tags.Add(new ConfigAttributeTagViewModel(tag, this));
+        }
         
         AddUsageCommand = ReactiveCommand.Create(OnAddUsageBtnClicked);
+        AddTagCommand = ReactiveCommand.Create(OnAddTagBtnClicked);
     }
 
     #endregion
@@ -98,9 +111,27 @@ public class ConfigAttributeDetailsViewModel : ViewModelBase
         {
             return;
         }
+
+        Usages.Add(new ConfigAttributeUsageViewModel(newUsageInfo, this));
+    }
+
+    private void OnAddTagBtnClicked()
+    {
+        foreach (var tag in Tags)
+        {
+            if (tag.Content == SelectedAttributeTag)
+            {
+                // duplicated, do nothing
+                return;
+            }
+        }
         
-        var newUsage = new ConfigAttributeUsageViewModel(newUsageInfo, this);
-        Usages.Add(newUsage);
+        if (!m_AttributeInfo.AddTag(SelectedAttributeTag))
+        {
+            return;
+        }
+        
+        Tags.Add(new ConfigAttributeTagViewModel(SelectedAttributeTag, this));
     }
 
     #endregion

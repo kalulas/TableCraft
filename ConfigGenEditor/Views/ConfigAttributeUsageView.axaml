@@ -20,6 +20,7 @@
         
         <TextBlock VerticalAlignment="Center">FieldName</TextBlock>
         <TextBox Margin="10,0,0,0" MinWidth="150"
-                 Text="{Binding FieldName}"></TextBox>
+                 Text="{Binding FieldName}"
+                 FontFamily="Consolas"></TextBox>
     </StackPanel>
 </UserControl>

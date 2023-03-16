@@ -34,6 +34,8 @@ namespace ConfigCodeGenLib
 
         public static string[] ConfigUsageType => m_ConfigUsageType.ToArray();
 
+        public static string[] AttributeTag => m_AttributeTag.ToArray();
+
         private static bool m_IsInited;
         public static bool IsInited => m_IsInited;
         
@@ -49,6 +51,8 @@ namespace ConfigCodeGenLib
         /// define usages like 'client', 'server'
         /// </summary>
         private static readonly List<string> m_ConfigUsageType = new List<string>();
+
+        private static readonly List<string> m_AttributeTag = new List<string>();
 
         private static readonly Dictionary<string, ConfigUsageInformation> m_UsageToInformation =
             new Dictionary<string, ConfigUsageInformation>();
@@ -107,6 +111,7 @@ namespace ConfigCodeGenLib
 
             ReadStringArrayFromJson(configData, "DataValueType", m_DataValueType);
             ReadStringArrayFromJson(configData, "DataCollectionType", m_DataCollectionType);
+            ReadStringArrayFromJson(configData, "AttributeTag", m_AttributeTag);
             
             CodeTemplatePath = Path.Combine(libEnvDir, configData["CodeTemplatePath"].ToString());
 
@@ -116,13 +121,6 @@ namespace ConfigCodeGenLib
                 var usage = (KeyValuePair<string,JsonData>)usageConfig;
                 AddConfigUsageType(usage.Key, usage.Value);
             }
-
-            #region Test Code
-            //var clientTemplateFullPath = CodeTemplatePath + m_UsageToInformation["client"].CodeTemplateName;
-            //Debugger.LogForamt("client code template full path {0}", clientTemplateFullPath);
-            //var content = File.ReadAllText(clientTemplateFullPath);
-            //Debugger.LogForamt(content);
-            #endregion
 
             m_IsInited = true;
         }

@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Linq;
 using System.Text;
 using LitJson;
 
@@ -65,6 +66,8 @@ namespace ConfigCodeGenLib.ConfigReader
         }
 
         public ConfigAttributeUsageInfo[] AttributeUsageInfos => m_UsageList.ToArray();
+
+        public string[] Tags => m_TagList.ToArray();
 
         #endregion
 
@@ -223,6 +226,11 @@ namespace ConfigCodeGenLib.ConfigReader
             }
 
             return false;
+        }
+
+        public bool AddTag(string tag)
+        {
+            return m_TagList.Add(tag);
         }
 
         #endregion
