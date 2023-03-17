@@ -129,12 +129,14 @@ namespace ConfigCodeGenLib
 
         internal static bool IsValueTypeValid(string valueType)
         {
-            return !string.IsNullOrEmpty(valueType) && m_DataValueType.Contains(valueType);
+            // empty string is legal
+            return valueType != null && (valueType == string.Empty || m_DataValueType.Contains(valueType));
         }
 
         internal static bool IsCollectionTypeValid(string collectionType)
         {
-            return !string.IsNullOrEmpty(collectionType) && m_DataCollectionType.Contains(collectionType);
+            // empty string is legal
+            return collectionType != null && (collectionType == string.Empty || m_DataCollectionType.Contains(collectionType));
         }
 
         internal static bool IsUsageValid(string usage)

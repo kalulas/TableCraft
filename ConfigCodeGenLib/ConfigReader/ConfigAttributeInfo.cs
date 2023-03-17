@@ -43,7 +43,7 @@ namespace ConfigCodeGenLib.ConfigReader
                 var valid = Configuration.IsValueTypeValid(value);
                 if (!valid)
                 {
-                    throw new ArgumentException($"Illegal value type {value}");
+                    throw new ArgumentException($"Illegal value type '{value}'");
                 }
                 
                 m_ValueType = value;
@@ -58,7 +58,7 @@ namespace ConfigCodeGenLib.ConfigReader
                 var valid = Configuration.IsCollectionTypeValid(value);
                 if (!valid)
                 {
-                    throw new ArgumentException($"Illegal collection type {value}");
+                    throw new ArgumentException($"Illegal collection type '{value}'");
                 }
                 
                 m_CollectionType = value;

@@ -23,7 +23,7 @@
             </TextBlock>
         </Grid>
         
-        <Grid RowDefinitions="Auto,Auto" Margin="16,10,16,10">
+        <Grid RowDefinitions="Auto,Auto" Margin="16,10">
             <TextBlock Grid.Row="0" FontSize="24">
                 Environment
             </TextBlock>
@@ -33,7 +33,7 @@
             </StackPanel>
         </Grid>
         
-        <Grid RowDefinitions="Auto" ColumnDefinitions="10*,10*,20*" Margin="16,10,16,10">
+        <Grid RowDefinitions="Auto" ColumnDefinitions="10*,10*,20*" Margin="16,10">
             <StackPanel Grid.Column="0" Margin="0,0,20,0">
                 <TextBlock
                     IsVisible="{Binding !TableList.Count}"
@@ -90,6 +90,16 @@
                 </UserControl>
             </StackPanel>
         </Grid>
+        
+        <StackPanel Orientation="Horizontal" HorizontalAlignment="Right" Margin="16,10">
+            <!-- <Button IsEnabled="False" Margin="0, 0, 16, 0"> -->
+            <!--     <StackPanel Orientation="Horizontal"> -->
+            <!--         <Image Source="/Assets/minus-30.png" Height="16"></Image> -->
+            <!--         <Label> Export </Label> -->
+            <!--     </StackPanel> -->
+            <!-- </Button> -->
+            <Button IsEnabled="False" Content="Save"></Button>
+        </StackPanel>
     </StackPanel>
 
 </Window>

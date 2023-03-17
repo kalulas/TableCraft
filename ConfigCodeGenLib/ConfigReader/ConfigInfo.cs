@@ -87,8 +87,16 @@ namespace ConfigCodeGenLib.ConfigReader
                     Debugger.LogError("attribute '{0}' not found in config file {1}", name, m_ConfigFilePath);
                     continue;
                 }
-
-                ConfigAttributeDict[name].SetJsonFileInfo(attributeJsonData);
+                
+                try
+                {
+                    ConfigAttributeDict[name].SetJsonFileInfo(attributeJsonData);
+                }
+                catch (Exception e)
+                {
+                    Debugger.LogError($"ReadJsonFileAttributes during attribute '{name}' of file '{ConfigName}' failed: {e.Message}");
+                    throw;
+                }
             }
 
             return this;

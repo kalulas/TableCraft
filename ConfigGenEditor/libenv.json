@@ -1,6 +1,6 @@
 {
     "DataValueType": ["int", "uint", "float", "boolean", "string"],
-    "DataCollectionType": ["array", "list"],
+    "DataCollectionType": ["none", "array", "list"],
     "AttributeTag": ["primary", "comma-separate", "semicolon-separate"],
     "CodeTemplatePath": "CodeTemplate",
     "ConfigUsageType":{
