@@ -214,6 +214,11 @@ namespace ConfigCodeGenLib.ConfigReader
             return true;
         }
 
+        /// <summary>
+        /// Remove usageInfo from <see cref="m_UsageList"/>
+        /// </summary>
+        /// <param name="usageType"></param>
+        /// <returns> True if removed </returns>
         public bool RemoveUsageInfo(string usageType)
         {
             foreach (var attributeUsageInfo in m_UsageList)
@@ -231,6 +236,16 @@ namespace ConfigCodeGenLib.ConfigReader
         public bool AddTag(string tag)
         {
             return m_TagList.Add(tag);
+        }
+        
+        /// <summary>
+        /// Remove tag from <see cref="m_TagList"/>
+        /// </summary>
+        /// <param name="tagContent"></param>
+        /// <returns> True if removed </returns>
+        public bool RemoveTag(string tagContent)
+        {
+            return m_TagList.Remove(tagContent);
         }
 
         #endregion

@@ -14,7 +14,7 @@ public class ConfigAttributeTagViewModel : ViewModelBase
 {
     #region Fields
 
-    private ConfigAttributeDetailsViewModel m_DetailsViewModel;
+    private readonly ConfigAttributeDetailsViewModel m_DetailsViewModel;
 
     #endregion
 
@@ -40,7 +40,7 @@ public class ConfigAttributeTagViewModel : ViewModelBase
 
     private void OnRemoveTagBtnClicked()
     {
-        // TODO call remove self function of detailsViewModel
+        m_DetailsViewModel.OnTagRemoved(this);
     }
 
     #endregion

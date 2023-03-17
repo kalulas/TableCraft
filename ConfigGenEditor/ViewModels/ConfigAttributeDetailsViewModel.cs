@@ -147,6 +147,16 @@ public class ConfigAttributeDetailsViewModel : ViewModelBase
 
         Usages.Remove(usageViewModel);
     }
+    
+    public void OnTagRemoved(ConfigAttributeTagViewModel tagViewModel)
+    {
+        if (!m_AttributeInfo.RemoveTag(tagViewModel.Content))
+        {
+            return;
+        }
+
+        Tags.Remove(tagViewModel);
+    }
 
     #endregion
 }
