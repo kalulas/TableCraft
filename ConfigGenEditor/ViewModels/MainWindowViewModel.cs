@@ -11,6 +11,7 @@ using Avalonia.Logging;
 using ConfigGenEditor.Models;
 using ConfigGenEditor.Services;
 using ReactiveUI;
+using Serilog;
 using Path = System.IO.Path;
 
 namespace ConfigGenEditor.ViewModels;
@@ -81,6 +82,7 @@ public class MainWindowViewModel : ViewModelBase
             if (Application.Current?.ApplicationLifetime is IControlledApplicationLifetime desktop)
             {
                 // TODO show error popup window, shutdown on confirm
+                Log.Error("ConfigCodeGenLib is not initialized, about to shutdown");
                 desktop.Shutdown();
             }
             
@@ -231,7 +233,7 @@ public class MainWindowViewModel : ViewModelBase
             if (result != null)
             {
                 var selected = result[0];
-                Logger.TryGet(LogEventLevel.Debug, LogArea.Control)?.Log(this, $"Selected file from dialog: {selected}");
+                Log.Information("Selected file from dialog: '{SelectedFile}'", selected);
                 AddNewSelectedTableFile(selected);
             }
         }

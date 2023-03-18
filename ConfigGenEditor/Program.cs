@@ -7,6 +7,7 @@ using ConfigCodeGenLib;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
+using Serilog;
 
 namespace ConfigGenEditor;
 
@@ -15,7 +16,7 @@ class Program
     public const string ListJsonFilename = "list.json";
     public const string LibEnvJsonFilename = "libenv.json";
     
-    private static IHost? ServiceProvider { get; set; }
+    private static IConfiguration? m_Configuration;
     
     // Initialization code. Don't use any Avalonia, third-party APIs or any
     // SynchronizationContext-reliant code before AppMain is called: things aren't initialized
@@ -23,17 +24,37 @@ class Program
     [STAThread]
     public static void Main(string[] args)
     {
-        ServiceProvider = Host.CreateDefaultBuilder(args).Build();
+        m_Configuration = Host.CreateDefaultBuilder(args).Build().Services.GetRequiredService<IConfiguration>();
 
-        var libEnvJsonFilePath = AppContext.BaseDirectory + LibEnvJsonFilename;
-        if (File.Exists(libEnvJsonFilePath))
+        Log.Logger = new LoggerConfiguration()
+            .ReadFrom.Configuration(m_Configuration)
+            .CreateLogger();
+
+        Log.Information("Logger is initialized");
+
+        try
         {
-            // TODO ReadComment to libenv.json
-            ConfigManager.singleton.ReadComment = true;
-            Configuration.ReadConfigurationFromJson(libEnvJsonFilePath);
-        }
+            var libEnvJsonFilePath = AppContext.BaseDirectory + LibEnvJsonFilename;
+            if (File.Exists(libEnvJsonFilePath))
+            {
+                Debugger.InitialCustomLogger(Log.Information);
+                Configuration.ReadConfigurationFromJson(libEnvJsonFilePath);
+                // TODO ReadComment to libenv.json
+                ConfigManager.singleton.ReadComment = true;
+                Log.Information("ConfigCodeGenLib is initialized with '{LibEnvJson}'", libEnvJsonFilePath);
+            }
 
-        BuildAvaloniaApp().StartWithClassicDesktopLifetime(args);
+            BuildAvaloniaApp().StartWithClassicDesktopLifetime(args);
+        }
+        catch (Exception e)
+        {
+            Log.Error(e, "Unhandled exception");
+        }
+        finally
+        {
+            Log.Information("Application shutdown");
+            Log.CloseAndFlush();
+        }
     }
 
     // Avalonia configuration, don't remove; also used by visual designer.
@@ -49,25 +70,23 @@ class Program
     
     public static string GetConfigHomePath()
     {
-        if (ServiceProvider == null)
+        if (m_Configuration == null)
         {
-            return string.Empty;
+            throw new Exception("m_Configuration from appsettings is null");
         }
-
-        var config = ServiceProvider.Services.GetRequiredService<IConfiguration>();
-        var path = config.GetValue<string>("ConfigHomePath");
+        
+        var path = m_Configuration.GetValue<string>("ConfigHomePath");
         return path ?? string.Empty;
     }
 
     public static string GetJsonHomePath()
     {
-        if (ServiceProvider == null)
+        if (m_Configuration == null)
         {
-            return string.Empty;
+            throw new Exception("m_Configuration from appsettings is null"); 
         }
-
-        var config = ServiceProvider.Services.GetRequiredService<IConfiguration>();
-        var path = config.GetValue<string>("JsonHomePath");
+        
+        var path = m_Configuration.GetValue<string>("JsonHomePath");
         return path ?? string.Empty;
     }
 
