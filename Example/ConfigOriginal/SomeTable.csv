@@ -1,3 +1,0 @@
-ID,Type,SubType,Title,Description,Priority,Cost,EffectList
-主键,类型,子类型,标题,描述,优先级,开销,效果
-1,1,1,TITLE_KEY,一段普通中文描述,0,11.4514,"1,2,3,4,5,6"
