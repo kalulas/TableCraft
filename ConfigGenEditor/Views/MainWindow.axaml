@@ -98,7 +98,14 @@
             <!--         <Label> Export </Label> -->
             <!--     </StackPanel> -->
             <!-- </Button> -->
-            <Button IsEnabled="False" Content="Save"></Button>
+            <Button 
+                IsEnabled="{Binding SelectedConfigInfo, Converter={x:Static ObjectConverters.IsNotNull}}"
+                Command="{Binding SaveJsonFileCommand}">
+                <StackPanel Orientation="Horizontal">
+                    <Image Source="/Assets/json-128.png" Height="32"></Image>
+                    <Label VerticalAlignment="Center"> Save json file </Label>
+                </StackPanel>
+            </Button>
         </StackPanel>
     </StackPanel>
 

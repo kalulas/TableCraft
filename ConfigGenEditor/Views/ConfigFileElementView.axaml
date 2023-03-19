@@ -13,11 +13,14 @@
     
     <StackPanel>
         <TextBlock Text="{Binding ConfigFileRelativePath}" HorizontalAlignment="Center"/>
-        <TextBlock IsVisible="{Binding !IsJsonDescriptionFound}" 
-                   Text="(no json found)" FontSize="12" 
-                   HorizontalAlignment="Center"/>
-        <TextBlock IsVisible="{Binding IsJsonDescriptionFound}" 
-                   Text="(json found)" FontSize="12" 
-                   HorizontalAlignment="Center"/>
+        <StackPanel IsVisible="{Binding !IsJsonDescriptionFound}" Orientation="Horizontal" HorizontalAlignment="Center">
+            <Image Source="/Assets/question-32.png" Height="14"></Image>
+            <TextBlock Text="no json found" FontSize="12" Margin="5"></TextBlock>
+        </StackPanel>
+        
+        <StackPanel IsVisible="{Binding IsJsonDescriptionFound}" Orientation="Horizontal" HorizontalAlignment="Center">
+            <Image Source="/Assets/accept-32.png" Height="14"></Image>
+            <TextBlock Text="json found" FontSize="12" Margin="5"></TextBlock>
+        </StackPanel>
     </StackPanel>
 </UserControl>

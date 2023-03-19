@@ -2,6 +2,7 @@
 using ConfigGenEditor.Models;
 using System.IO;
 using ConfigCodeGenLib.ConfigReader;
+using ReactiveUI;
 
 namespace ConfigGenEditor.ViewModels;
 
@@ -37,5 +38,27 @@ public class ConfigFileElementViewModel : ViewModelBase
             default:
                 throw new Exception($"Unknown config type with path:{m_Element.ConfigFileRelativePath}");
         }
+    }
+    
+    /// <summary>
+    /// <para> Return the name of the json file that will be generated </para>
+    /// <para> Notice: if config relative path contains separators, all separators will be replaced by '_' to ensure a flat hierarchy of json directory </para>
+    /// </summary>
+    /// <returns></returns>
+    public string GetTargetJsonFileName()
+    {
+        // make sure this works on all platforms
+        var replacedConfigFileName = m_Element.ConfigFileRelativePath.Replace("/", "_").Replace("\\", "_");
+        return Path.ChangeExtension(replacedConfigFileName, "json");
+    }
+    
+    public void SetJsonFileRelativePath(string relativePath)
+    {
+        m_Element.SetJsonFileRelativePath(relativePath);
+    }
+
+    public void NotifyJsonFileStatusChanged()
+    {
+        this.RaisePropertyChanged(nameof(IsJsonDescriptionFound));
     }
 }

@@ -134,6 +134,23 @@ namespace ConfigCodeGenLib
         }
 
         /// <summary>
+        /// Save related json file, a wrapper method of <see cref="ConfigInfo.SaveJsonFile"/>
+        /// </summary>
+        /// <param name="configInfo"></param>
+        /// <param name="jsonFilePath"></param>
+        /// <returns></returns>
+        public bool SaveConfigInfoJsonFile(ConfigInfo configInfo, string jsonFilePath)
+        {
+            if (configInfo == null)
+            {
+                return false;
+            }
+            
+            configInfo.SaveJsonFile(jsonFilePath);
+            return true;
+        }
+
+        /// <summary>
         /// Generate code with specific usage to <paramref name="outputFilePath"/>
         /// </summary>
         /// <param name="identifier"></param>

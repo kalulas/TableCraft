@@ -9,9 +9,9 @@ namespace ConfigGenEditor.Models;
 /// </summary>
 public class ConfigFileElement : IComparable<ConfigFileElement>
 {
-    // CamelCase for LitJson reflection
+    // public / CamelCase for LitJson reflection
     public readonly string ConfigFileRelativePath;
-    public readonly string JsonFileRelativePath;
+    public string JsonFileRelativePath;
 
     public ConfigFileElement()
     {
@@ -45,5 +45,10 @@ public class ConfigFileElement : IComparable<ConfigFileElement>
         if (ReferenceEquals(this, other)) return 0;
         if (ReferenceEquals(null, other)) return 1;
         return string.Compare(ConfigFileRelativePath, other.ConfigFileRelativePath, StringComparison.Ordinal);
+    }
+
+    public void SetJsonFileRelativePath(string relativePath)
+    {
+        JsonFileRelativePath = relativePath;
     }
 }

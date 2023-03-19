@@ -7,7 +7,7 @@ using System.Windows.Input;
 using Avalonia;
 using Avalonia.Controls;
 using Avalonia.Controls.ApplicationLifetimes;
-using Avalonia.Logging;
+using ConfigCodeGenLib;
 using ConfigGenEditor.Models;
 using ConfigGenEditor.Services;
 using ReactiveUI;
@@ -20,6 +20,9 @@ public class MainWindowViewModel : ViewModelBase
 {
     private readonly FakeDatabase m_Database;
     private readonly List<FileDialogFilter> m_NewTableFileFilters = new();
+    /// <summary>
+    /// ConfigFileRelativeFilePath -> ConfigInfoViewModel, create on selected
+    /// </summary>
     private readonly Dictionary<string, ConfigInfoViewModel> m_EditorRuntimeConfigInfo = new();
 
     #region Propreties
@@ -67,6 +70,7 @@ public class MainWindowViewModel : ViewModelBase
     #region Commands
 
     public ICommand? AddNewTableFileCommand { get; private set; }
+    public ICommand? SaveJsonFileCommand { get; private set; }
     public EventHandler<SelectionChangedEventArgs>? SelectedTableChangedEventHandler { get; private set; }
     public EventHandler<SelectionChangedEventArgs>? SelectedAttributeChangedEventHandler { get; private set; }
 
@@ -97,7 +101,7 @@ public class MainWindowViewModel : ViewModelBase
 
     private bool EnvironmentCheck()
     {
-        return ConfigCodeGenLib.Configuration.IsInited;
+        return Configuration.IsInited;
     }
     
     private void AppendNewTableFileFilter()
@@ -129,6 +133,7 @@ public class MainWindowViewModel : ViewModelBase
     private void CreateCommands()
     {
         AddNewTableFileCommand = ReactiveCommand.CreateFromTask(OnAddNewTableButtonClicked);
+        SaveJsonFileCommand = ReactiveCommand.Create(OnSaveJsonButtonClicked);
         SelectedTableChangedEventHandler = OnSelectedTableChanged;
         SelectedAttributeChangedEventHandler = OnSelectedAttributeChanged;
     }
@@ -137,8 +142,19 @@ public class MainWindowViewModel : ViewModelBase
     {
         SelectedAttribute = null;
     }
+    
+    private async Task FlushTableListToDatabase()
+    {
+        if (TableList == null)
+        {
+            return;
+        }
+        
+        var updatedTableList = TableList.Select(viewModel => viewModel.GetElement()).ToList();
+        await m_Database.WriteTableElements(updatedTableList);
+    }
 
-    private void AddNewSelectedTableFile(string newTableFilePath)
+    private async Task AddNewSelectedTableFile(string newTableFilePath)
     {
         if (TableList == null)
         {
@@ -171,10 +187,7 @@ public class MainWindowViewModel : ViewModelBase
         //     createdTableViewModel.JsonFilePath, createdTableViewModel.GetConfigType());
         
         // write to local file, we make it async
-        var updatedTableList = TableList.Select(viewModel => viewModel.GetElement()).ToList();
-#pragma warning disable CS4014
-        m_Database.WriteTableElements(updatedTableList);
-#pragma warning restore CS4014
+        await FlushTableListToDatabase();
     }
 
     private void UpdateSelectedConfigInfoWithTable(ConfigFileElementViewModel? selectedTable)
@@ -193,10 +206,19 @@ public class MainWindowViewModel : ViewModelBase
             return;
         }
 
-        var newConfigInfo = new ConfigInfoViewModel(selectedTable.ConfigFilePath, selectedTable.JsonFilePath,
-            selectedTable.GetConfigType());
-        m_EditorRuntimeConfigInfo.Add(identifier, newConfigInfo);
-        SelectedConfigInfo = newConfigInfo;
+        var configInfo = ConfigManager.singleton.AddNewConfigInfo(selectedTable.ConfigFilePath,
+            selectedTable.JsonFilePath, selectedTable.GetConfigType());
+        if (configInfo == null)
+        {
+            Log.Error("Failed to create config info for '{identifier}' with config home path '{HomePath}'",
+                selectedTable.ConfigFileRelativePath, Program.GetConfigHomePath());
+            SelectedConfigInfo = null;
+            return;
+        }
+        
+        var configInfoViewModel = new ConfigInfoViewModel(configInfo);
+        m_EditorRuntimeConfigInfo.Add(identifier, configInfoViewModel);
+        SelectedConfigInfo = configInfoViewModel;
 
         // reset selected attribute
         CancelSelectedAttribute();
@@ -212,6 +234,39 @@ public class MainWindowViewModel : ViewModelBase
 
         var configInfo = listItemViewModel.GetAttributeInfo();
         SelectedAttribute = new ConfigAttributeDetailsViewModel(configInfo);
+    }
+
+    private async Task SaveJsonFileWithCurrentSelected()
+    {
+        if (m_SelectedConfigInfo == null || m_SelectedTable == null)
+        {
+            Log.Error("No selected config info, cannot save json file");
+            return;
+        }
+
+        // step1 save json file
+        var configInfo = m_SelectedConfigInfo.GetConfigInfo();
+        var jsonFileName = m_SelectedTable.GetTargetJsonFileName();
+        var jsonFileFullPath = Path.Combine(JsonHomePath, jsonFileName);
+        var success = ConfigManager.singleton.SaveConfigInfoJsonFile(configInfo, jsonFileFullPath);
+        if (!success)
+        {
+            Log.Error("Failed to save json file '{JsonFilePath}'", jsonFileFullPath);
+            return;
+        }
+        
+        Log.Information("Saved json file '{JsonFilePath}'", jsonFileFullPath);
+        
+        // step2 update and save list.json
+        m_SelectedTable.SetJsonFileRelativePath(jsonFileName);
+        await FlushTableListToDatabase();
+        Log.Information("Save table list to list.json finished");
+        
+        // step3 update 'json file found' status
+        m_SelectedTable.NotifyJsonFileStatusChanged();
+        
+        // step4 success message popup
+        // TODO
     }
 
     #endregion
@@ -234,9 +289,18 @@ public class MainWindowViewModel : ViewModelBase
             {
                 var selected = result[0];
                 Log.Information("Selected file from dialog: '{SelectedFile}'", selected);
+#pragma warning disable CS4014
                 AddNewSelectedTableFile(selected);
+#pragma warning restore CS4014
             }
         }
+    }
+    
+    private void OnSaveJsonButtonClicked()
+    {
+#pragma warning disable CS4014
+        SaveJsonFileWithCurrentSelected();
+#pragma warning restore CS4014
     }
 
     private void OnSelectedTableChanged(object? sender, SelectionChangedEventArgs e)

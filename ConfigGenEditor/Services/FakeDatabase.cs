@@ -7,6 +7,7 @@ using System.Threading.Tasks;
 using Avalonia.Logging;
 using ConfigGenEditor.Models;
 using LitJson;
+using Serilog;
 
 namespace ConfigGenEditor.Services;
 
@@ -72,6 +73,6 @@ public class FakeDatabase
         await using var fs = File.Open(m_ListJsonFilePath, FileMode.OpenOrCreate);
         await using var sw = new StreamWriter(fs, utf8NoBom);
         await sw.WriteAsync(builder.ToString());
-        Logger.TryGet(LogEventLevel.Debug, LogArea.Control)?.Log(this, "write ListJsonFile finished");
+        Log.Information("write ListJsonFile {Path} finished", m_ListJsonFilePath);
     }
 }

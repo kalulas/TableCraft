@@ -6,6 +6,7 @@
 #endregion
 
 using System.Collections.ObjectModel;
+using System.IO;
 using ConfigCodeGenLib;
 using ConfigCodeGenLib.ConfigReader;
 
@@ -29,9 +30,9 @@ public class ConfigInfoViewModel : ViewModelBase
 
     #endregion
 
-    public ConfigInfoViewModel(string configFilePath, string jsonFilePath, EConfigType configType)
+    public ConfigInfoViewModel(ConfigInfo configInfo)
     {
-        m_ConfigInfo = ConfigManager.singleton.AddNewConfigInfo(configFilePath, jsonFilePath, configType);
+        m_ConfigInfo = configInfo;
         m_Attributes = new ObservableCollection<ConfigAttributeListItemViewModel>();
         CreateAttributes();
     }
@@ -44,6 +45,15 @@ public class ConfigInfoViewModel : ViewModelBase
         {
             m_Attributes.Add(new ConfigAttributeListItemViewModel(configAttributeInfo));
         }
+    }
+
+    #endregion
+
+    #region Public API
+
+    public ConfigInfo GetConfigInfo()
+    {
+        return m_ConfigInfo;
     }
 
     #endregion
