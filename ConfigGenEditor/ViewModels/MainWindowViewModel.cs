@@ -81,29 +81,11 @@ public class MainWindowViewModel : ViewModelBase
     public MainWindowViewModel(FakeDatabase db)
     {
         m_Database = db;
-        if (!EnvironmentCheck())
-        {
-            if (Application.Current?.ApplicationLifetime is IControlledApplicationLifetime desktop)
-            {
-                // TODO show error popup window, shutdown on confirm
-                Log.Error("ConfigCodeGenLib is not initialized, about to shutdown");
-                desktop.Shutdown();
-            }
-            
-            // This is not supposed to happen ...
-            return;
-        }
-
         AppendNewTableFileFilter();
         CreateSubViewModels(db);
         CreateCommands();
     }
 
-    private bool EnvironmentCheck()
-    {
-        return Configuration.IsInited;
-    }
-    
     private void AppendNewTableFileFilter()
     {
         // TODO get extensions from lib?
