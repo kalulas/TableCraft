@@ -92,18 +92,21 @@
         </Grid>
         
         <StackPanel Orientation="Horizontal" HorizontalAlignment="Right" Margin="16,10">
-            <!-- <Button IsEnabled="False" Margin="0, 0, 16, 0"> -->
-            <!--     <StackPanel Orientation="Horizontal"> -->
-            <!--         <Image Source="/Assets/minus-30.png" Height="16"></Image> -->
-            <!--         <Label> Export </Label> -->
-            <!--     </StackPanel> -->
-            <!-- </Button> -->
             <Button 
                 IsEnabled="{Binding SelectedConfigInfo, Converter={x:Static ObjectConverters.IsNotNull}}"
-                Command="{Binding SaveJsonFileCommand}">
+                Command="{Binding GenerateCodeCommand}">
+                <StackPanel Orientation="Horizontal">
+                    <Image Source="/Assets/script-128.png" Height="32"></Image>
+                    <Label VerticalAlignment="Center"> Generate </Label>
+                </StackPanel>
+            </Button>
+            <Button 
+                IsEnabled="{Binding SelectedConfigInfo, Converter={x:Static ObjectConverters.IsNotNull}}"
+                Command="{Binding SaveJsonFileCommand}"
+                Margin="20, 0, 0, 0">
                 <StackPanel Orientation="Horizontal">
                     <Image Source="/Assets/json-128.png" Height="32"></Image>
-                    <Label VerticalAlignment="Center"> Save json file </Label>
+                    <Label VerticalAlignment="Center"> Save </Label>
                 </StackPanel>
             </Button>
         </StackPanel>

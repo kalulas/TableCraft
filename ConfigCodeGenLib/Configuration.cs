@@ -151,5 +151,21 @@ namespace ConfigCodeGenLib
 
         #endregion
 
+        #region Public API
+
+        public static string GetTemplateFilePathForUsage(string usage)
+        {
+            if (!m_UsageToInformation.ContainsKey(usage))
+            {
+                Debugger.LogError("usage '{0}' not found", usage);
+                return string.Empty;
+            }
+
+            var templateName = m_UsageToInformation[usage].CodeTemplateName;
+            return Path.Combine(CodeTemplatePath, templateName);
+        }
+
+        #endregion
+
     }
 }

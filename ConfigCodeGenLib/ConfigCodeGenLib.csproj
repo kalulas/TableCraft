@@ -6,6 +6,7 @@
 
   <ItemGroup>
     <PackageReference Include="LitJson" Version="0.17.0" />
+    <PackageReference Include="Microsoft.VisualStudio.TextTemplating" Version="17.5.33428.366" />
   </ItemGroup>
 
   <ItemGroup>

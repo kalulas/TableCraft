@@ -1,8 +1,9 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Text;
+﻿using System.Collections.Generic;
 using System.IO;
+using System.Threading.Tasks;
 using ConfigCodeGenLib.ConfigReader;
+using ConfigCodeGenLib.Generation;
+using Microsoft.VisualStudio.TextTemplating;
 
 namespace ConfigCodeGenLib
 {
@@ -153,13 +154,36 @@ namespace ConfigCodeGenLib
         /// <summary>
         /// Generate code with specific usage to <paramref name="outputFilePath"/>
         /// </summary>
-        /// <param name="identifier"></param>
         /// <param name="usage"></param>
+        /// <param name="configInfo"></param>
         /// <param name="outputFilePath"></param>
         /// <returns></returns>
-        public bool GenerateCodeWithTemplate(string identifier, string usage, string outputFilePath)
+        public async Task<bool> GenerateCodeForUsage(string usage, ConfigInfo configInfo, string outputFilePath)
         {
-            // TODO
+            if (configInfo == null)
+            {
+                return false;
+            }
+
+            if (!Configuration.IsUsageValid(usage))
+            {
+                return false;
+            }
+
+            if (File.Exists(outputFilePath))
+            {
+                Debugger.LogWarning("existed file '{0}' will be overwrite", outputFilePath);
+            }
+
+            var templateFilePath = Configuration.GetTemplateFilePathForUsage(usage);
+            if (string.IsNullOrEmpty(templateFilePath))
+            {
+                return false;
+            }
+
+            var host = new ReaderScriptHost();
+            var engine = new Engine();
+            // TODO implement custom host
             return false;
         }
 

@@ -10,6 +10,8 @@ using Avalonia.Controls.ApplicationLifetimes;
 using ConfigCodeGenLib;
 using ConfigGenEditor.Models;
 using ConfigGenEditor.Services;
+using MessageBox.Avalonia.DTO;
+using MessageBox.Avalonia.Enums;
 using ReactiveUI;
 using Serilog;
 using Path = System.IO.Path;
@@ -71,6 +73,7 @@ public class MainWindowViewModel : ViewModelBase
 
     public ICommand? AddNewTableFileCommand { get; private set; }
     public ICommand? SaveJsonFileCommand { get; private set; }
+    public ICommand? GenerateCodeCommand { get; private set; }
     public EventHandler<SelectionChangedEventArgs>? SelectedTableChangedEventHandler { get; private set; }
     public EventHandler<SelectionChangedEventArgs>? SelectedAttributeChangedEventHandler { get; private set; }
 
@@ -116,6 +119,7 @@ public class MainWindowViewModel : ViewModelBase
     {
         AddNewTableFileCommand = ReactiveCommand.CreateFromTask(OnAddNewTableButtonClicked);
         SaveJsonFileCommand = ReactiveCommand.Create(OnSaveJsonButtonClicked);
+        GenerateCodeCommand = ReactiveCommand.Create(OnGenerateCodeButtonClicked);
         SelectedTableChangedEventHandler = OnSelectedTableChanged;
         SelectedAttributeChangedEventHandler = OnSelectedAttributeChanged;
     }
@@ -248,7 +252,33 @@ public class MainWindowViewModel : ViewModelBase
         m_SelectedTable.NotifyJsonFileStatusChanged();
         
         // step4 success message popup
-        // TODO
+        var messageBox = MessageBox.Avalonia.MessageBoxManager.GetMessageBoxStandardWindow(new MessageBoxStandardParams
+        {
+            ButtonDefinitions = ButtonEnum.Ok,
+            ContentTitle = "Success",
+            ContentMessage = $"Json file saved: {jsonFileFullPath}",
+            WindowStartupLocation = WindowStartupLocation.CenterScreen,
+            MinHeight = 180.0,
+            CanResize = true
+        });
+
+        await messageBox.ShowDialog(App.GetMainWindow());
+    }
+
+    private async Task GenerateCodeWithCurrentUsage()
+    {
+        // TODO to appsettings.json with different usage
+        var generateHomePath = AppContext.BaseDirectory;
+        var configInfo = m_SelectedConfigInfo?.GetConfigInfo();
+        if (configInfo == null)
+        {
+            Log.Error("[MainWindowViewModel.GenerateCodeWithCurrentUsage] selected configInfo is null, exit");
+            return;
+        }
+
+        // TODO to ConfigInfo API with different usage
+        var targetPath = Path.Combine(generateHomePath, Path.ChangeExtension(configInfo.ConfigName, "cs"));
+        var success = await ConfigManager.singleton.GenerateCodeForUsage(Configuration.ConfigUsageType[0], configInfo, targetPath);
     }
 
     #endregion
@@ -282,6 +312,13 @@ public class MainWindowViewModel : ViewModelBase
     {
 #pragma warning disable CS4014
         SaveJsonFileWithCurrentSelected();
+#pragma warning restore CS4014
+    }
+
+    private void OnGenerateCodeButtonClicked()
+    {
+#pragma warning disable CS4014
+        GenerateCodeWithCurrentUsage();
 #pragma warning restore CS4014
     }
 

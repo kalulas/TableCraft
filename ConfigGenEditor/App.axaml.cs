@@ -20,6 +20,16 @@ public partial class App : Application
         AvaloniaXamlLoader.Load(this);
     }
 
+    public static Window? GetMainWindow()
+    {
+        if (Current?.ApplicationLifetime is IClassicDesktopStyleApplicationLifetime desktop)
+        {
+            return desktop.MainWindow;
+        }
+
+        return null;
+    }
+
     public override void OnFrameworkInitializationCompleted()
     {
         if (ApplicationLifetime is IClassicDesktopStyleApplicationLifetime desktop)
@@ -34,6 +44,7 @@ public partial class App : Application
                         ContentTitle = "Error",
                         ContentMessage = errorMessage,
                         WindowStartupLocation = WindowStartupLocation.CenterScreen,
+                        MinHeight = 180.0
                     });
                 
                 messageBox.Show();
