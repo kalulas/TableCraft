@@ -157,12 +157,23 @@ namespace ConfigCodeGenLib
         {
             if (!m_UsageToInformation.ContainsKey(usage))
             {
-                Debugger.LogError("usage '{0}' not found", usage);
+                Debugger.LogError("[Configuration.GetTemplateFilePathForUsage] usage '{0}' not found", usage);
                 return string.Empty;
             }
 
             var templateName = m_UsageToInformation[usage].CodeTemplateName;
             return Path.Combine(CodeTemplatePath, templateName);
+        }
+        
+        public static string GetTargetFileTypeForUsage(string usage)
+        {
+            if (!m_UsageToInformation.ContainsKey(usage))
+            {
+                Debugger.LogError("[Configuration.GetTargetFileTypeForUsage] usage '{0}' not found", usage);
+                return string.Empty;
+            }
+
+            return m_UsageToInformation[usage].TargetFileType;
         }
 
         #endregion

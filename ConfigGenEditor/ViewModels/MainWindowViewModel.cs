@@ -268,7 +268,7 @@ public class MainWindowViewModel : ViewModelBase
     private async Task GenerateCodeWithCurrentUsage()
     {
         // TODO to appsettings.json with different usage
-        var generateHomePath = AppContext.BaseDirectory;
+        var outputDir = AppContext.BaseDirectory;
         var configInfo = m_SelectedConfigInfo?.GetConfigInfo();
         if (configInfo == null)
         {
@@ -276,9 +276,7 @@ public class MainWindowViewModel : ViewModelBase
             return;
         }
 
-        // TODO to ConfigInfo API with different usage
-        var targetPath = Path.Combine(generateHomePath, Path.ChangeExtension(configInfo.ConfigName, "cs"));
-        var success = await ConfigManager.singleton.GenerateCodeForUsage(Configuration.ConfigUsageType[0], configInfo, targetPath);
+        var success = await ConfigManager.singleton.GenerateCodeForUsage(Configuration.ConfigUsageType[0], configInfo, outputDir);
     }
 
     #endregion

@@ -152,13 +152,13 @@ namespace ConfigCodeGenLib
         }
 
         /// <summary>
-        /// Generate code with specific usage to <paramref name="outputFilePath"/>
+        /// Generate code with specific usage to <paramref name="outputDirectory"/>
         /// </summary>
         /// <param name="usage"></param>
         /// <param name="configInfo"></param>
-        /// <param name="outputFilePath"></param>
+        /// <param name="outputDirectory"></param>
         /// <returns></returns>
-        public async Task<bool> GenerateCodeForUsage(string usage, ConfigInfo configInfo, string outputFilePath)
+        public async Task<bool> GenerateCodeForUsage(string usage, ConfigInfo configInfo, string outputDirectory)
         {
             if (configInfo == null)
             {
@@ -171,19 +171,23 @@ namespace ConfigCodeGenLib
             }
             
             var templateFilePath = Configuration.GetTemplateFilePathForUsage(usage);
-            if (string.IsNullOrEmpty(templateFilePath) || !File.Exists(templateFilePath))
+            var extension = Configuration.GetTargetFileTypeForUsage(usage);
+            if (string.IsNullOrEmpty(templateFilePath) || string.IsNullOrEmpty(extension) || !File.Exists(templateFilePath))
             {
                 Debugger.LogWarning("[ConfigManager.GenerateCodeForUsage] template file {1} not found for usage '{0}'",
                     usage, templateFilePath ?? string.Empty);
                 return false;
             }
 
-            if (File.Exists(outputFilePath))
+            // TODO configInfo: different name under different usage
+            var configName = Path.ChangeExtension(configInfo.ConfigName, extension);
+            var outputFileName = Path.Combine(outputDirectory, configName);
+            if (File.Exists(outputFileName))
             {
-                Debugger.LogWarning("[ConfigManager.GenerateCodeForUsage] existed file '{0}' will be overwrite", outputFilePath);
+                Debugger.LogWarning("[ConfigManager.GenerateCodeForUsage] existed file '{0}' will be overwrite", outputDirectory);
             }
             
-            var host = new ReaderScriptHost();
+            var host = new CustomHost();
             var engine = new Engine();
             // TODO implement custom host
             return false;

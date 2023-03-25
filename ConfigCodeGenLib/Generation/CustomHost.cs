@@ -13,7 +13,7 @@ using Microsoft.VisualStudio.TextTemplating;
 
 namespace ConfigCodeGenLib.Generation
 {
-    public class ReaderScriptHost : ITextTemplatingEngineHost
+    public class CustomHost : ITextTemplatingEngineHost
     {
         public bool LoadIncludeText(string requestFileName, out string content, out string location)
         {
