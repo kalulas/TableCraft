@@ -169,18 +169,20 @@ namespace ConfigCodeGenLib
             {
                 return false;
             }
-
-            if (File.Exists(outputFilePath))
-            {
-                Debugger.LogWarning("existed file '{0}' will be overwrite", outputFilePath);
-            }
-
+            
             var templateFilePath = Configuration.GetTemplateFilePathForUsage(usage);
-            if (string.IsNullOrEmpty(templateFilePath))
+            if (string.IsNullOrEmpty(templateFilePath) || !File.Exists(templateFilePath))
             {
+                Debugger.LogWarning("[ConfigManager.GenerateCodeForUsage] template file {1} not found for usage '{0}'",
+                    usage, templateFilePath ?? string.Empty);
                 return false;
             }
 
+            if (File.Exists(outputFilePath))
+            {
+                Debugger.LogWarning("[ConfigManager.GenerateCodeForUsage] existed file '{0}' will be overwrite", outputFilePath);
+            }
+            
             var host = new ReaderScriptHost();
             var engine = new Engine();
             // TODO implement custom host

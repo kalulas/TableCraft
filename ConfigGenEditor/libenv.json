@@ -5,15 +5,15 @@
     "UTF8BOM": false,
     "ConfigUsageType":{
         "client0":{
-            "CodeTemplateName": "client0-template.txt",
+            "CodeTemplateName": "client0-template.tt",
             "TargetFileType": ".cs"
         },
         "client1":{
-            "CodeTemplateName": "client1-template.txt",
+            "CodeTemplateName": "client1-template.tt",
             "TargetFileType": ".cs"
         },
         "server":{
-            "CodeTemplateName": "server-template.txt",
+            "CodeTemplateName": "server-template.tt",
             "TargetFileType": ".go"
         }
     }
