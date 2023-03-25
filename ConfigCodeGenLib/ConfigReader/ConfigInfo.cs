@@ -64,7 +64,8 @@ namespace ConfigCodeGenLib.ConfigReader
                 return this;
             }
             
-            var jsonContent = File.ReadAllText(m_RelatedJsonFilePath, Encoding.UTF8);
+            var encoding = new UTF8Encoding(Configuration.UseUTF8WithBOM);
+            var jsonContent = File.ReadAllText(m_RelatedJsonFilePath, encoding);
             var jsonData = JsonMapper.ToObject(jsonContent);
             if (!jsonData.ContainsKey(ATTRIBUTES_KEY))
             {
@@ -130,10 +131,10 @@ namespace ConfigCodeGenLib.ConfigReader
 
             // make sure the directory existed
             Directory.CreateDirectory(Path.GetDirectoryName(jsonFilePath));
-            var utf8 = new UTF8Encoding(false);
+            var encoding = new UTF8Encoding(Configuration.UseUTF8WithBOM);
             using (var fs = File.Open(jsonFilePath, FileMode.Create))
             {
-                using (var sw = new StreamWriter(fs, utf8))
+                using (var sw = new StreamWriter(fs, encoding))
                 {
                     sw.Write(builder.ToString());
                 }

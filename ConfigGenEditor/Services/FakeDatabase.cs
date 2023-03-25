@@ -31,8 +31,8 @@ public class FakeDatabase
             throw new FileNotFoundException(m_ListJsonFilePath + " not found");
         }
 
-        var utf8NoBom = new UTF8Encoding(false);
-        var listJsonFileContent = File.ReadAllText(m_ListJsonFilePath, utf8NoBom);
+        var encoding = new UTF8Encoding(ConfigCodeGenLib.Configuration.UseUTF8WithBOM);
+        var listJsonFileContent = File.ReadAllText(m_ListJsonFilePath, encoding);
         var jsonData = JsonMapper.ToObject(listJsonFileContent);
         if (!jsonData.IsArray)
         {
@@ -69,9 +69,9 @@ public class FakeDatabase
         elementList.Sort();
         
         JsonMapper.ToJson(elementList, writer);
-        var utf8NoBom = new UTF8Encoding(false);
+        var encoding = new UTF8Encoding(ConfigCodeGenLib.Configuration.UseUTF8WithBOM);
         await using var fs = File.Open(m_ListJsonFilePath, FileMode.OpenOrCreate);
-        await using var sw = new StreamWriter(fs, utf8NoBom);
+        await using var sw = new StreamWriter(fs, encoding);
         await sw.WriteAsync(builder.ToString());
         Log.Information("write ListJsonFile {Path} finished", m_ListJsonFilePath);
     }

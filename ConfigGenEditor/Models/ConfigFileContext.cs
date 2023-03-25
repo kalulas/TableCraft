@@ -25,7 +25,8 @@ public static class ConfigFileContext
     /// <returns></returns>
     internal static bool Load(string listJsonFilePath)
     {
-        var listJsonFileContent = File.ReadAllText(listJsonFilePath, Encoding.UTF8);
+        var encoding = new UTF8Encoding(ConfigCodeGenLib.Configuration.UseUTF8WithBOM);
+        var listJsonFileContent = File.ReadAllText(listJsonFilePath, encoding);
         var jsonData = JsonMapper.ToObject(listJsonFileContent);
         if (!jsonData.IsArray)
         {

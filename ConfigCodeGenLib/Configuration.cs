@@ -26,7 +26,9 @@ namespace ConfigCodeGenLib
             public string TargetFileType { get; set; }
         }
         
-        public static string CodeTemplatePath { get; private set; } 
+        public static string CodeTemplatePath { get; private set; }
+
+        public static bool UseUTF8WithBOM { get; private set; } = true;
         
         public static string[] DataValueType => m_DataValueType.ToArray();
 
@@ -37,6 +39,8 @@ namespace ConfigCodeGenLib
         public static string[] AttributeTag => m_AttributeTag.ToArray();
 
         private static bool m_IsInited;
+        
+        private const string m_TemplatesPath = "Templates";
         public static bool IsInited => m_IsInited;
         
         /// <summary>
@@ -113,7 +117,8 @@ namespace ConfigCodeGenLib
             ReadStringArrayFromJson(configData, "DataCollectionType", m_DataCollectionType);
             ReadStringArrayFromJson(configData, "AttributeTag", m_AttributeTag);
             
-            CodeTemplatePath = Path.Combine(libEnvDir, configData["CodeTemplatePath"].ToString());
+            CodeTemplatePath = Path.Combine(libEnvDir, m_TemplatesPath);
+            UseUTF8WithBOM = (bool)configData["UTF8BOM"];
 
             m_ConfigUsageType.Clear();
             foreach (var usageConfig in configData["ConfigUsageType"])

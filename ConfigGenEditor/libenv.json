@@ -2,7 +2,7 @@
     "DataValueType": ["int", "uint", "float", "boolean", "string"],
     "DataCollectionType": ["none", "array", "list"],
     "AttributeTag": ["primary", "comma-separate", "semicolon-separate"],
-    "CodeTemplatePath": "CodeTemplate",
+    "UTF8BOM": false,
     "ConfigUsageType":{
         "client0":{
             "CodeTemplateName": "csharp.txt",
