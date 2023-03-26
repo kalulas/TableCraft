@@ -15,6 +15,9 @@ namespace ConfigGenEditor;
 
 public partial class App : Application
 {
+    // TODO move to MessageBoxExtend or somewhere else ...
+    public const float StandardPopupHeight = 180.0f;
+    
     public override void Initialize()
     {
         AvaloniaXamlLoader.Load(this);
@@ -44,7 +47,7 @@ public partial class App : Application
                         ContentTitle = "Error",
                         ContentMessage = errorMessage,
                         WindowStartupLocation = WindowStartupLocation.CenterScreen,
-                        MinHeight = 180.0
+                        MinHeight = StandardPopupHeight
                     });
                 
                 messageBox.Show();

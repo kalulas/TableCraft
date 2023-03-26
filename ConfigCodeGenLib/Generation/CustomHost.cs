@@ -112,7 +112,6 @@ namespace ConfigCodeGenLib.Generation
 
         public object GetHostOption(string optionName)
         {
-            // TODO test if this satisfy our needs
             object returnObject;
             switch (optionName)
             {
@@ -127,7 +126,7 @@ namespace ConfigCodeGenLib.Generation
                     break;
             }
             
-            Debugger.Log($"[CustomHost.GetHostOption] is called with {optionName}");
+            // Debugger.Log($"[CustomHost.GetHostOption] is called with {optionName}");
             return returnObject;
         }
 
@@ -135,11 +134,11 @@ namespace ConfigCodeGenLib.Generation
         {
             get
             {
+                // all assembly references needed in template c# code
                 return new string[]
                 {
                     // mscorlib.dll
                     typeof(System.String).Assembly.Location,
-                    // typeof(Microsoft.CodeAnalysis.Metadata).Assembly.Location,
                     // library dll
                     typeof(ConfigCodeGenLib.ConfigManager).Assembly.Location,
                     // litjson needed? dont know yet
@@ -151,6 +150,7 @@ namespace ConfigCodeGenLib.Generation
         {
             get
             {
+                // like 'using' statement in c#
                 return new string[]
                 {
                     "System",
@@ -180,17 +180,25 @@ namespace ConfigCodeGenLib.Generation
 
         #region Public API
 
-        public void PrintErrors()
+        /// <summary>
+        /// Return true if ErrorCollection is null and no errors
+        /// </summary>
+        /// <returns></returns>
+        public bool PrintErrors()
         {
             if (m_ErrorCollection == null)
             {
-                return;
+                return true;
             }
-            
+
+            var hasPrintedError = false;
             foreach (CompilerError compilerError in m_ErrorCollection)
             {
                 Debugger.LogError(compilerError.ToString());
+                hasPrintedError = true;
             }
+
+            return !hasPrintedError;
         }
 
         #endregion

@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
+using System.IO;
 using System.Linq;
 using System.Threading.Tasks;
 using System.Windows.Input;
@@ -148,7 +149,8 @@ public class MainWindowViewModel : ViewModelBase
         }
         
         // TODO uniqueness check, popup message if duplicate
-        var tableFileRelative = Path.GetRelativePath(ConfigHomePath, newTableFilePath);
+        // var tableFileRelative = Path.GetRelativePath(ConfigHomePath, newTableFilePath);
+        var tableFileRelative = PathExtend.MakeRelativePath(ConfigHomePath + Path.DirectorySeparatorChar, newTableFilePath);
         // imported table file, without json file
         var tableElement = new ConfigFileElement(tableFileRelative, string.Empty);
         var createdTableViewModel = new ConfigFileElementViewModel(tableElement);
@@ -256,19 +258,21 @@ public class MainWindowViewModel : ViewModelBase
         {
             ButtonDefinitions = ButtonEnum.Ok,
             ContentTitle = "Success",
-            ContentMessage = $"Json file saved: {jsonFileFullPath}",
+            ContentMessage = $"Json file saved: '{jsonFileFullPath}'",
             WindowStartupLocation = WindowStartupLocation.CenterScreen,
-            MinHeight = 180.0,
-            CanResize = true
+            MinHeight = App.StandardPopupHeight,
+            CanResize = true,
         });
 
         await messageBox.ShowDialog(App.GetMainWindow());
     }
 
-    private void GenerateCodeWithCurrentUsage()
+    private async Task GenerateCodeWithCurrentUsage()
     {
         // TODO to appsettings.json with different usage
-        var outputDir = AppContext.BaseDirectory;
+        var outputDir = Path.Combine(AppContext.BaseDirectory, "GeneratedCode");
+        Directory.CreateDirectory(outputDir);
+        
         var configInfo = m_SelectedConfigInfo?.GetConfigInfo();
         if (configInfo == null)
         {
@@ -276,7 +280,23 @@ public class MainWindowViewModel : ViewModelBase
             return;
         }
 
-        var success = ConfigManager.singleton.GenerateCodeForUsage(Configuration.ConfigUsageType[0], configInfo, outputDir);
+        var success =
+            await ConfigManager.singleton.GenerateCodeForUsage(Configuration.ConfigUsageType[0], configInfo, outputDir);
+        var popupTitle = success ? "Success" : "Error";
+        var popupMessage = success
+            ? $"Generation success, output directory: '{outputDir}'"
+            : "Generation failed, please refer to log for more details";
+        var messageBox = MessageBox.Avalonia.MessageBoxManager.GetMessageBoxStandardWindow(new MessageBoxStandardParams
+        {
+            ButtonDefinitions = ButtonEnum.Ok,
+            ContentTitle = popupTitle,
+            ContentMessage = popupMessage,
+            WindowStartupLocation = WindowStartupLocation.CenterScreen,
+            MinHeight = App.StandardPopupHeight,
+            CanResize = true,
+        });
+
+        await messageBox.ShowDialog(App.GetMainWindow());
     }
 
     #endregion
@@ -315,7 +335,9 @@ public class MainWindowViewModel : ViewModelBase
 
     private void OnGenerateCodeButtonClicked()
     {
+#pragma warning disable CS4014
         GenerateCodeWithCurrentUsage();
+#pragma warning restore CS4014
     }
 
     private void OnSelectedTableChanged(object? sender, SelectionChangedEventArgs e)

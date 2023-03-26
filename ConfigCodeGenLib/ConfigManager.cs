@@ -1,6 +1,7 @@
 ﻿using System.Collections.Generic;
 using System.IO;
 using System.Text;
+using System.Threading.Tasks;
 using ConfigCodeGenLib.ConfigReader;
 using ConfigCodeGenLib.Generation;
 using Microsoft.VisualStudio.TextTemplating;
@@ -158,15 +159,17 @@ namespace ConfigCodeGenLib
         /// <param name="configInfo"></param>
         /// <param name="outputDirectory"></param>
         /// <returns></returns>
-        public bool GenerateCodeForUsage(string usage, ConfigInfo configInfo, string outputDirectory)
+        public async Task<bool> GenerateCodeForUsage(string usage, ConfigInfo configInfo, string outputDirectory)
         {
             if (configInfo == null)
             {
+                Debugger.LogWarning("[ConfigManager.GenerateCodeForUsage] configInfo is null");
                 return false;
             }
 
             if (!Configuration.IsUsageValid(usage))
             {
+                Debugger.LogWarning($"[ConfigManager.GenerateCodeForUsage] usage '{usage}' is not valid");
                 return false;
             }
             
@@ -191,17 +194,34 @@ namespace ConfigCodeGenLib
             var host = new CustomHost(templateFilePath, outputExtension, encoding, configInfo);
             var engine = new Engine();
             // read from template file
-            var templateContent = File.ReadAllText(templateFilePath, encoding);
+            string templateContent;
+            // templateContent = File.ReadAllText(templateFilePath, encoding);
+            using (var fs = File.Open(templateFilePath, FileMode.Open, FileAccess.Read))
+            {
+                using (var sr = new StreamReader(fs, encoding))
+                {
+                    templateContent = await sr.ReadToEndAsync();
+                };
+            };
+            
             Debugger.Log($"[ConfigManager.GenerateCodeForUsage] start processing template file {templateFilePath}");
             // transform the text template
             var outputContent = engine.ProcessTemplate(templateContent, host);
-            
+            // var outputContent = await Task.Run(() => engine.ProcessTemplate(templateContent, host));
             Debugger.Log($"[ConfigManager.GenerateCodeForUsage] finish processing template file {templateFilePath}");
-            File.WriteAllText(outputFilePath, outputContent, encoding);
-            Debugger.Log($"[ConfigManager.GenerateCodeForUsage] write generated content to file {outputFilePath} finished");
+            using (var fs = File.Open(outputFilePath, FileMode.OpenOrCreate, FileAccess.Write))
+            {
+                using (var sw = new StreamWriter(fs, encoding))
+                {
+                    await sw.WriteAsync(outputContent);
+                }
+            }
+            
+            // File.WriteAllText(outputFilePath, outputContent, encoding);
+            Debugger.Log($"[ConfigManager.GenerateCodeForUsage] finish writing generated content to file {outputFilePath}");
             // generation errors to logger
-            host.PrintErrors();
-            return false;
+            var success = host.PrintErrors();
+            return success;
         }
 
         #endregion
