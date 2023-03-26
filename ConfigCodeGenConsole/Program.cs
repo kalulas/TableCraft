@@ -14,7 +14,7 @@ namespace ConfigCodeGenConsole
             var host = Host.CreateDefaultBuilder(args).Build();
             var config = host.Services.GetRequiredService<IConfiguration>();
             var targetCsvConfigFilePath = config.GetValue<string>("CsvFilePath");
-            var jsonHomeDir = config.GetValue<string>("JsonDirectory");
+            var jsonFilePath = config.GetValue<string>("JsonFilePath");
 
             if (string.IsNullOrEmpty(targetCsvConfigFilePath))
             {
@@ -31,14 +31,11 @@ namespace ConfigCodeGenConsole
             }
 
             ConfigManager.singleton.ReadComment = true;
-            var identifier = ConfigManager.singleton.GetConfigIdentifier(targetCsvConfigFilePath);
-            var relatedJsonFilePath = $"{jsonHomeDir}\\{identifier}.json";
-            var configInfo = ConfigManager.singleton.AddNewConfigInfo(targetCsvConfigFilePath, relatedJsonFilePath, ConfigCodeGenLib.ConfigReader.EConfigType.CSV);
-            if (!configInfo.HasJsonConfig)
-            {
-                Debugger.Log($"{identifier} related json file not found, create a new one");
-                ConfigManager.singleton.SaveConfigInfoJsonFile(identifier, relatedJsonFilePath);
-            }
+            // var identifier = ConfigManager.singleton.GetConfigIdentifier(targetCsvConfigFilePath);
+            // var relatedJsonFilePath = $"{jsonHomeDir}\\{identifier}.json";
+            var configInfo = ConfigManager.singleton.AddNewConfigInfo(targetCsvConfigFilePath, jsonFilePath, ConfigCodeGenLib.ConfigReader.EConfigType.CSV);
+            ConfigManager.singleton.GenerateCodeForUsage(Configuration.ConfigUsageType[0], configInfo,
+                AppContext.BaseDirectory);
         }
     }
 }

@@ -1,6 +1,6 @@
 ﻿using System.Collections.Generic;
 using System.IO;
-using System.Threading.Tasks;
+using System.Text;
 using ConfigCodeGenLib.ConfigReader;
 using ConfigCodeGenLib.Generation;
 using Microsoft.VisualStudio.TextTemplating;
@@ -158,7 +158,7 @@ namespace ConfigCodeGenLib
         /// <param name="configInfo"></param>
         /// <param name="outputDirectory"></param>
         /// <returns></returns>
-        public async Task<bool> GenerateCodeForUsage(string usage, ConfigInfo configInfo, string outputDirectory)
+        public bool GenerateCodeForUsage(string usage, ConfigInfo configInfo, string outputDirectory)
         {
             if (configInfo == null)
             {
@@ -171,8 +171,8 @@ namespace ConfigCodeGenLib
             }
             
             var templateFilePath = Configuration.GetTemplateFilePathForUsage(usage);
-            var extension = Configuration.GetTargetFileTypeForUsage(usage);
-            if (string.IsNullOrEmpty(templateFilePath) || string.IsNullOrEmpty(extension) || !File.Exists(templateFilePath))
+            var outputExtension = Configuration.GetTargetFileTypeForUsage(usage);
+            if (string.IsNullOrEmpty(templateFilePath) || string.IsNullOrEmpty(outputExtension) || !File.Exists(templateFilePath))
             {
                 Debugger.LogWarning("[ConfigManager.GenerateCodeForUsage] template file {1} not found for usage '{0}'",
                     usage, templateFilePath ?? string.Empty);
@@ -180,16 +180,27 @@ namespace ConfigCodeGenLib
             }
 
             // TODO configInfo: different name under different usage
-            var configName = Path.ChangeExtension(configInfo.ConfigName, extension);
-            var outputFileName = Path.Combine(outputDirectory, configName);
-            if (File.Exists(outputFileName))
+            var configName = Path.ChangeExtension(configInfo.ConfigName, outputExtension);
+            var outputFilePath = Path.Combine(outputDirectory, configName);
+            if (File.Exists(outputFilePath))
             {
                 Debugger.LogWarning("[ConfigManager.GenerateCodeForUsage] existed file '{0}' will be overwrite", outputDirectory);
             }
-            
-            var host = new CustomHost();
+
+            var encoding = new UTF8Encoding(Configuration.UseUTF8WithBOM);
+            var host = new CustomHost(templateFilePath, outputExtension, encoding, configInfo);
             var engine = new Engine();
-            // TODO implement custom host
+            // read from template file
+            var templateContent = File.ReadAllText(templateFilePath, encoding);
+            Debugger.Log($"[ConfigManager.GenerateCodeForUsage] start processing template file {templateFilePath}");
+            // transform the text template
+            var outputContent = engine.ProcessTemplate(templateContent, host);
+            
+            Debugger.Log($"[ConfigManager.GenerateCodeForUsage] finish processing template file {templateFilePath}");
+            File.WriteAllText(outputFilePath, outputContent, encoding);
+            Debugger.Log($"[ConfigManager.GenerateCodeForUsage] write generated content to file {outputFilePath} finished");
+            // generation errors to logger
+            host.PrintErrors();
             return false;
         }
 

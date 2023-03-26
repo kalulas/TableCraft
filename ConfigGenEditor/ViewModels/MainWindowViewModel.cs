@@ -265,7 +265,7 @@ public class MainWindowViewModel : ViewModelBase
         await messageBox.ShowDialog(App.GetMainWindow());
     }
 
-    private async Task GenerateCodeWithCurrentUsage()
+    private void GenerateCodeWithCurrentUsage()
     {
         // TODO to appsettings.json with different usage
         var outputDir = AppContext.BaseDirectory;
@@ -276,7 +276,7 @@ public class MainWindowViewModel : ViewModelBase
             return;
         }
 
-        var success = await ConfigManager.singleton.GenerateCodeForUsage(Configuration.ConfigUsageType[0], configInfo, outputDir);
+        var success = ConfigManager.singleton.GenerateCodeForUsage(Configuration.ConfigUsageType[0], configInfo, outputDir);
     }
 
     #endregion
@@ -315,9 +315,7 @@ public class MainWindowViewModel : ViewModelBase
 
     private void OnGenerateCodeButtonClicked()
     {
-#pragma warning disable CS4014
         GenerateCodeWithCurrentUsage();
-#pragma warning restore CS4014
     }
 
     private void OnSelectedTableChanged(object? sender, SelectionChangedEventArgs e)

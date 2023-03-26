@@ -1,15 +1,19 @@
 {
     "DataValueType": ["int", "uint", "float", "boolean", "string"],
     "DataCollectionType": ["none", "array", "list"],
-    "DefaultCollectionType": "none",
-    "CodeTemplatePath": "CodeTemplate",
+    "AttributeTag": ["primary", "comma-separate", "semicolon-separate"],
+    "UTF8BOM": false,
     "ConfigUsageType":{
-        "client":{
-            "CodeTemplateName": "csharp.txt",
+        "client0":{
+            "CodeTemplateName": "client0-template.tt",
+            "TargetFileType": ".cs"
+        },
+        "client1":{
+            "CodeTemplateName": "client1-template.tt",
             "TargetFileType": ".cs"
         },
         "server":{
-            "CodeTemplateName": "go.txt",
+            "CodeTemplateName": "server-template.tt",
             "TargetFileType": ".go"
         }
     }
