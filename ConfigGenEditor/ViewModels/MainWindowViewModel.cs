@@ -149,8 +149,9 @@ public class MainWindowViewModel : ViewModelBase
         }
         
         // TODO uniqueness check, popup message if duplicate
-        // var tableFileRelative = Path.GetRelativePath(ConfigHomePath, newTableFilePath);
-        var tableFileRelative = PathExtend.MakeRelativePath(ConfigHomePath + Path.DirectorySeparatorChar, newTableFilePath);
+        var tableFileRelative = Path.GetRelativePath(ConfigHomePath, newTableFilePath);
+        // var tableFileRelative = PathExtend.MakeRelativePath(ConfigHomePath + Path.DirectorySeparatorChar, newTableFilePath);
+        
         // imported table file, without json file
         var tableElement = new ConfigFileElement(tableFileRelative, string.Empty);
         var createdTableViewModel = new ConfigFileElementViewModel(tableElement);
