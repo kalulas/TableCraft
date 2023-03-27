@@ -1,13 +1,12 @@
 <Project Sdk="Microsoft.NET.Sdk">
 
   <PropertyGroup>
-    <TargetFramework>net48</TargetFramework>
+    <TargetFramework>net6.0</TargetFramework>
   </PropertyGroup>
 
   <ItemGroup>
     <PackageReference Include="LitJson" Version="0.17.0" />
-    <PackageReference Include="Microsoft.CodeAnalysis" Version="4.5.0" />
-    <PackageReference Include="Microsoft.VisualStudio.TextTemplating" Version="17.5.33428.366" />
+    <PackageReference Include="Mono.TextTemplating" Version="2.3.1" />
   </ItemGroup>
 
   <ItemGroup>

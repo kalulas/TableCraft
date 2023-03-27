@@ -4,7 +4,7 @@ using System.Text;
 using System.Threading.Tasks;
 using ConfigCodeGenLib.ConfigReader;
 using ConfigCodeGenLib.Generation;
-using Microsoft.VisualStudio.TextTemplating;
+using Mono.TextTemplating;
 
 namespace ConfigCodeGenLib
 {
@@ -184,15 +184,13 @@ namespace ConfigCodeGenLib
 
             // TODO configInfo: different name under different usage
             var configName = Path.ChangeExtension(configInfo.ConfigName, outputExtension);
-            var outputFilePath = Path.Combine(outputDirectory, configName);
+            var outputFilePath = Path.Combine(outputDirectory, configName ?? string.Empty);
             if (File.Exists(outputFilePath))
             {
                 Debugger.LogWarning("[ConfigManager.GenerateCodeForUsage] existed file '{0}' will be overwrite", outputDirectory);
             }
 
             var encoding = new UTF8Encoding(Configuration.UseUTF8WithBOM);
-            var host = new CustomHost(templateFilePath, outputExtension, encoding, configInfo);
-            var engine = new Engine();
             // read from template file
             string templateContent;
             // templateContent = File.ReadAllText(templateFilePath, encoding);
@@ -203,24 +201,38 @@ namespace ConfigCodeGenLib
                     templateContent = await sr.ReadToEndAsync();
                 };
             };
+
+            var generator = new CustomTemplateGenerator(templateFilePath, configInfo);
+            var parsed = generator.ParseTemplate(templateFilePath, templateContent);
+            // additional settings available
+            var settings = TemplatingEngine.GetSettings(generator, parsed);
+
+            // previous Microsoft.VisualStudio.TextTemplating
+            // var host = new CustomTemplateGenerator(templateFilePath, configInfo); // var engine = new Engine();
+            // transform the text template
+            // var outputContent = engine.ProcessTemplate(templateContent, host);
             
             Debugger.Log($"[ConfigManager.GenerateCodeForUsage] start processing template file {templateFilePath}");
-            // transform the text template
-            var outputContent = engine.ProcessTemplate(templateContent, host);
-            // var outputContent = await Task.Run(() => engine.ProcessTemplate(templateContent, host));
-            Debugger.Log($"[ConfigManager.GenerateCodeForUsage] finish processing template file {templateFilePath}");
-            using (var fs = File.Open(outputFilePath, FileMode.OpenOrCreate, FileAccess.Write))
+            
+            var (finalOutputFilePath, generatedContent) =
+                await generator.ProcessTemplateAsync(parsed, templateFilePath, templateContent, outputFilePath,
+                    settings);
+
+            Debugger.Log(
+                $"[ConfigManager.GenerateCodeForUsage] finish processing template file {templateFilePath}");
+            using (var fs = File.Open(finalOutputFilePath, FileMode.OpenOrCreate, FileAccess.Write))
             {
                 using (var sw = new StreamWriter(fs, encoding))
                 {
-                    await sw.WriteAsync(outputContent);
+                    await sw.WriteAsync(generatedContent);
                 }
             }
-            
+
             // File.WriteAllText(outputFilePath, outputContent, encoding);
-            Debugger.Log($"[ConfigManager.GenerateCodeForUsage] finish writing generated content to file {outputFilePath}");
+            Debugger.Log(
+                $"[ConfigManager.GenerateCodeForUsage] finish writing generated content to file {finalOutputFilePath}");
             // generation errors to logger
-            var success = host.PrintErrors();
+            var success = generator.PrintErrors();
             return success;
         }
 

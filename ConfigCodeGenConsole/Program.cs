@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Threading.Tasks;
 using ConfigCodeGenLib;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
@@ -8,7 +9,7 @@ namespace ConfigCodeGenConsole
 {
     class Program
     {
-        static void Main(string[] args)
+        static async Task Main(string[] args)
         {
             // https://learn.microsoft.com/zh-cn/dotnet/core/extensions/configuration
             var host = Host.CreateDefaultBuilder(args).Build();
@@ -34,7 +35,7 @@ namespace ConfigCodeGenConsole
             // var identifier = ConfigManager.singleton.GetConfigIdentifier(targetCsvConfigFilePath);
             // var relatedJsonFilePath = $"{jsonHomeDir}\\{identifier}.json";
             var configInfo = ConfigManager.singleton.AddNewConfigInfo(targetCsvConfigFilePath, jsonFilePath, ConfigCodeGenLib.ConfigReader.EConfigType.CSV);
-            ConfigManager.singleton.GenerateCodeForUsage(Configuration.ConfigUsageType[0], configInfo,
+            await ConfigManager.singleton.GenerateCodeForUsage(Configuration.ConfigUsageType[0], configInfo,
                 AppContext.BaseDirectory);
         }
     }
