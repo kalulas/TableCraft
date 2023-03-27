@@ -3,11 +3,9 @@ using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.IO;
 using System.Linq;
+using System.Reactive;
 using System.Threading.Tasks;
-using System.Windows.Input;
-using Avalonia;
 using Avalonia.Controls;
-using Avalonia.Controls.ApplicationLifetimes;
 using ConfigCodeGenLib;
 using ConfigGenEditor.Models;
 using ConfigGenEditor.Services;
@@ -72,9 +70,9 @@ public class MainWindowViewModel : ViewModelBase
 
     #region Commands
 
-    public ICommand? AddNewTableFileCommand { get; private set; }
-    public ICommand? SaveJsonFileCommand { get; private set; }
-    public ICommand? GenerateCodeCommand { get; private set; }
+    public ReactiveCommand<Unit, Unit>? AddNewTableFileCommand { get; private set; }
+    public ReactiveCommand<Unit, Unit>? SaveJsonFileCommand { get; private set; }
+    public ReactiveCommand<Unit, Unit>? GenerateCodeCommand { get; private set; }
     public EventHandler<SelectionChangedEventArgs>? SelectedTableChangedEventHandler { get; private set; }
     public EventHandler<SelectionChangedEventArgs>? SelectedAttributeChangedEventHandler { get; private set; }
 
@@ -119,8 +117,11 @@ public class MainWindowViewModel : ViewModelBase
     private void CreateCommands()
     {
         AddNewTableFileCommand = ReactiveCommand.CreateFromTask(OnAddNewTableButtonClicked);
-        SaveJsonFileCommand = ReactiveCommand.Create(OnSaveJsonButtonClicked);
-        GenerateCodeCommand = ReactiveCommand.Create(OnGenerateCodeButtonClicked);
+        AddNewTableFileCommand.ThrownExceptions.Subscribe(Program.HandleException);
+        SaveJsonFileCommand = ReactiveCommand.CreateFromTask(SaveJsonFileWithCurrentSelected);
+        SaveJsonFileCommand.ThrownExceptions.Subscribe(Program.HandleException);
+        GenerateCodeCommand = ReactiveCommand.CreateFromTask(GenerateCodeWithCurrentUsage);
+        GenerateCodeCommand.ThrownExceptions.Subscribe(Program.HandleException);
         SelectedTableChangedEventHandler = OnSelectedTableChanged;
         SelectedAttributeChangedEventHandler = OnSelectedAttributeChanged;
     }
@@ -313,32 +314,19 @@ public class MainWindowViewModel : ViewModelBase
             AllowMultiple = false
         };
         
-        if (Application.Current?.ApplicationLifetime is IClassicDesktopStyleApplicationLifetime desktop)
+        var mainWindow = App.GetMainWindow();
+        if (mainWindow == null)
         {
-            var result = await dialog.ShowAsync(desktop.MainWindow);
-            if (result != null)
-            {
-                var selected = result[0];
-                Log.Information("Selected file from dialog: '{SelectedFile}'", selected);
-#pragma warning disable CS4014
-                AddNewSelectedTableFile(selected);
-#pragma warning restore CS4014
-            }
+            return;
         }
-    }
-    
-    private void OnSaveJsonButtonClicked()
-    {
-#pragma warning disable CS4014
-        SaveJsonFileWithCurrentSelected();
-#pragma warning restore CS4014
-    }
-
-    private void OnGenerateCodeButtonClicked()
-    {
-#pragma warning disable CS4014
-        GenerateCodeWithCurrentUsage();
-#pragma warning restore CS4014
+        
+        var result = await dialog.ShowAsync(mainWindow);
+        if (result != null)
+        {
+            var selected = result[0];
+            Log.Information("Selected file from dialog: '{SelectedFile}'", selected);
+            await AddNewSelectedTableFile(selected);
+        }
     }
 
     private void OnSelectedTableChanged(object? sender, SelectionChangedEventArgs e)

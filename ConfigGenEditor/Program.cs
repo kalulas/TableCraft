@@ -49,7 +49,7 @@ class Program
         }
         catch (Exception e)
         {
-            Log.Error(e, "Unhandled exception");
+            HandleException(e);
         }
         finally
         {
@@ -89,6 +89,15 @@ class Program
         
         var path = m_Configuration.GetValue<string>("JsonHomePath");
         return path ?? string.Empty;
+    }
+
+    #endregion
+
+    #region Logger
+
+    public static void HandleException(Exception e)
+    {
+        Log.Error(e, "Unhandled exception");
     }
 
     #endregion
