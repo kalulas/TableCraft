@@ -187,7 +187,7 @@ namespace ConfigCodeGenLib
             var outputFilePath = Path.Combine(outputDirectory, configName ?? string.Empty);
             if (File.Exists(outputFilePath))
             {
-                Debugger.LogWarning("[ConfigManager.GenerateCodeForUsage] existed file '{0}' will be overwrite", outputDirectory);
+                Debugger.LogWarning("[ConfigManager.GenerateCodeForUsage] existed file '{0}' will be overwrite", outputFilePath);
             }
 
             var encoding = new UTF8Encoding(Configuration.UseUTF8WithBOM);
