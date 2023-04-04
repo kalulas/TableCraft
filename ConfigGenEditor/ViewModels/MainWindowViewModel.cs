@@ -34,6 +34,14 @@ public class MainWindowViewModel : ViewModelBase
 
     public string JsonHomePath => Program.GetJsonHomePath();
 
+    private string m_ExportCodeUsage = string.Empty;
+
+    public string ExportCodeUsage
+    {
+        get => m_ExportCodeUsage;
+        set => this.RaiseAndSetIfChanged(ref m_ExportCodeUsage, value);
+    }
+
     private ConfigFileElementViewModel? m_SelectedTable;
 
     /// <summary>
@@ -130,6 +138,18 @@ public class MainWindowViewModel : ViewModelBase
     {
         SelectedAttribute = null;
     }
+
+    private void UpdateSelectedExportCodeUsage()
+    {
+        var usages = Configuration.ConfigUsageType;
+        if (usages.Length == 0)
+        {
+            ExportCodeUsage = string.Empty;
+            return;
+        }
+
+        ExportCodeUsage = usages[0]; // default selection
+    }
     
     private async Task FlushTableListToDatabase()
     {
@@ -149,9 +169,23 @@ public class MainWindowViewModel : ViewModelBase
             return;
         }
         
-        // TODO uniqueness check, popup message if duplicate
         var tableFileRelative = Path.GetRelativePath(ConfigHomePath, newTableFilePath);
         // var tableFileRelative = PathExtend.MakeRelativePath(ConfigHomePath + Path.DirectorySeparatorChar, newTableFilePath);
+        if (TableList.Any(elementViewModel => elementViewModel.ConfigFileRelativePath == tableFileRelative))
+        {
+            var messageBox = MessageBox.Avalonia.MessageBoxManager.GetMessageBoxStandardWindow(new MessageBoxStandardParams
+            {
+                ButtonDefinitions = ButtonEnum.Ok,
+                ContentTitle = "Error",
+                ContentMessage = $"Config file already existed: '{tableFileRelative}', ignore",
+                WindowStartupLocation = WindowStartupLocation.CenterScreen,
+                MinHeight = App.StandardPopupHeight,
+                CanResize = true,
+            });
+
+            await messageBox.ShowDialog(App.GetMainWindow());
+            return;
+        }
         
         // imported table file, without json file
         var tableElement = new ConfigFileElement(tableFileRelative, string.Empty);
@@ -193,6 +227,7 @@ public class MainWindowViewModel : ViewModelBase
         if (existed)
         {
             SelectedConfigInfo = createdConfigInfo;
+            UpdateSelectedExportCodeUsage();
             return;
         }
 
@@ -212,6 +247,7 @@ public class MainWindowViewModel : ViewModelBase
 
         // reset selected attribute
         CancelSelectedAttribute();
+        UpdateSelectedExportCodeUsage();
     }
 
     private void UpdateSelectedAttributeWithListItem(ConfigAttributeListItemViewModel? listItemViewModel)
@@ -283,7 +319,7 @@ public class MainWindowViewModel : ViewModelBase
         }
 
         var success =
-            await ConfigManager.singleton.GenerateCodeForUsage(Configuration.ConfigUsageType[0], configInfo, outputDir);
+            await ConfigManager.singleton.GenerateCodeForUsage(m_ExportCodeUsage, configInfo, outputDir);
         var popupTitle = success ? "Success" : "Error";
         var popupMessage = success
             ? $"Generation success, output directory: '{outputDir}'"

@@ -2,6 +2,7 @@
         xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
         xmlns:vm="using:ConfigGenEditor.ViewModels"
         xmlns:views="using:ConfigGenEditor.Views"
+        xmlns:lib="clr-namespace:ConfigCodeGenLib;assembly=ConfigCodeGenLib"
         xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
         mc:Ignorable="d" d:DesignWidth="800" d:DesignHeight="450"
@@ -92,9 +93,17 @@
         </Grid>
         
         <StackPanel Orientation="Horizontal" HorizontalAlignment="Right" Margin="16,10">
+            <StackPanel
+                IsEnabled="{Binding SelectedConfigInfo, Converter={x:Static ObjectConverters.IsNotNull}}"
+                VerticalAlignment="Center">
+                <ComboBox Items="{x:Static lib:Configuration.ConfigUsageType}" 
+                          SelectedItem="{Binding ExportCodeUsage}" Width="150">
+                </ComboBox>
+            </StackPanel>
             <Button 
                 IsEnabled="{Binding SelectedConfigInfo, Converter={x:Static ObjectConverters.IsNotNull}}"
-                Command="{Binding GenerateCodeCommand}">
+                Command="{Binding GenerateCodeCommand}"
+                Margin="20, 0, 0, 0">
                 <StackPanel Orientation="Horizontal">
                     <Image Source="/Assets/script-128.png" Height="32"></Image>
                     <Label VerticalAlignment="Center"> Generate </Label>

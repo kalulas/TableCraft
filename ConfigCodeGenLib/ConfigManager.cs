@@ -220,7 +220,7 @@ namespace ConfigCodeGenLib
 
             Debugger.Log(
                 $"[ConfigManager.GenerateCodeForUsage] finish processing template file {templateFilePath}");
-            using (var fs = File.Open(finalOutputFilePath, FileMode.OpenOrCreate, FileAccess.Write))
+            using (var fs = File.Open(finalOutputFilePath, FileMode.Create, FileAccess.Write))
             {
                 using (var sw = new StreamWriter(fs, encoding))
                 {

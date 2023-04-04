@@ -70,7 +70,7 @@ public class FakeDatabase
         
         JsonMapper.ToJson(elementList, writer);
         var encoding = new UTF8Encoding(ConfigCodeGenLib.Configuration.UseUTF8WithBOM);
-        using var fs = File.Open(m_ListJsonFilePath, FileMode.OpenOrCreate);
+        using var fs = File.Open(m_ListJsonFilePath, FileMode.Create);
         using var sw = new StreamWriter(fs, encoding);
         await sw.WriteAsync(builder.ToString());
         Log.Information("write ListJsonFile {Path} finished", m_ListJsonFilePath);
