@@ -84,6 +84,16 @@
             </StackPanel>
             
             <StackPanel Grid.Column="2">
+                <TextBlock 
+                    FontSize="20"
+                    IsVisible="{Binding SelectedConfigInfo, Converter={x:Static ObjectConverters.IsNotNull}}">
+                     About Selected Table
+                </TextBlock>
+                <UserControl
+                    IsVisible="{Binding SelectedConfigInfo, Converter={x:Static ObjectConverters.IsNotNull}}"
+                    Content="{Binding SelectedConfigInfo}">
+                </UserControl>
+                
                 <TextBlock FontSize="20"> Attribute Information </TextBlock>
                 <UserControl
                     IsVisible="{Binding SelectedAttribute, Converter={x:Static ObjectConverters.IsNotNull}}"

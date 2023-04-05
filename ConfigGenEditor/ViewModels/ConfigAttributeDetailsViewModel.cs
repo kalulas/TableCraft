@@ -20,6 +20,8 @@ public class ConfigAttributeDetailsViewModel : ViewModelBase
     #region Fields
 
     private readonly ConfigAttributeInfo m_AttributeInfo;
+    private string m_SelectedUsageType = string.Empty;
+    private string m_SelectedAttributeTag = string.Empty;
 
     #endregion
 
@@ -51,10 +53,18 @@ public class ConfigAttributeDetailsViewModel : ViewModelBase
         set => m_AttributeInfo.DefaultValue = value;
     }
 
-    public string SelectedUsageType { get; set; } = string.Empty;
+    public string SelectedUsageType
+    {
+        get => m_SelectedUsageType;
+        set => this.RaiseAndSetIfChanged(ref m_SelectedUsageType, value);
+    }
 
-    public string SelectedAttributeTag { get; set; } = string.Empty;
-    
+    public string SelectedAttributeTag
+    {
+        get => m_SelectedAttributeTag;
+        set => this.RaiseAndSetIfChanged(ref m_SelectedAttributeTag, value);
+    }
+
     public ICommand AddUsageCommand { get; }
     
     public ICommand AddTagCommand { get; }
@@ -94,7 +104,7 @@ public class ConfigAttributeDetailsViewModel : ViewModelBase
     {
         foreach (var usage in Usages)
         {
-            if (usage.Usage == SelectedUsageType)
+            if (usage.Usage == m_SelectedUsageType)
             {
                 // duplicated, do nothing
                 return;
@@ -103,7 +113,7 @@ public class ConfigAttributeDetailsViewModel : ViewModelBase
 
         var newUsageInfo = new ConfigAttributeUsageInfo
         {
-            Usage = SelectedUsageType,
+            Usage = m_SelectedUsageType,
             FieldName = m_AttributeInfo.AttributeName
         };
 
@@ -119,19 +129,19 @@ public class ConfigAttributeDetailsViewModel : ViewModelBase
     {
         foreach (var tag in Tags)
         {
-            if (tag.Content == SelectedAttributeTag)
+            if (tag.Content == m_SelectedAttributeTag)
             {
                 // duplicated, do nothing
                 return;
             }
         }
         
-        if (!m_AttributeInfo.AddTag(SelectedAttributeTag))
+        if (!m_AttributeInfo.AddTag(m_SelectedAttributeTag))
         {
             return;
         }
         
-        Tags.Add(new ConfigAttributeTagViewModel(SelectedAttributeTag, this));
+        Tags.Add(new ConfigAttributeTagViewModel(m_SelectedAttributeTag, this));
     }
 
     #endregion

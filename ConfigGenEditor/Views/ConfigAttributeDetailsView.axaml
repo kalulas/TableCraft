@@ -57,7 +57,9 @@
                     </ComboBox>
                 </StackPanel>
                 
-                <Button Margin="10, 0" Command="{Binding AddUsageCommand}">
+                <Button Margin="10, 0"
+                        IsEnabled="{Binding SelectedUsageType, Converter={x:Static StringConverters.IsNotNullOrEmpty}}"
+                        Command="{Binding AddUsageCommand}">
                      Add
                 </Button>
             </StackPanel>
@@ -74,7 +76,9 @@
                     </ComboBox>
                 </StackPanel>
                 
-                <Button Margin="10, 0" Command="{Binding AddTagCommand}">
+                <Button Margin="10, 0"
+                        IsEnabled="{Binding SelectedAttributeTag, Converter={x:Static StringConverters.IsNotNullOrEmpty}}"
+                        Command="{Binding AddTagCommand}">
                     Add
                 </Button>
             </StackPanel>
