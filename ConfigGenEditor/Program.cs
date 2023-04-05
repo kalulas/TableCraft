@@ -38,7 +38,9 @@ class Program
             {
                 // we initialize library here and build Avalonia app anyway,
                 // later we check if it's initialized in App.OnFrameworkInitializationCompleted
-                ConfigCodeGenLib.Debugger.InitialCustomLogger(Log.Information);
+                ConfigCodeGenLib.Debugger.InitialCustomLogger(Log.Information, ConfigCodeGenLib.Debugger.LogLevel.Information);
+                ConfigCodeGenLib.Debugger.InitialCustomLogger(Log.Warning, ConfigCodeGenLib.Debugger.LogLevel.Warning);
+                ConfigCodeGenLib.Debugger.InitialCustomLogger(Log.Error, ConfigCodeGenLib.Debugger.LogLevel.Error);
                 Log.Information("try initializing library with '{LibEnvJson}'", libEnvJsonFilePath);
                 ConfigCodeGenLib.Configuration.ReadConfigurationFromJson(libEnvJsonFilePath);
                 // TODO ReadComment to libenv.json

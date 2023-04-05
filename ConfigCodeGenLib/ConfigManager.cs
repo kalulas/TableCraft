@@ -182,9 +182,8 @@ namespace ConfigCodeGenLib
                 return false;
             }
 
-            // TODO configInfo: different name under different usage
-            var configName = Path.ChangeExtension(configInfo.ConfigName, outputExtension);
-            var outputFilePath = Path.Combine(outputDirectory, configName ?? string.Empty);
+            var outputFileName = Path.ChangeExtension(configInfo.GetExportName(usage), outputExtension);
+            var outputFilePath = Path.Combine(outputDirectory, outputFileName ?? string.Empty);
             if (File.Exists(outputFilePath))
             {
                 Debugger.LogWarning("[ConfigManager.GenerateCodeForUsage] existed file '{0}' will be overwrite", outputFilePath);

@@ -23,7 +23,7 @@ namespace ConfigCodeGenConsole
                 return;
             }
 
-            Debugger.InitialCustomLogger(Console.WriteLine);
+            Debugger.InitialCustomLogger(Console.WriteLine, Debugger.LogLevel.All);
             // pass json file with absolute path
             Configuration.ReadConfigurationFromJson(AppContext.BaseDirectory + "libenv.json");
             if (!Configuration.IsInited)
