@@ -307,10 +307,7 @@ public class MainWindowViewModel : ViewModelBase
 
     private async Task GenerateCodeWithCurrentUsage()
     {
-        // TODO to appsettings.json with different usage
-        var outputDir = Path.Combine(AppContext.BaseDirectory, "GeneratedCode");
-        Directory.CreateDirectory(outputDir);
-        
+        var outputDir = Program.GetCodeExportPath(m_ExportCodeUsage);
         var configInfo = m_SelectedConfigInfo?.GetConfigInfo();
         if (configInfo == null)
         {

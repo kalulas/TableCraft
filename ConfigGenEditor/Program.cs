@@ -15,6 +15,7 @@ class Program
     public const string ListJsonFilename = "list.json";
     public const string LibEnvJsonFilename = "libenv.json";
     
+    private static readonly string m_FallbackCodeExportPath = Path.Combine(AppContext.BaseDirectory, "GeneratedCode");
     private static IConfiguration? m_Configuration;
     
     // Initialization code. Don't use any Avalonia, third-party APIs or any
@@ -91,6 +92,22 @@ class Program
         
         var path = m_Configuration.GetValue<string>("JsonHomePath");
         return path ?? string.Empty;
+    }
+
+    /// <summary>
+    /// Try get the export path for code generation from appsettings.json, if not found, use <see cref="m_FallbackCodeExportPath"/>
+    /// </summary>
+    /// <param name="usage"></param>
+    /// <returns></returns>
+    /// <exception cref="NullReferenceException"></exception>
+    public static string GetCodeExportPath(string usage)
+    {
+        if (m_Configuration == null) throw new NullReferenceException("m_Configuration from appsettings is null");
+
+        var section = m_Configuration.GetSection("ExportPath");
+        // section is not null, if 'ExportPath' not found, empty section will return a null string
+        var exportPath = section.GetValue<string>(usage);
+        return exportPath ?? m_FallbackCodeExportPath;
     }
 
     #endregion

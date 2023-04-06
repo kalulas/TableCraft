@@ -1,4 +1,4 @@
-﻿using System.Collections.Generic;
+﻿using System;
 using System.IO;
 using System.Text;
 using System.Threading.Tasks;
@@ -161,6 +161,18 @@ namespace ConfigCodeGenLib
 
             Debugger.Log(
                 $"[ConfigManager.GenerateCodeForUsage] finish processing template file {templateFilePath}");
+            // make sure target output directory existed
+            // add a extra try-catch for more information
+            try
+            {
+                Directory.CreateDirectory(outputDirectory);
+            }
+            catch (Exception e)
+            {
+                Debugger.LogError($"Exception {e} was thrown when creating directory {outputDirectory}");
+                throw;
+            }
+            
             using (var fs = File.Open(finalOutputFilePath, FileMode.Create, FileAccess.Write))
             {
                 using (var sw = new StreamWriter(fs, encoding))

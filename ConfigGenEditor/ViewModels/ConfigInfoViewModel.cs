@@ -55,8 +55,18 @@ public class ConfigInfoViewModel : ViewModelBase
     {
         m_ConfigInfo = configInfo;
         m_Attributes = new ObservableCollection<ConfigAttributeListItemViewModel>();
-        m_SelectedUsage = string.Empty;
-        m_PreviewConfigConfigUsageInfo = null;
+        if (Configuration.ConfigUsageType.Length > 0)
+        {
+            m_SelectedUsage = Configuration.ConfigUsageType[0];
+            m_ConfigInfo.TryGetUsageInfo(m_SelectedUsage, out var usageInfo);
+            m_PreviewConfigConfigUsageInfo = usageInfo;
+        }
+        else
+        {
+            m_SelectedUsage = string.Empty;
+            m_PreviewConfigConfigUsageInfo = null;
+        }
+
         CreateAttributes();
     }
 
