@@ -102,7 +102,7 @@
             </StackPanel>
         </Grid>
         
-        <StackPanel Orientation="Horizontal" HorizontalAlignment="Right" Margin="16,10">
+        <StackPanel Orientation="Horizontal" HorizontalAlignment="Right" Margin="16,0, 16, 10">
             <StackPanel
                 IsEnabled="{Binding SelectedConfigInfo, Converter={x:Static ObjectConverters.IsNotNull}}"
                 VerticalAlignment="Center">
@@ -129,6 +129,11 @@
                 </StackPanel>
             </Button>
         </StackPanel>
+        
+        <TextBlock HorizontalAlignment="Right" Margin="16,0, 16, 10"
+                   IsVisible="{Binding ExportCodeUsage, Converter={x:Static StringConverters.IsNotNullOrEmpty}}"
+                   Text="{Binding ExportCodePath}">
+        </TextBlock>
     </StackPanel>
 
 </Window>

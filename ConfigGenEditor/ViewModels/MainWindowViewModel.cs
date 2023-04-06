@@ -39,7 +39,19 @@ public class MainWindowViewModel : ViewModelBase
     public string ExportCodeUsage
     {
         get => m_ExportCodeUsage;
-        set => this.RaiseAndSetIfChanged(ref m_ExportCodeUsage, value);
+        set
+        {
+            this.RaiseAndSetIfChanged(ref m_ExportCodeUsage, value);
+            OnExportCodeUsageChanged();
+        }
+    }
+
+    private string m_ExportCodePath = string.Empty;
+    
+    public string ExportCodePath
+    {
+        get => m_ExportCodePath;
+        set => this.RaiseAndSetIfChanged(ref m_ExportCodePath, value);
     }
 
     private ConfigFileElementViewModel? m_SelectedTable;
@@ -374,6 +386,11 @@ public class MainWindowViewModel : ViewModelBase
         var selected = e.AddedItems.Count > 0 ? e.AddedItems[0] : null;
         var selectedListItem = selected as ConfigAttributeListItemViewModel;
         UpdateSelectedAttributeWithListItem(selectedListItem);
+    }
+    
+    private void OnExportCodeUsageChanged()
+    {
+        ExportCodePath = Program.GetCodeExportPath(m_ExportCodeUsage);
     }
 
     #endregion
