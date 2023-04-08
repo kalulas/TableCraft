@@ -1,10 +1,13 @@
 ﻿using System;
 using System.IO;
+using System.Linq;
+using System.Reflection;
 using System.Text;
 using System.Threading.Tasks;
 using Mono.TextTemplating;
 using TableCraft.Core.ConfigReader;
 using TableCraft.Core.Generation;
+using TableCraft.Core.Source;
 
 namespace TableCraft.Core
 {
@@ -32,6 +35,7 @@ namespace TableCraft.Core
                 if (m_Singleton == null)
                 {
                     m_Singleton = new ConfigManager();
+                    m_Singleton.Init();
                 }
 
                 return m_Singleton;
@@ -47,6 +51,15 @@ namespace TableCraft.Core
         /// TODO this should be moved to libenv.json, specific line number
         /// </summary>
         public bool ReadComment;
+
+        #endregion
+
+        #region Private Methods
+
+        private void Init()
+        {
+            ConfigInfoFactory.LoadAllDefaultRegistration();
+        }
 
         #endregion
 

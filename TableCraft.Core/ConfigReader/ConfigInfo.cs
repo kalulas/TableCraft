@@ -3,13 +3,15 @@ using System.Collections.Generic;
 using System.IO;
 using LitJson;
 using System.Text;
+using TableCraft.Core.Decorator;
+using TableCraft.Core.Source;
 
 namespace TableCraft.Core.ConfigReader
 {
     /// <summary>
     /// Information about a single config file, for example: SomeTable.csv
     /// </summary>
-    public abstract class ConfigInfo
+    public class ConfigInfo
     {
         #region Fields
 
@@ -53,8 +55,18 @@ namespace TableCraft.Core.ConfigReader
             m_RelatedJsonFilePath = relatedJsonFilePath;
             PrepareUsageDict();
         }
+        
+        public ConfigInfo(string configName, string dataSourceFilePath, string dataDecoratorFilePath)
+        {
+            ConfigName = configName;
+            ConfigAttributeDict = new Dictionary<string, ConfigAttributeInfo>();
+            ConfigUsageDict = new Dictionary<string, ConfigUsageInfo>();
+            m_ConfigFilePath = dataSourceFilePath;
+            m_RelatedJsonFilePath = dataDecoratorFilePath;
+            PrepareUsageDict();
+        }
 
-        #region Private Methods
+        #region Private / Internal Methods
 
         private void PrepareUsageDict()
         {
@@ -75,7 +87,10 @@ namespace TableCraft.Core.ConfigReader
         /// <summary>
         /// NOTICE: clean up attributes first
         /// </summary>
-        public abstract ConfigInfo ReadConfigFileAttributes();
+        public virtual ConfigInfo ReadConfigFileAttributes()
+        {
+            return this;
+        }
 
         /// <summary>
         /// add json related information to attributes
@@ -206,6 +221,42 @@ namespace TableCraft.Core.ConfigReader
         #endregion
 
         #region Public API
+        
+        public ConfigInfo FillWith(IDataSource dataSource)
+        {
+            return dataSource.Fill(this);
+        }
+        
+        public ConfigInfo DecorateWith(IDataDecorator decorator)
+        {
+            return decorator.Decorate(this);
+        }
+
+        public ConfigInfo DecorateWith(IEnumerable<IDataDecorator> decorators)
+        {
+            foreach (var decorator in decorators)
+            {
+                decorator.Decorate(this);
+            }
+            
+            return this;
+        }
+        
+        public void ClearAttributes()
+        {
+            ConfigAttributeDict.Clear();
+        }
+        
+        public bool ContainsAttribute(string attributeName)
+        {
+            return ConfigAttributeDict.ContainsKey(attributeName);
+        }
+        
+        public bool TryAddAttribute(string attributeName, ConfigAttributeInfo attributeInfo)
+        {
+            return ConfigAttributeDict.TryAdd(attributeName, attributeInfo);
+        }
+        
 
         public bool TryGetUsageInfo(string usage, out ConfigUsageInfo usageInfo)
         {

@@ -44,8 +44,9 @@ class Program
                 Core.Debugger.InitialCustomLogger(Log.Error, Core.Debugger.LogLevel.Error);
                 Log.Information("try initializing library with '{LibEnvJson}'", libEnvJsonFilePath);
                 Core.Configuration.ReadConfigurationFromJson(libEnvJsonFilePath);
+                var instance = Core.ConfigManager.singleton;
                 // TODO ReadComment to libenv.json
-                Core.ConfigManager.singleton.ReadComment = true;
+                instance.ReadComment = true;
             }
 
             BuildAvaloniaApp().StartWithClassicDesktopLifetime(args);

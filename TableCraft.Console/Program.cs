@@ -4,6 +4,7 @@ using TableCraft.Core;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
+using TableCraft.Core.ConfigReader;
 
 namespace TableCraft.Console
 {
@@ -32,11 +33,12 @@ namespace TableCraft.Console
             }
 
             ConfigManager.singleton.ReadComment = true;
+            var experimentalInfo = ConfigInfoFactory.CreateConfigInfo(targetCsvConfigFilePath, new[] {jsonFilePath});
             // var identifier = ConfigManager.singleton.GetConfigIdentifier(targetCsvConfigFilePath);
             // var relatedJsonFilePath = $"{jsonHomeDir}\\{identifier}.json";
-            var configInfo = ConfigManager.singleton.AddNewConfigInfo(targetCsvConfigFilePath, jsonFilePath, Core.ConfigReader.EConfigType.CSV);
-            await ConfigManager.singleton.GenerateCodeForUsage(Configuration.ConfigUsageType[0], configInfo,
-                AppContext.BaseDirectory);
+            // var configInfo = ConfigManager.singleton.AddNewConfigInfo(targetCsvConfigFilePath, jsonFilePath, Core.ConfigReader.EConfigType.CSV);
+            // await ConfigManager.singleton.GenerateCodeForUsage(Configuration.ConfigUsageType[0], configInfo,
+            //     AppContext.BaseDirectory);
         }
     }
 }
