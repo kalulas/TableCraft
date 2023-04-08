@@ -37,7 +37,7 @@ public partial class App : Application
     {
         if (ApplicationLifetime is IClassicDesktopStyleApplicationLifetime desktop)
         {
-            if (!TableCraft.Core.Configuration.IsInited)
+            if (!Core.Configuration.IsInited)
             {
                 const string errorMessage = $"library's initialization failed, please check '{Program.LibEnvJsonFilename}'";
                 var messageBox = MessageBox.Avalonia.MessageBoxManager.GetMessageBoxStandardWindow(

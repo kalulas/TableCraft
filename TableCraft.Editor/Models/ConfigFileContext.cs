@@ -25,7 +25,7 @@ public static class ConfigFileContext
     /// <returns></returns>
     internal static bool Load(string listJsonFilePath)
     {
-        var encoding = new UTF8Encoding(TableCraft.Core.Configuration.UseUTF8WithBOM);
+        var encoding = new UTF8Encoding(Core.Configuration.UseUTF8WithBOM);
         var listJsonFileContent = File.ReadAllText(listJsonFilePath, encoding);
         var jsonData = JsonMapper.ToObject(listJsonFileContent);
         if (!jsonData.IsArray)

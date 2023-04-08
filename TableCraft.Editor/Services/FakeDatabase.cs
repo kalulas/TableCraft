@@ -31,7 +31,7 @@ public class FakeDatabase
             throw new FileNotFoundException(m_ListJsonFilePath + " not found");
         }
 
-        var encoding = new UTF8Encoding(TableCraft.Core.Configuration.UseUTF8WithBOM);
+        var encoding = new UTF8Encoding(Core.Configuration.UseUTF8WithBOM);
         var listJsonFileContent = File.ReadAllText(m_ListJsonFilePath, encoding);
         var jsonData = JsonMapper.ToObject(listJsonFileContent);
         if (!jsonData.IsArray)
@@ -69,7 +69,7 @@ public class FakeDatabase
         elementList.Sort();
         
         JsonMapper.ToJson(elementList, writer);
-        var encoding = new UTF8Encoding(TableCraft.Core.Configuration.UseUTF8WithBOM);
+        var encoding = new UTF8Encoding(Core.Configuration.UseUTF8WithBOM);
         using var fs = File.Open(m_ListJsonFilePath, FileMode.Create);
         using var sw = new StreamWriter(fs, encoding);
         await sw.WriteAsync(builder.ToString());

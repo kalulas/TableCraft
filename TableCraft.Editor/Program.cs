@@ -39,13 +39,13 @@ class Program
             {
                 // we initialize library here and build Avalonia app anyway,
                 // later we check if it's initialized in App.OnFrameworkInitializationCompleted
-                TableCraft.Core.Debugger.InitialCustomLogger(Log.Information, TableCraft.Core.Debugger.LogLevel.Information);
-                TableCraft.Core.Debugger.InitialCustomLogger(Log.Warning, TableCraft.Core.Debugger.LogLevel.Warning);
-                TableCraft.Core.Debugger.InitialCustomLogger(Log.Error, TableCraft.Core.Debugger.LogLevel.Error);
+                Core.Debugger.InitialCustomLogger(Log.Information, Core.Debugger.LogLevel.Information);
+                Core.Debugger.InitialCustomLogger(Log.Warning, Core.Debugger.LogLevel.Warning);
+                Core.Debugger.InitialCustomLogger(Log.Error, Core.Debugger.LogLevel.Error);
                 Log.Information("try initializing library with '{LibEnvJson}'", libEnvJsonFilePath);
-                TableCraft.Core.Configuration.ReadConfigurationFromJson(libEnvJsonFilePath);
+                Core.Configuration.ReadConfigurationFromJson(libEnvJsonFilePath);
                 // TODO ReadComment to libenv.json
-                TableCraft.Core.ConfigManager.singleton.ReadComment = true;
+                Core.ConfigManager.singleton.ReadComment = true;
             }
 
             BuildAvaloniaApp().StartWithClassicDesktopLifetime(args);
