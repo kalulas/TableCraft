@@ -1,0 +1,51 @@
+﻿<UserControl xmlns="https://github.com/avaloniaui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+             mc:Ignorable="d" d:DesignWidth="800" d:DesignHeight="450"
+             xmlns:vm="using:TableCraft.Editor.ViewModels"
+             xmlns:views="using:TableCraft.Editor.Views"
+             xmlns:lib="clr-namespace:TableCraft.Core;assembly=TableCraft.Core"
+             x:Class="TableCraft.Editor.Views.ConfigInfoView">
+    <Design.DataContext>
+        <!-- This only sets the DataContext for the previewer in an IDE,
+             to set the actual DataContext for runtime, set the DataContext property in code (look at App.axaml.cs) -->
+        <vm:ConfigInfoViewModel/>
+    </Design.DataContext>
+    
+    <Grid Margin="8" ColumnDefinitions="10*,30*" RowDefinitions="Auto,Auto,Auto">
+        <TextBlock Grid.Row="0" Grid.Column="0" FontSize="16">
+            Name
+        </TextBlock>
+        
+        <TextBlock Grid.Row="0" Grid.Column="1"
+            Text="{Binding ConfigName}">
+        </TextBlock>
+        
+        <TextBlock Grid.Row="1" Grid.Column="0" FontSize="16">
+            Usage
+        </TextBlock>
+        
+        <StackPanel Grid.Row="1" Grid.Column="1" Orientation="Horizontal" Margin="0, 0, 0, 10">
+            <StackPanel>
+                <ComboBox Width="200" 
+                          Items="{x:Static lib:Configuration.ConfigUsageType}" 
+                          SelectedItem="{Binding PreviewInfoUsage}">
+                </ComboBox>
+            </StackPanel>
+        </StackPanel>
+        
+        <TextBlock Grid.Row="2" Grid.Column="0" FontSize="16"
+                   IsVisible="{Binding PreviewConfigUsageInfo, Converter={x:Static ObjectConverters.IsNotNull}}">
+            ExportName
+        </TextBlock>
+        
+        <TextBox Grid.Row="2" Grid.Column="1" Width="200" HorizontalAlignment="Left" Margin="0, 0, 0, 10"
+                 IsVisible="{Binding PreviewConfigUsageInfo, Converter={x:Static ObjectConverters.IsNotNull}}"
+                 Text="{Binding PreviewConfigUsageInfo.ExportName}"
+                 FontFamily="Consolas"></TextBox>
+        
+    </Grid>
+    
+
+</UserControl>

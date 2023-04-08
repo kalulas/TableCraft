@@ -1,0 +1,90 @@
+﻿<UserControl xmlns="https://github.com/avaloniaui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+             xmlns:vm="clr-namespace:TableCraft.Editor.ViewModels"
+             xmlns:views="using:TableCraft.Editor.Views"
+             xmlns:lib="clr-namespace:TableCraft.Core;assembly=TableCraft.Core"
+             mc:Ignorable="d" d:DesignWidth="800" d:DesignHeight="450"
+             x:Class="TableCraft.Editor.Views.ConfigAttributeDetailsView">
+    <Design.DataContext>
+        <!-- This only sets the DataContext for the previewer in an IDE,
+             to set the actual DataContext for runtime, set the DataContext property in code (look at App.axaml.cs) -->
+        <vm:ConfigAttributeDetailsViewModel/>
+    </Design.DataContext>
+    
+    <Grid Margin="8" ColumnDefinitions="10*,30*" RowDefinitions="Auto,Auto,Auto,Auto,Auto,Auto,Auto">
+
+        <TextBlock Grid.Row="0" Grid.Column="0" FontSize="16">Name </TextBlock>
+        <TextBlock Grid.Row="0" Grid.Column="1" Text="{Binding Name}"></TextBlock>
+        
+        <TextBlock Grid.Row="1" Grid.Column="0" FontSize="16">Comment </TextBlock>
+        <TextBox Grid.Row="1" Grid.Column="1" TextWrapping="Wrap" FontFamily="Microsoft YaHei"
+                 Text="{Binding Comment}" 
+                 Width="300" HorizontalAlignment="Left" Margin="0, 0, 0, 10"></TextBox>
+        
+        <TextBlock Grid.Row="2" Grid.Column="0" FontSize="16">ValueType </TextBlock>
+        <StackPanel Grid.Row="2" Grid.Column="1">
+            <ComboBox Name="ValueTypeComboBox" Items="{x:Static lib:Configuration.DataValueType}" 
+                      SelectedItem="{Binding ValueType}" Width="300" Margin="0, 0, 0, 10">
+                <!-- This is the default template -->
+                <!-- <ComboBox.ItemTemplate> -->
+                <!--     <DataTemplate> -->
+                <!--         <TextBlock Text="{Binding}"/> -->
+                <!--     </DataTemplate> -->
+                <!-- </ComboBox.ItemTemplate> -->
+            </ComboBox>
+        </StackPanel>
+        
+        <TextBlock Grid.Row="3" Grid.Column="0" FontSize="16">CollectionType </TextBlock>
+        <StackPanel Grid.Row="3" Grid.Column="1">
+            <ComboBox Name="CollectionTypeComboBox" Items="{x:Static lib:Configuration.DataCollectionType}" 
+                      SelectedItem="{Binding CollectionType}" Width="300" Margin="0, 0, 0, 10">
+            </ComboBox>
+        </StackPanel>
+        
+        <TextBlock Grid.Row="4" Grid.Column="0" FontSize="16">DefaultValue </TextBlock>
+        <TextBox Grid.Row="4" Grid.Column="1" TextWrapping="Wrap" FontFamily="Microsoft YaHei"
+                 Text="{Binding DefaultValue}" 
+                 Width="300" HorizontalAlignment="Left" Margin="0, 0, 0, 10"></TextBox>
+        
+        <TextBlock Grid.Row="5" Grid.Column="0" FontSize="16">Usage </TextBlock>
+        <StackPanel Grid.Row="5" Grid.Column="1">
+            <StackPanel Orientation="Horizontal" Margin="0,0,0,5">
+                <StackPanel>
+                    <ComboBox Items="{x:Static lib:Configuration.ConfigUsageType}" 
+                              SelectedItem="{Binding SelectedUsageType}" Width="150">
+                    </ComboBox>
+                </StackPanel>
+                
+                <Button Margin="10, 0"
+                        IsEnabled="{Binding SelectedUsageType, Converter={x:Static StringConverters.IsNotNullOrEmpty}}"
+                        Command="{Binding AddUsageCommand}">
+                     Add
+                </Button>
+            </StackPanel>
+            
+            <ItemsControl Items="{Binding Usages}"></ItemsControl>
+        </StackPanel>
+        
+        <TextBlock Grid.Row="6" Grid.Column="0" FontSize="16">Tag </TextBlock>
+        <StackPanel Grid.Row="6" Grid.Column="1">
+            <StackPanel Orientation="Horizontal" Margin="0,0,0,5">
+                <StackPanel>
+                    <ComboBox Items="{x:Static lib:Configuration.AttributeTag}"
+                              SelectedItem="{Binding SelectedAttributeTag}" Width="150">
+                    </ComboBox>
+                </StackPanel>
+                
+                <Button Margin="10, 0"
+                        IsEnabled="{Binding SelectedAttributeTag, Converter={x:Static StringConverters.IsNotNullOrEmpty}}"
+                        Command="{Binding AddTagCommand}">
+                    Add
+                </Button>
+            </StackPanel>
+
+            <ItemsControl Items="{Binding Tags}"></ItemsControl>
+        </StackPanel>
+    </Grid>
+
+</UserControl>

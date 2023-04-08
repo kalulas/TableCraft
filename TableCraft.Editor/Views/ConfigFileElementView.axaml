@@ -1,0 +1,26 @@
+﻿<UserControl xmlns="https://github.com/avaloniaui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+             xmlns:vm="clr-namespace:TableCraft.Editor.ViewModels"
+             mc:Ignorable="d" d:DesignWidth="800" d:DesignHeight="450"
+             x:Class="TableCraft.Editor.Views.ConfigFileElementView">
+    <Design.DataContext>
+        <!-- This only sets the DataContext for the previewer in an IDE,
+             to set the actual DataContext for runtime, set the DataContext property in code (look at App.axaml.cs) -->
+        <vm:ConfigFileElementViewModel/>
+    </Design.DataContext>
+    
+    <StackPanel>
+        <TextBlock Text="{Binding ConfigFileRelativePath}" HorizontalAlignment="Center"/>
+        <StackPanel IsVisible="{Binding !IsJsonDescriptionFound}" Orientation="Horizontal" HorizontalAlignment="Center">
+            <Image Source="/Assets/question-32.png" Height="14"></Image>
+            <TextBlock Text="no json found" FontSize="12" Margin="5"></TextBlock>
+        </StackPanel>
+        
+        <StackPanel IsVisible="{Binding IsJsonDescriptionFound}" Orientation="Horizontal" HorizontalAlignment="Center">
+            <Image Source="/Assets/accept-32.png" Height="14"></Image>
+            <TextBlock Text="json found" FontSize="12" Margin="5"></TextBlock>
+        </StackPanel>
+    </StackPanel>
+</UserControl>

@@ -1,0 +1,7 @@
+{
+  "profiles": {
+    "TableCraft.Console": {
+      "commandName": "Project"
+    }
+  }
+}
