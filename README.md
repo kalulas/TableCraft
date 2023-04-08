@@ -1,4 +1,2 @@
-# ConfigCodeGen
-编辑配置表属性，字段属性，生成读表代码的代码库与开发辅助工具
-
-开发中，更多介绍详见：https://www.threegates.net/p/ab7a58fcc8d2/
+# TableCraft
+TableCraft是用于生成配置表，配置表字段属性描述文件，并生成各类关联代码的代码库与开发辅助工具
