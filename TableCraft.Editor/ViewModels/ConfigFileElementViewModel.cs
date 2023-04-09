@@ -28,18 +28,6 @@ public class ConfigFileElementViewModel : ViewModelBase
         return m_Element;
     }
 
-    public EConfigType GetConfigType()
-    {
-        var extension = Path.GetExtension(m_Element.ConfigFileRelativePath);
-        switch (extension)
-        {
-            case ".csv":
-                return EConfigType.CSV;
-            default:
-                throw new Exception($"Unknown config type with path:{m_Element.ConfigFileRelativePath}");
-        }
-    }
-    
     /// <summary>
     /// <para> Return the name of the json file that will be generated </para>
     /// <para> Notice: if config relative path contains separators, all separators will be replaced by '_' to ensure a flat hierarchy of json directory </para>

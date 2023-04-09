@@ -15,4 +15,5 @@ namespace TableCraft.Core.Source;
 public interface IDataSource
 {
     ConfigInfo Fill(ConfigInfo configInfo);
+    string GetFilePath();
 }

@@ -247,7 +247,7 @@ public class MainWindowViewModel : ViewModelBase
             new []{selectedTable.JsonFilePath});
         if (configInfo == null)
         {
-            Log.Error("Failed to create config info for '{identifier}' with config home path '{HomePath}'",
+            Log.Error("Failed to create config info for '{identifier}' under '{HomePath}'",
                 selectedTable.ConfigFileRelativePath, Program.GetConfigHomePath());
             SelectedConfigInfo = null;
             return;

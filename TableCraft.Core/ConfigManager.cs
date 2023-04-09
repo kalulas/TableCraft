@@ -54,31 +54,6 @@ namespace TableCraft.Core
         #endregion
 
         #region Public API
-        
-        /// <summary>
-        /// Add new <see cref="ConfigInfo"/> with no json file created
-        /// </summary>
-        /// <param name="configFilePath"></param>
-        /// <param name="configType"></param>
-        /// <returns></returns>
-        public ConfigInfo AddNewConfigInfo(string configFilePath, EConfigType configType)
-        {
-            var configInfo = ConfigInfoFactory.CreateConfigInfo(configType, configFilePath);
-            return configInfo;
-        }
-
-        /// <summary>
-        /// Add new <see cref="ConfigInfo"/> with specific json file
-        /// </summary>
-        /// <param name="configFilePath"></param>
-        /// <param name="jsonFilePath"></param>
-        /// <param name="configType"></param>
-        /// <returns></returns>
-        public ConfigInfo AddNewConfigInfo(string configFilePath, string jsonFilePath, EConfigType configType)
-        {
-            var configInfo = ConfigInfoFactory.CreateConfigInfo(configType, configFilePath, jsonFilePath);
-            return configInfo;
-        }
 
         /// <summary>
         /// Create a ConfigInfo instance with DataSource and DataDecorators
@@ -89,23 +64,6 @@ namespace TableCraft.Core
         public ConfigInfo CreateConfigInfo(string dataSourcePath, string[] dataDecoratorPaths)
         {
             return ConfigInfoFactory.CreateConfigInfo(dataSourcePath, dataDecoratorPaths);
-        }
-
-        /// <summary>
-        /// Save related json file, a wrapper method of <see cref="ConfigInfo.SaveJsonFile"/>
-        /// </summary>
-        /// <param name="configInfo"></param>
-        /// <param name="jsonFilePath"></param>
-        /// <returns></returns>
-        public bool SaveConfigInfoJsonFile(ConfigInfo configInfo, string jsonFilePath)
-        {
-            if (configInfo == null)
-            {
-                return false;
-            }
-            
-            configInfo.SaveJsonFile(jsonFilePath);
-            return true;
         }
 
         /// <summary>

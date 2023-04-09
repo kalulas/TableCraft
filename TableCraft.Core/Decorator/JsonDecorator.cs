@@ -194,8 +194,7 @@ public class JsonDecorator : IDataDecorator
         var attributesJsonData = jsonData[ATTRIBUTES_KEY];
         foreach (var attributeJson in attributesJsonData)
         {
-            var attributeJsonData = attributeJson as JsonData;
-            if (attributeJsonData == null)
+            if (attributeJson is not JsonData attributeJsonData)
             {
                 continue;
             }
@@ -248,6 +247,11 @@ public class JsonDecorator : IDataDecorator
         using var sw = new StreamWriter(fs, encoding);
         sw.Write(builder.ToString());
         return true;
+    }
+
+    public string GetFilePath()
+    {
+        return m_FilePath;
     }
 
     #endregion

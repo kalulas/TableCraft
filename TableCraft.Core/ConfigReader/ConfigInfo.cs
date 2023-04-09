@@ -1,8 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.IO;
-using LitJson;
-using System.Text;
+using System.Linq;
 using TableCraft.Core.Decorator;
 using TableCraft.Core.Source;
 
@@ -15,14 +13,8 @@ namespace TableCraft.Core.ConfigReader
     {
         #region Fields
 
-        private const string ATTRIBUTES_KEY = "Attributes";
-        private const string CONFIG_NAME_KEY = "ConfigName";
-        private const string USAGE_KEY = "Usage";
-        
-        protected readonly string m_ConfigFilePath;
-        protected readonly string m_RelatedJsonFilePath;
-        
-        private List<IDataDecorator> m_Decorators;
+        private IDataSource m_Source;
+        private readonly List<IDataDecorator> m_Decorators;
         
         /// <summary>
         /// AttributeName -> AttributeInfo instance
@@ -37,36 +29,24 @@ namespace TableCraft.Core.ConfigReader
         #endregion
 
         #region Properties
-        
-        public bool HasJsonConfig { get; private set; }
 
         public string ConfigName { get; }
-        public EConfigType ConfigType { get; }
         
-        public ICollection<ConfigAttributeInfo> AttributeInfos => ConfigAttributeDict.Values;
+        public string DataSourceFilePath => m_Source?.GetFilePath() ?? string.Empty;
+        
+        public IEnumerable<string> DataDecoratorFilePaths => m_Decorators.Select(decorator => decorator.GetFilePath());
+
+        public IEnumerable<ConfigAttributeInfo> AttributeInfos => ConfigAttributeDict.Values;
 
         #endregion
 
-        public ConfigInfo(EConfigType configType, string configName, string configFilePath, string relatedJsonFilePath)
-        {
-            ConfigType = configType;
-            ConfigName = configName;
-            ConfigAttributeDict = new Dictionary<string, ConfigAttributeInfo>();
-            ConfigUsageDict = new Dictionary<string, ConfigUsageInfo>();
-            m_ConfigFilePath = configFilePath;
-            m_RelatedJsonFilePath = relatedJsonFilePath;
-            m_Decorators = new List<IDataDecorator>();
-            PrepareUsageDict();
-        }
-        
-        public ConfigInfo(string configName, string dataSourceFilePath, string dataDecoratorFilePath)
+        public ConfigInfo(string configName)
         {
             ConfigName = configName;
+            m_Source = null;
+            m_Decorators = new List<IDataDecorator>();
             ConfigAttributeDict = new Dictionary<string, ConfigAttributeInfo>();
             ConfigUsageDict = new Dictionary<string, ConfigUsageInfo>();
-            m_ConfigFilePath = dataSourceFilePath;
-            m_RelatedJsonFilePath = dataDecoratorFilePath;
-            m_Decorators = new List<IDataDecorator>();
             PrepareUsageDict();
         }
 
@@ -86,14 +66,19 @@ namespace TableCraft.Core.ConfigReader
         
         internal ConfigInfo FillWith(IDataSource dataSource)
         {
+            if (m_Source != null)
+            {
+                throw new Exception("ConfigInfo already filled with data source, multiple data source is not allowed");
+            }
+            
+            m_Source = dataSource;
             return dataSource.Fill(this);
         }
         
         internal ConfigInfo DecorateWith(IDataDecorator decorator)
         {
-            decorator.Decorate(this);
             m_Decorators.Add(decorator);
-            return this;
+            return decorator.Decorate(this);
         }
 
         internal ConfigInfo DecorateWith(IEnumerable<IDataDecorator> decorators)
@@ -131,169 +116,11 @@ namespace TableCraft.Core.ConfigReader
 
         #endregion
 
-        #region LOAD ATTRIBUTES FROM CONFIG & JSON
-
-        /// <summary>
-        /// NOTICE: clean up attributes first
-        /// </summary>
-        public virtual ConfigInfo ReadConfigFileAttributes()
-        {
-            return this;
-        }
-
-        /// <summary>
-        /// add json related information to attributes
-        /// </summary>
-        public ConfigInfo ReadJsonFileAttributes()
-        {
-            HasJsonConfig = !string.IsNullOrEmpty(m_RelatedJsonFilePath) && File.Exists(m_RelatedJsonFilePath);
-            if (!HasJsonConfig)
-            {
-                return this;
-            }
-            
-            var encoding = new UTF8Encoding(Configuration.UseUTF8WithBOM);
-            var jsonContent = File.ReadAllText(m_RelatedJsonFilePath, encoding);
-            var jsonData = JsonMapper.ToObject(jsonContent);
-            if (!jsonData.ContainsKey(CONFIG_NAME_KEY))
-            {
-                Debugger.LogError("'{0}' not found in json file {1}", CONFIG_NAME_KEY, m_RelatedJsonFilePath);
-                return this;
-            }
-            
-            var configName = jsonData[CONFIG_NAME_KEY].ToString();
-            if (configName != ConfigName)
-            {
-                Debugger.LogWarning($"ConfigName doesn't match: json({configName}), runtime({ConfigName})");
-            }
-
-            if (!jsonData.ContainsKey(USAGE_KEY))
-            {
-                Debugger.LogError("'{0}' not found in json file {1}", USAGE_KEY, m_RelatedJsonFilePath);
-                return this;
-            }
-            
-            var usageJsonData = jsonData[USAGE_KEY];
-            foreach (var usageConfig in usageJsonData)
-            {
-                var (usage, usageInfoJsonData) = (KeyValuePair<string,JsonData>)usageConfig;
-                var usageInfo = JsonMapper.ToObject<ConfigUsageInfo>(usageInfoJsonData.ToJson());
-                if (ConfigUsageDict.ContainsKey(usage))
-                {
-                    ConfigUsageDict[usage] = usageInfo;
-                }
-                else
-                {
-                    Debugger.LogWarning($"Usage '{usage}' is not available under current configuration, ignore");
-                }
-            }
-            
-            if (!jsonData.ContainsKey(ATTRIBUTES_KEY))
-            {
-                Debugger.LogError("'{0}' not found in json file {1}", ATTRIBUTES_KEY, m_RelatedJsonFilePath);
-                return this;
-            }
-
-            var attributesJsonData = jsonData[ATTRIBUTES_KEY];
-            foreach (var attributeJson in attributesJsonData)
-            {
-                var attributeJsonData = attributeJson as JsonData;
-                if (attributeJsonData == null)
-                {
-                    continue;
-                }
-
-                var name = attributeJsonData[ConfigAttributeInfo.ATTRIBUTE_NAME_KEY].ToString();
-                if (!ConfigAttributeDict.ContainsKey(name))
-                {
-                    Debugger.LogError("attribute '{0}' not found in config file {1}", name, m_ConfigFilePath);
-                    continue;
-                }
-                
-                try
-                {
-                    ConfigAttributeDict[name].SetJsonFileInfo(attributeJsonData);
-                }
-                catch (Exception e)
-                {
-                    Debugger.LogError($"ReadJsonFileAttributes during attribute '{name}' of file '{ConfigName}' failed: {e.Message}");
-                    throw;
-                }
-            }
-
-            return this;
-        }
-
-        #endregion
-
-        #region Seriailize
-
-        internal void SaveJsonFile(string jsonFilePath)
-        {
-            var builder = new StringBuilder();
-            var writer = new JsonWriter(builder)
-            {
-                PrettyPrint = true
-            };
-
-            writer.WriteObjectStart();
-            writer.WritePropertyName(CONFIG_NAME_KEY);
-            writer.Write(ConfigName);
-            
-            writer.WritePropertyName(USAGE_KEY);
-            JsonMapper.ToJson(ConfigUsageDict, writer);
-
-            writer.WritePropertyName(ATTRIBUTES_KEY);
-            writer.WriteArrayStart();
-            foreach (var attribute in ConfigAttributeDict)
-            {
-                attribute.Value.WriteToJson(writer);
-            }
-
-            writer.WriteArrayEnd();
-            writer.WriteObjectEnd();
-
-            // make sure the directory existed
-            Directory.CreateDirectory(Path.GetDirectoryName(jsonFilePath));
-            var encoding = new UTF8Encoding(Configuration.UseUTF8WithBOM);
-            using (var fs = File.Open(jsonFilePath, FileMode.Create))
-            {
-                using (var sw = new StreamWriter(fs, encoding))
-                {
-                    sw.Write(builder.ToString());
-                }
-            }
-
-            HasJsonConfig = true;
-        }
-
-        #endregion
-
         #region Public API
 
-        public void ClearAttributes()
-        {
-            ConfigAttributeDict.Clear();
-        }
-        
-        public bool ContainsAttribute(string attributeName)
-        {
-            return ConfigAttributeDict.ContainsKey(attributeName);
-        }
-        
-        public bool TryAddAttribute(string attributeName, ConfigAttributeInfo attributeInfo)
-        {
-            return ConfigAttributeDict.TryAdd(attributeName, attributeInfo);
-        }
-        
         public bool TryGetAttribute(string attributeName, out ConfigAttributeInfo attributeInfo)
         {
             return ConfigAttributeDict.TryGetValue(attributeName, out attributeInfo);
-        }
-
-        public bool TryAddUsageInfo(string usage, ConfigUsageInfo usageInfo)
-        {
-            return ConfigUsageDict.TryAdd(usage, usageInfo);
         }
 
         public bool TryGetUsageInfo(string usage, out ConfigUsageInfo usageInfo)

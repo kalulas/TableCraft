@@ -86,55 +86,19 @@ namespace TableCraft.Core.ConfigReader
                 }
             }
         }
-        
-        internal static ConfigInfo CreateConfigInfo(EConfigType configType, string configFilePath)
-        {
-            var configName = Path.GetFileNameWithoutExtension(configFilePath);
-            var relatedJsonPath = string.Empty;
-            switch (configType)
-            {
-                case EConfigType.CSV:
-                    ConfigInfo configInfo = new CSVConfigInfo(configType, configName, configFilePath, relatedJsonPath);
-                    return configInfo.ReadConfigFileAttributes()?.ReadJsonFileAttributes();
-                default:
-                    Debugger.Log("[ConfigInfoFactory.CreateConfigInfo] not supported config type!");
-                    return null;
-            }
-        }
 
-        internal static ConfigInfo CreateConfigInfo(EConfigType configType, string configFilePath, string jsonFilePath)
-        {
-            var configName = Path.GetFileNameWithoutExtension(configFilePath);
-            switch (configType)
-            {
-                case EConfigType.CSV:
-                    ConfigInfo configInfo = new CSVConfigInfo(configType, configName, configFilePath, jsonFilePath);
-                    return configInfo.ReadConfigFileAttributes()?.ReadJsonFileAttributes();
-                default:
-                    Debugger.Log("[ConfigInfoFactory.CreateConfigInfo] not supported config type!");
-                    return null;
-            }
-        }
-        
         internal static ConfigInfo CreateConfigInfo(string dataSourceFilePath, string[] dataDecoratorFilePaths)
         {
             var configName = Path.GetFileNameWithoutExtension(dataSourceFilePath);
             var source = CreateDataSource(dataSourceFilePath);
             
-            string decoratorFilePath;
             var decorators = new List<IDataDecorator>();
-            if (dataDecoratorFilePaths != null && dataDecoratorFilePaths.Length > 0)
+            if (dataDecoratorFilePaths is {Length: > 0})
             {
-                decoratorFilePath = dataDecoratorFilePaths[0];
-                decorators.AddRange(dataDecoratorFilePaths.Where(filepath => !string.IsNullOrEmpty(filepath)).Select(CreateDataDecorator));
-            }
-            else
-            {
-                decoratorFilePath = string.Empty;
+                decorators.AddRange(dataDecoratorFilePaths.SkipWhile(string.IsNullOrEmpty).Select(CreateDataDecorator));
             }
 
-            var configInfo = new ConfigInfo(configName, dataSourceFilePath, decoratorFilePath).FillWith(source)
-                .DecorateWith(decorators);
+            var configInfo = new ConfigInfo(configName).FillWith(source).DecorateWith(decorators);
             return configInfo;
         }
     }
