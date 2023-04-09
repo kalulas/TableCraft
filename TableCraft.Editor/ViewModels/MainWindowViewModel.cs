@@ -110,16 +110,12 @@ public class MainWindowViewModel : ViewModelBase
 
     private void AppendNewTableFileFilter()
     {
-        // TODO get extensions from lib?
-        var extensions = new List<string>
-        {
-            "csv",
-        };
+        var extensions = new List<string>(Configuration.GetDataSourceExtensions());
         
         var fileFilter = new FileDialogFilter
         {
             Extensions = extensions,
-            Name = "Table Files",
+            Name = "Data Sources",
         };
 
         m_NewTableFileFilters.Add(fileFilter);

@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.IO;
 using System.Text;
 using LitJson;
+using TableCraft.Core.ConfigReader;
 
 namespace TableCraft.Core
 {
@@ -176,6 +177,15 @@ namespace TableCraft.Core
         #endregion
 
         #region Public API
+
+        /// <summary>
+        /// Get all extensions for all available Data Sources(no '.' prefix)
+        /// </summary>
+        /// <returns></returns>
+        public static string[] GetDataSourceExtensions()
+        {
+            return ConfigInfoFactory.GetDataSourceExtensions();
+        }
 
         public static string GetTemplateFilePathForUsage(string usage)
         {

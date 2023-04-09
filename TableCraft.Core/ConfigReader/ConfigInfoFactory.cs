@@ -101,5 +101,10 @@ namespace TableCraft.Core.ConfigReader
             var configInfo = new ConfigInfo(configName).FillWith(source).DecorateWith(decorators);
             return configInfo;
         }
+
+        internal static string[] GetDataSourceExtensions()
+        {
+            return m_RegisteredDataSources.Keys.ToArray();
+        }
     }
 }
