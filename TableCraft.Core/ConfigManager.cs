@@ -35,7 +35,6 @@ namespace TableCraft.Core
                 if (m_Singleton == null)
                 {
                     m_Singleton = new ConfigManager();
-                    m_Singleton.Init();
                 }
 
                 return m_Singleton;
@@ -51,15 +50,6 @@ namespace TableCraft.Core
         /// TODO this should be moved to libenv.json, specific line number
         /// </summary>
         public bool ReadComment;
-
-        #endregion
-
-        #region Private Methods
-
-        private void Init()
-        {
-            ConfigInfoFactory.LoadAllDefaultRegistration();
-        }
 
         #endregion
 
@@ -105,6 +95,25 @@ namespace TableCraft.Core
             
             configInfo.SaveJsonFile(jsonFilePath);
             return true;
+        }
+
+        /// <summary>
+        /// Save all additional information with a new created <see cref="TableCraft.Core.Decorator.IDataDecorator"/>
+        /// </summary>
+        /// <param name="configInfo"></param>
+        /// <param name="decoratorPath"></param>
+        /// <returns></returns>
+        /// <exception cref="ArgumentNullException"></exception>
+        public bool SaveConfigInfoWithDecorator(ConfigInfo configInfo, string decoratorPath)
+        {
+            if (configInfo == null)
+            {
+                throw new ArgumentNullException(nameof(configInfo), "configInfo is null");
+            }
+
+            var decorator = ConfigInfoFactory.CreateDataDecorator(decoratorPath);
+            var success = configInfo.SaveWith(decorator);
+            return success;
         }
 
         /// <summary>

@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using System.Reflection;
+using TableCraft.Core.Attributes;
 using TableCraft.Core.Decorator;
 using TableCraft.Core.Source;
 
@@ -10,6 +11,11 @@ namespace TableCraft.Core.ConfigReader
 {
     public static class ConfigInfoFactory
     {
+        static ConfigInfoFactory()
+        {
+            LoadAllDefaultRegistration();
+        }
+        
         private static readonly Dictionary<string, Type> m_RegisteredDataSources = new();
         private static readonly Dictionary<string, Type> m_RegisteredDataDecorators = new();
 
@@ -30,7 +36,7 @@ namespace TableCraft.Core.ConfigReader
             throw new Exception($"[ConfigInfoFactory.CreateDataSource] not supported extension: {extension}");
         }
 
-        private static IDataDecorator CreateDataDecorator(string filepath)
+        internal static IDataDecorator CreateDataDecorator(string filepath)
         {
             var extension = Path.GetExtension(filepath).Replace(".", "");
             if (m_RegisteredDataDecorators.TryGetValue(extension, out var dataDecoratorType))
@@ -46,8 +52,8 @@ namespace TableCraft.Core.ConfigReader
 
             throw new Exception($"[ConfigInfoFactory.CreateDataDecorator] not supported extension: {extension}");
         }
-        
-        public static void LoadAllDefaultRegistration()
+
+        private static void LoadAllDefaultRegistration()
         {
             m_RegisteredDataSources.Clear();
             // get all types that implement IDataSource in current assembly

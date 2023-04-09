@@ -16,6 +16,7 @@ class Program
     public const string LibEnvJsonFilename = "libenv.json";
     
     private static readonly string m_FallbackCodeExportPath = Path.Combine(AppContext.BaseDirectory, "GeneratedCode");
+    private static IHost? m_Host;
     private static IConfiguration? m_Configuration;
     
     // Initialization code. Don't use any Avalonia, third-party APIs or any
@@ -24,7 +25,8 @@ class Program
     [STAThread]
     public static void Main(string[] args)
     {
-        m_Configuration = Host.CreateDefaultBuilder(args).Build().Services.GetRequiredService<IConfiguration>();
+        m_Host = Host.CreateDefaultBuilder(args).Build();
+        m_Configuration = m_Host.Services.GetRequiredService<IConfiguration>();
 
         Log.Logger = new LoggerConfiguration()
             .ReadFrom.Configuration(m_Configuration)

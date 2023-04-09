@@ -9,6 +9,7 @@ using System;
 using System.IO;
 using System.Text;
 using System.Text.RegularExpressions;
+using TableCraft.Core.Attributes;
 using TableCraft.Core.ConfigReader;
 
 namespace TableCraft.Core.Source;

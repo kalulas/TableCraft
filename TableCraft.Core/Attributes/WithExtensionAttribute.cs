@@ -9,8 +9,9 @@
 
 using System;
 
-namespace TableCraft.Core;
+namespace TableCraft.Core.Attributes;
 
+[AttributeUsage(AttributeTargets.Class)]
 public class WithExtensionAttribute : Attribute
 {
     public string Extension { get; private set; }

@@ -23,8 +23,8 @@ namespace TableCraft.Core.ConfigReader
 
         private string m_ValueType;
         private string m_CollectionType;
-        private readonly List<ConfigAttributeUsageInfo> m_UsageList;
-        private readonly HashSet<string> m_TagList;
+        internal readonly List<ConfigAttributeUsageInfo> UsageList;
+        internal readonly HashSet<string> TagList;
 
         #endregion
 
@@ -65,9 +65,9 @@ namespace TableCraft.Core.ConfigReader
             }
         }
 
-        public ConfigAttributeUsageInfo[] AttributeUsageInfos => m_UsageList.ToArray();
+        public ConfigAttributeUsageInfo[] AttributeUsageInfos => UsageList.ToArray();
 
-        public string[] Tags => m_TagList.ToArray();
+        public string[] Tags => TagList.ToArray();
 
         #endregion
 
@@ -76,8 +76,8 @@ namespace TableCraft.Core.ConfigReader
             m_ValueType = string.Empty;
             DefaultValue = string.Empty;
             m_CollectionType = string.Empty;
-            m_UsageList = new List<ConfigAttributeUsageInfo>();
-            m_TagList = new HashSet<string>();
+            UsageList = new List<ConfigAttributeUsageInfo>();
+            TagList = new HashSet<string>();
         }
 
         /// AttributeName & Comment can be read from config file (for example the first line and the second line of csv file)
@@ -95,7 +95,7 @@ namespace TableCraft.Core.ConfigReader
             DefaultValue = jsonData[DEFAULT_VALUE_KEY].ToString();
             CollectionType = jsonData[COLLECTION_TYPE_KEY].ToString();
             Comment = jsonData[COMMENT_KEY].ToString();
-            m_UsageList.Clear();
+            UsageList.Clear();
             if (jsonData[USAGE_KEY].IsArray)
             {
                 foreach (var usage in jsonData[USAGE_KEY])
@@ -108,16 +108,16 @@ namespace TableCraft.Core.ConfigReader
                     var newUsageInfo = new ConfigAttributeUsageInfo().ReadFromJson(usageJsonData);
                     if (newUsageInfo != null)
                     {
-                        m_UsageList.Add(newUsageInfo);
+                        UsageList.Add(newUsageInfo);
                     }
                 }
             }
 
 
-            m_TagList.Clear();
+            TagList.Clear();
             foreach (var tag in jsonData[TAG_KEY])
             {
-                m_TagList.Add(tag.ToString());
+                TagList.Add(tag.ToString());
             }
 
             return true;
@@ -138,7 +138,7 @@ namespace TableCraft.Core.ConfigReader
             writer.Write(CollectionType);
             writer.WritePropertyName(USAGE_KEY);
             writer.WriteArrayStart();
-            foreach (var usage in m_UsageList)
+            foreach (var usage in UsageList)
             {
                 usage.WriteToJson(writer);
             }
@@ -146,7 +146,7 @@ namespace TableCraft.Core.ConfigReader
             writer.WriteArrayEnd();
             writer.WritePropertyName(TAG_KEY);
             writer.WriteArrayStart();
-            foreach (var tag in m_TagList)
+            foreach (var tag in TagList)
             {
                 writer.Write(tag);
             }
@@ -159,12 +159,12 @@ namespace TableCraft.Core.ConfigReader
 
         public bool HasTag(string tag)
         {
-            return m_TagList.Contains(tag);
+            return TagList.Contains(tag);
         }
 
         public bool HasUsage(string usage)
         {
-            foreach (var usageInfo in m_UsageList)
+            foreach (var usageInfo in UsageList)
             {
                 if (usageInfo.Usage == usage)
                 {
@@ -177,7 +177,7 @@ namespace TableCraft.Core.ConfigReader
 
         public string GetUsageFieldName(string usage)
         {
-            var targetUsage = m_UsageList.Find(info => info.Usage == usage);
+            var targetUsage = UsageList.Find(info => info.Usage == usage);
             if (targetUsage != null)
             {
                 return targetUsage.FieldName;
@@ -202,7 +202,7 @@ namespace TableCraft.Core.ConfigReader
         /// <returns> True if not duplicated </returns>
         public bool AddUsageInfo(ConfigAttributeUsageInfo usageInfo)
         {
-            foreach (var attributeUsageInfo in m_UsageList)
+            foreach (var attributeUsageInfo in UsageList)
             {
                 if (attributeUsageInfo.Usage == usageInfo.Usage)
                 {
@@ -210,22 +210,22 @@ namespace TableCraft.Core.ConfigReader
                 }
             }
             
-            m_UsageList.Add(usageInfo);
+            UsageList.Add(usageInfo);
             return true;
         }
 
         /// <summary>
-        /// Remove usageInfo from <see cref="m_UsageList"/>
+        /// Remove usageInfo from <see cref="UsageList"/>
         /// </summary>
         /// <param name="usageType"></param>
         /// <returns> True if removed </returns>
         public bool RemoveUsageInfo(string usageType)
         {
-            foreach (var attributeUsageInfo in m_UsageList)
+            foreach (var attributeUsageInfo in UsageList)
             {
                 if (attributeUsageInfo.Usage == usageType)
                 {
-                    m_UsageList.Remove(attributeUsageInfo);
+                    UsageList.Remove(attributeUsageInfo);
                     return true;
                 }
             }
@@ -235,17 +235,17 @@ namespace TableCraft.Core.ConfigReader
 
         public bool AddTag(string tag)
         {
-            return m_TagList.Add(tag);
+            return TagList.Add(tag);
         }
         
         /// <summary>
-        /// Remove tag from <see cref="m_TagList"/>
+        /// Remove tag from <see cref="TagList"/>
         /// </summary>
         /// <param name="tagContent"></param>
         /// <returns> True if removed </returns>
         public bool RemoveTag(string tagContent)
         {
-            return m_TagList.Remove(tagContent);
+            return TagList.Remove(tagContent);
         }
 
         #endregion

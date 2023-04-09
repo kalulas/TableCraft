@@ -21,6 +21,18 @@ namespace TableCraft.Core.ConfigReader
         
         protected readonly string m_ConfigFilePath;
         protected readonly string m_RelatedJsonFilePath;
+        
+        private List<IDataDecorator> m_Decorators;
+        
+        /// <summary>
+        /// AttributeName -> AttributeInfo instance
+        /// </summary>
+        internal readonly Dictionary<string, ConfigAttributeInfo> ConfigAttributeDict;
+
+        /// <summary>
+        /// UsageName -> UsageInfo
+        /// </summary>
+        internal readonly Dictionary<string, ConfigUsageInfo> ConfigUsageDict;
 
         #endregion
 
@@ -30,17 +42,7 @@ namespace TableCraft.Core.ConfigReader
 
         public string ConfigName { get; }
         public EConfigType ConfigType { get; }
-
-        /// <summary>
-        /// AttributeName -> AttributeInfo instance
-        /// </summary>
-        protected readonly Dictionary<string, ConfigAttributeInfo> ConfigAttributeDict;
-
-        /// <summary>
-        /// UsageName -> UsageInfo
-        /// </summary>
-        protected readonly Dictionary<string, ConfigUsageInfo> ConfigUsageDict;
-
+        
         public ICollection<ConfigAttributeInfo> AttributeInfos => ConfigAttributeDict.Values;
 
         #endregion
@@ -53,6 +55,7 @@ namespace TableCraft.Core.ConfigReader
             ConfigUsageDict = new Dictionary<string, ConfigUsageInfo>();
             m_ConfigFilePath = configFilePath;
             m_RelatedJsonFilePath = relatedJsonFilePath;
+            m_Decorators = new List<IDataDecorator>();
             PrepareUsageDict();
         }
         
@@ -63,6 +66,7 @@ namespace TableCraft.Core.ConfigReader
             ConfigUsageDict = new Dictionary<string, ConfigUsageInfo>();
             m_ConfigFilePath = dataSourceFilePath;
             m_RelatedJsonFilePath = dataDecoratorFilePath;
+            m_Decorators = new List<IDataDecorator>();
             PrepareUsageDict();
         }
 
@@ -78,6 +82,51 @@ namespace TableCraft.Core.ConfigReader
                     ExportName = ConfigName
                 };
             }
+        }
+        
+        internal ConfigInfo FillWith(IDataSource dataSource)
+        {
+            return dataSource.Fill(this);
+        }
+        
+        internal ConfigInfo DecorateWith(IDataDecorator decorator)
+        {
+            decorator.Decorate(this);
+            m_Decorators.Add(decorator);
+            return this;
+        }
+
+        internal ConfigInfo DecorateWith(IEnumerable<IDataDecorator> decorators)
+        {
+            foreach (var decorator in decorators)
+            {
+                decorator.Decorate(this);
+                m_Decorators.Add(decorator);
+            }
+            
+            return this;
+        }
+
+        /// <summary>
+        /// Save all decorators to file after modification, every used decorator is saved in <see cref="m_Decorators"/>
+        /// </summary>
+        internal void SaveDecoratorsToFile()
+        {
+            if (m_Decorators.Count == 0)
+            {
+                Debugger.LogWarning("[ConfigInfo.SaveDecoratorsToFile] No decorator found");
+                return;
+            }
+
+            foreach (var decorator in m_Decorators)
+            {
+                decorator.SaveToFile(this);
+            }
+        }
+
+        internal bool SaveWith(IDataDecorator decorator)
+        {
+            return decorator.SaveToFile(this);
         }
 
         #endregion
@@ -221,27 +270,7 @@ namespace TableCraft.Core.ConfigReader
         #endregion
 
         #region Public API
-        
-        public ConfigInfo FillWith(IDataSource dataSource)
-        {
-            return dataSource.Fill(this);
-        }
-        
-        public ConfigInfo DecorateWith(IDataDecorator decorator)
-        {
-            return decorator.Decorate(this);
-        }
 
-        public ConfigInfo DecorateWith(IEnumerable<IDataDecorator> decorators)
-        {
-            foreach (var decorator in decorators)
-            {
-                decorator.Decorate(this);
-            }
-            
-            return this;
-        }
-        
         public void ClearAttributes()
         {
             ConfigAttributeDict.Clear();
@@ -257,6 +286,15 @@ namespace TableCraft.Core.ConfigReader
             return ConfigAttributeDict.TryAdd(attributeName, attributeInfo);
         }
         
+        public bool TryGetAttribute(string attributeName, out ConfigAttributeInfo attributeInfo)
+        {
+            return ConfigAttributeDict.TryGetValue(attributeName, out attributeInfo);
+        }
+
+        public bool TryAddUsageInfo(string usage, ConfigUsageInfo usageInfo)
+        {
+            return ConfigUsageDict.TryAdd(usage, usageInfo);
+        }
 
         public bool TryGetUsageInfo(string usage, out ConfigUsageInfo usageInfo)
         {

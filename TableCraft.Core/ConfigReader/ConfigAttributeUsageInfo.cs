@@ -12,13 +12,13 @@ namespace TableCraft.Core.ConfigReader
     {
         private const string USAGE_KEY = "Usage";
         private const string FIELD_NAME_KEY = "FieldName";
-        public string FieldName { get; set; }
         public string Usage { get; set; }
+        public string FieldName { get; set; }
 
         public ConfigAttributeUsageInfo()
         {
-            FieldName = string.Empty;
             Usage = string.Empty;
+            FieldName = string.Empty;
         }
 
         public ConfigAttributeUsageInfo ReadFromJson(JsonData jsonData)
