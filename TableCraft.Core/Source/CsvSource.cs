@@ -19,6 +19,30 @@ namespace TableCraft.Core.Source;
 [WithExtension("csv")]
 public class CsvSource : IDataSource
 {
+    private class Configuration
+    {
+        /// <summary>
+        /// Read Attribute name from header line, this is a must-have
+        /// </summary>
+        public int HeaderLineIndex;
+        /// <summary>
+        /// -1 if no comment line
+        /// </summary>
+        public int CommentLineIndex = -1;
+
+        public Configuration Fix()
+        {
+            if (HeaderLineIndex == CommentLineIndex)
+            {
+                HeaderLineIndex = -1;
+                CommentLineIndex = -1;
+                Debugger.LogError("[Configuration.Fix] HeaderLineIndex and CommentLineIndex can't be the same, all set to -1");
+            }
+
+            return this;
+        }
+    }
+    
     #region Fields
 
     private readonly string m_FilePath;
@@ -84,38 +108,45 @@ public class CsvSource : IDataSource
             return null;
         }
 
-        var count = 0;
+        var curLineIndex = 0;
         var headers = Array.Empty<string>();
         var comments = Array.Empty<string>();
-        var encoding = new UTF8Encoding(Configuration.UseUTF8WithBOM);
+        var encoding = new UTF8Encoding(Core.Configuration.UseUTF8WithBOM);
+        
+        var dataSourceConfig = Core.Configuration.GetDataSourceConfiguration<Configuration>(typeof(CsvSource)).Fix();
+        var maxLineIndex = Math.Max(dataSourceConfig.HeaderLineIndex, dataSourceConfig.CommentLineIndex);
         foreach (var line in File.ReadAllLines(m_FilePath, encoding))
         {
-            if (count++ >= 2)
+            if (curLineIndex > maxLineIndex)
             {
                 break;
             }
 
             var contentList = ReadLineAttributes(line);
-            if (count == 1)
+            if (curLineIndex == dataSourceConfig.HeaderLineIndex)
             {
                 headers = contentList;
-                continue;
             }
 
-            if (count == 2 && ConfigManager.singleton.ReadComment)
+            if (curLineIndex == dataSourceConfig.CommentLineIndex)
             {
                 comments = contentList;
-                continue;
             }
+
+            curLineIndex++;
         }
 
+        if (dataSourceConfig.CommentLineIndex != -1 && headers.Length != comments.Length)
+        {
+            Debugger.LogWarning(
+                $"[CsvDataSource.Fill] Header count '{headers.Length}' not equal to comment count '{comments.Length}'");
+        }
+        
         configInfo.ConfigAttributeDict.Clear();
         for (int index = 0; index < headers.Length; index++)
         {
             var header = headers[index];
-            var comment = ConfigManager.singleton.ReadComment && index < comments.Length
-                ? comments[index]
-                : string.Empty;
+            var comment = index < comments.Length ? comments[index] : string.Empty;
 
             var newAttributeInfo = FillConfigAttribute(new ConfigAttributeInfo(), index, header, comment);
             var success = configInfo.ConfigAttributeDict.TryAdd(header, newAttributeInfo);

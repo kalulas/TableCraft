@@ -28,28 +28,7 @@ namespace TableCraft.Core
 
         private static ConfigManager m_Singleton;
 
-        public static ConfigManager singleton
-        {
-            get
-            {
-                if (m_Singleton == null)
-                {
-                    m_Singleton = new ConfigManager();
-                }
-
-                return m_Singleton;
-            }
-        }
-
-        #endregion
-
-        #region Fields
-
-        /// <summary>
-        /// try getting comments from second line if true
-        /// TODO this should be moved to libenv.json, specific line number
-        /// </summary>
-        public bool ReadComment;
+        public static ConfigManager singleton => m_Singleton ??= new ConfigManager();
 
         #endregion
 

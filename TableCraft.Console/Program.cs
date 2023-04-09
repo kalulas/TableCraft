@@ -32,8 +32,7 @@ namespace TableCraft.Console
             {
                 return;
             }
-
-            ConfigManager.singleton.ReadComment = true;
+            
             var experimentalInfo = ConfigManager.singleton.CreateConfigInfo(targetCsvConfigFilePath, new[] {jsonFilePath});
             var success = ConfigManager.singleton.SaveConfigInfoWithDecorator(experimentalInfo,
                 Path.Combine(AppContext.BaseDirectory, "experimental.json"));
