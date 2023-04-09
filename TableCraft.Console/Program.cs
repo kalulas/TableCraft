@@ -1,4 +1,5 @@
 ﻿using System;
+using System.IO;
 using System.Threading.Tasks;
 using TableCraft.Core;
 using Microsoft.Extensions.Configuration;
@@ -31,14 +32,15 @@ namespace TableCraft.Console
             {
                 return;
             }
-
-            ConfigManager.singleton.ReadComment = true;
-            var experimentalInfo = ConfigInfoFactory.CreateConfigInfo(targetCsvConfigFilePath, new[] {jsonFilePath});
+            
+            var experimentalInfo = ConfigManager.singleton.CreateConfigInfo(targetCsvConfigFilePath, new[] {jsonFilePath});
+            var success = ConfigManager.singleton.SaveConfigInfoWithDecorator(experimentalInfo,
+                Path.Combine(AppContext.BaseDirectory, "experimental.json"));
             // var identifier = ConfigManager.singleton.GetConfigIdentifier(targetCsvConfigFilePath);
             // var relatedJsonFilePath = $"{jsonHomeDir}\\{identifier}.json";
             // var configInfo = ConfigManager.singleton.AddNewConfigInfo(targetCsvConfigFilePath, jsonFilePath, Core.ConfigReader.EConfigType.CSV);
-            // await ConfigManager.singleton.GenerateCodeForUsage(Configuration.ConfigUsageType[0], configInfo,
-            //     AppContext.BaseDirectory);
+            await ConfigManager.singleton.GenerateCodeForUsage(Configuration.ConfigUsageType[0], experimentalInfo,
+                AppContext.BaseDirectory);
         }
     }
 }

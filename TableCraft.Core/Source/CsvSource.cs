@@ -1,14 +1,17 @@
 ﻿#region File Header
+
 // Filename: CsvDataSource.cs
 // Author: Kalulas
 // Create: 2023-04-08
 // Description:
+
 #endregion
 
 using System;
 using System.IO;
 using System.Text;
 using System.Text.RegularExpressions;
+using TableCraft.Core.Attributes;
 using TableCraft.Core.ConfigReader;
 
 namespace TableCraft.Core.Source;
@@ -16,6 +19,30 @@ namespace TableCraft.Core.Source;
 [WithExtension("csv")]
 public class CsvSource : IDataSource
 {
+    private class Configuration
+    {
+        /// <summary>
+        /// Read Attribute name from header line, this is a must-have
+        /// </summary>
+        public int HeaderLineIndex;
+        /// <summary>
+        /// -1 if no comment line
+        /// </summary>
+        public int CommentLineIndex = -1;
+
+        public Configuration Fix()
+        {
+            if (HeaderLineIndex == CommentLineIndex)
+            {
+                HeaderLineIndex = -1;
+                CommentLineIndex = -1;
+                Debugger.LogError("[Configuration.Fix] HeaderLineIndex and CommentLineIndex can't be the same, all set to -1");
+            }
+
+            return this;
+        }
+    }
+    
     #region Fields
 
     private readonly string m_FilePath;
@@ -42,7 +69,7 @@ public class CsvSource : IDataSource
     private string[] ReadLineAttributes(string line)
     {
         const string commaPlaceholder = "#comma#";
-        var processedLine = m_Pattern.Replace(line, match => match.Value.Replace(",", commaPlaceholder)); 
+        var processedLine = m_Pattern.Replace(line, match => match.Value.Replace(",", commaPlaceholder));
         var attributes = processedLine.Split(',');
         for (int i = 0; i < attributes.Length; i++)
         {
@@ -55,10 +82,18 @@ public class CsvSource : IDataSource
                 // replace inner quote
                 attributes[i] = result.Replace("\"\"", "\"");
             }
-
         }
 
         return attributes;
+    }
+
+    private static ConfigAttributeInfo FillConfigAttribute(ConfigAttributeInfo attributeInfo, int index,
+        string attributeName, string comment)
+    {
+        attributeInfo.Index = index;
+        attributeInfo.AttributeName = attributeName;
+        attributeInfo.Comment = comment;
+        return attributeInfo;
     }
 
     #endregion
@@ -72,48 +107,62 @@ public class CsvSource : IDataSource
             Debugger.LogError($"[CsvDataSource.Fill] '{m_FilePath}' not found!");
             return null;
         }
-            
-        var count = 0;
+
+        var curLineIndex = 0;
         var headers = Array.Empty<string>();
         var comments = Array.Empty<string>();
-        var encoding = new UTF8Encoding(Configuration.UseUTF8WithBOM);
+        var encoding = new UTF8Encoding(Core.Configuration.UseUTF8WithBOM);
+        
+        var dataSourceConfig = Core.Configuration.GetDataSourceConfiguration<Configuration>(typeof(CsvSource)).Fix();
+        var maxLineIndex = Math.Max(dataSourceConfig.HeaderLineIndex, dataSourceConfig.CommentLineIndex);
         foreach (var line in File.ReadAllLines(m_FilePath, encoding))
         {
-            if (count++ >= 2)
+            if (curLineIndex > maxLineIndex)
             {
                 break;
             }
 
             var contentList = ReadLineAttributes(line);
-            if (count == 1)
+            if (curLineIndex == dataSourceConfig.HeaderLineIndex)
             {
                 headers = contentList;
-                continue;
             }
 
-            if (count == 2 && ConfigManager.singleton.ReadComment)
+            if (curLineIndex == dataSourceConfig.CommentLineIndex)
             {
                 comments = contentList;
-                continue;
             }
+
+            curLineIndex++;
         }
 
-        configInfo.ClearAttributes();
-        for (int i = 0; i < headers.Length; i++)
+        if (dataSourceConfig.CommentLineIndex != -1 && headers.Length != comments.Length)
         {
-            var header = headers[i];
-            var comment = ConfigManager.singleton.ReadComment && i < comments.Length 
-                ? comments[i] : string.Empty;
-
-            var newAttributeInfo = new ConfigAttributeInfo().SetConfigFileInfo(i, header, comment);
-            var success = configInfo.TryAddAttribute(header, newAttributeInfo);
-            if (!success)
-            {
-                Debugger.LogWarning($"[CsvDataSource.Fill] Add attribute with '{header}' into '{configInfo.ConfigName}' failed!");
-            }
+            Debugger.LogWarning(
+                $"[CsvDataSource.Fill] Header count '{headers.Length}' not equal to comment count '{comments.Length}'");
         }
         
+        configInfo.ConfigAttributeDict.Clear();
+        for (int index = 0; index < headers.Length; index++)
+        {
+            var header = headers[index];
+            var comment = index < comments.Length ? comments[index] : string.Empty;
+
+            var newAttributeInfo = FillConfigAttribute(new ConfigAttributeInfo(), index, header, comment);
+            var success = configInfo.ConfigAttributeDict.TryAdd(header, newAttributeInfo);
+            if (!success)
+            {
+                Debugger.LogWarning(
+                    $"[CsvDataSource.Fill] Add attribute with '{header}' into '{configInfo.ConfigName}' failed!");
+            }
+        }
+
         return configInfo;
+    }
+
+    public string GetFilePath()
+    {
+        return m_FilePath;
     }
 
     #endregion

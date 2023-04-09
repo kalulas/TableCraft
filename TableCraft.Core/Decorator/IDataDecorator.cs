@@ -15,4 +15,6 @@ namespace TableCraft.Core.Decorator;
 public interface IDataDecorator
 {
     ConfigInfo Decorate(ConfigInfo configInfo);
+    bool SaveToFile(ConfigInfo configInfo);
+    string GetFilePath();
 }

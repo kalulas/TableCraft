@@ -110,16 +110,12 @@ public class MainWindowViewModel : ViewModelBase
 
     private void AppendNewTableFileFilter()
     {
-        // TODO get extensions from lib?
-        var extensions = new List<string>
-        {
-            "csv",
-        };
+        var extensions = new List<string>(Configuration.GetDataSourceExtensions());
         
         var fileFilter = new FileDialogFilter
         {
             Extensions = extensions,
-            Name = "Table Files",
+            Name = "Data Sources",
         };
 
         m_NewTableFileFilters.Add(fileFilter);
@@ -243,11 +239,11 @@ public class MainWindowViewModel : ViewModelBase
             return;
         }
 
-        var configInfo = ConfigManager.singleton.AddNewConfigInfo(selectedTable.ConfigFilePath,
-            selectedTable.JsonFilePath, selectedTable.GetConfigType());
+        var configInfo = ConfigManager.singleton.CreateConfigInfo(selectedTable.ConfigFilePath,
+            new []{selectedTable.JsonFilePath});
         if (configInfo == null)
         {
-            Log.Error("Failed to create config info for '{identifier}' with config home path '{HomePath}'",
+            Log.Error("Failed to create config info for '{identifier}' under '{HomePath}'",
                 selectedTable.ConfigFileRelativePath, Program.GetConfigHomePath());
             SelectedConfigInfo = null;
             return;
@@ -286,7 +282,7 @@ public class MainWindowViewModel : ViewModelBase
         var configInfo = m_SelectedConfigInfo.GetConfigInfo();
         var jsonFileName = m_SelectedTable.GetTargetJsonFileName();
         var jsonFileFullPath = Path.Combine(JsonHomePath, jsonFileName);
-        var success = ConfigManager.singleton.SaveConfigInfoJsonFile(configInfo, jsonFileFullPath);
+        var success = ConfigManager.singleton.SaveConfigInfoWithDecorator(configInfo, jsonFileFullPath);
         if (!success)
         {
             Log.Error("Failed to save json file '{JsonFilePath}'", jsonFileFullPath);

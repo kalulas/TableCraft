@@ -28,83 +28,40 @@ namespace TableCraft.Core
 
         private static ConfigManager m_Singleton;
 
-        public static ConfigManager singleton
-        {
-            get
-            {
-                if (m_Singleton == null)
-                {
-                    m_Singleton = new ConfigManager();
-                    m_Singleton.Init();
-                }
-
-                return m_Singleton;
-            }
-        }
-
-        #endregion
-
-        #region Fields
-
-        /// <summary>
-        /// try getting comments from second line if true
-        /// TODO this should be moved to libenv.json, specific line number
-        /// </summary>
-        public bool ReadComment;
-
-        #endregion
-
-        #region Private Methods
-
-        private void Init()
-        {
-            ConfigInfoFactory.LoadAllDefaultRegistration();
-        }
+        public static ConfigManager singleton => m_Singleton ??= new ConfigManager();
 
         #endregion
 
         #region Public API
-        
+
         /// <summary>
-        /// Add new <see cref="ConfigInfo"/> with no json file created
+        /// Create a ConfigInfo instance with DataSource and DataDecorators
         /// </summary>
-        /// <param name="configFilePath"></param>
-        /// <param name="configType"></param>
+        /// <param name="dataSourcePath"></param>
+        /// <param name="dataDecoratorPaths"></param>
         /// <returns></returns>
-        public ConfigInfo AddNewConfigInfo(string configFilePath, EConfigType configType)
+        public ConfigInfo CreateConfigInfo(string dataSourcePath, string[] dataDecoratorPaths)
         {
-            var configInfo = ConfigInfoFactory.CreateConfigInfo(configType, configFilePath);
-            return configInfo;
+            return ConfigInfoFactory.CreateConfigInfo(dataSourcePath, dataDecoratorPaths);
         }
 
         /// <summary>
-        /// Add new <see cref="ConfigInfo"/> with specific json file
-        /// </summary>
-        /// <param name="configFilePath"></param>
-        /// <param name="jsonFilePath"></param>
-        /// <param name="configType"></param>
-        /// <returns></returns>
-        public ConfigInfo AddNewConfigInfo(string configFilePath, string jsonFilePath, EConfigType configType)
-        {
-            var configInfo = ConfigInfoFactory.CreateConfigInfo(configType, configFilePath, jsonFilePath);
-            return configInfo;
-        }
-
-        /// <summary>
-        /// Save related json file, a wrapper method of <see cref="ConfigInfo.SaveJsonFile"/>
+        /// Save all additional information with a new created <see cref="TableCraft.Core.Decorator.IDataDecorator"/>
         /// </summary>
         /// <param name="configInfo"></param>
-        /// <param name="jsonFilePath"></param>
+        /// <param name="decoratorPath"></param>
         /// <returns></returns>
-        public bool SaveConfigInfoJsonFile(ConfigInfo configInfo, string jsonFilePath)
+        /// <exception cref="ArgumentNullException"></exception>
+        public bool SaveConfigInfoWithDecorator(ConfigInfo configInfo, string decoratorPath)
         {
             if (configInfo == null)
             {
-                return false;
+                throw new ArgumentNullException(nameof(configInfo), "configInfo is null");
             }
-            
-            configInfo.SaveJsonFile(jsonFilePath);
-            return true;
+
+            var decorator = ConfigInfoFactory.CreateDataDecorator(decoratorPath);
+            var success = configInfo.SaveWith(decorator);
+            return success;
         }
 
         /// <summary>

@@ -3,11 +3,12 @@ using System.Collections.Generic;
 using System.IO;
 using System.Text;
 using LitJson;
+using TableCraft.Core.ConfigReader;
 
 namespace TableCraft.Core
 {
     /// <summary>
-    /// Setup environmetal settings, like directory for code-template, generated code ...
+    /// Setup environmental settings, like directory for code-template, generated code ...
     /// </summary>
     public static class Configuration
     {
@@ -46,20 +47,21 @@ namespace TableCraft.Core
         /// <summary>
         /// define legal data value type
         /// </summary>
-        private static readonly List<string> m_DataValueType = new List<string>();
+        private static readonly List<string> m_DataValueType = new();
         /// <summary>
         /// define legal data container type
         /// </summary>
-        private static readonly List<string> m_DataCollectionType = new List<string>();
+        private static readonly List<string> m_DataCollectionType = new();
         /// <summary>
         /// define usages like 'client', 'server'
         /// </summary>
-        private static readonly List<string> m_ConfigUsageType = new List<string>();
+        private static readonly List<string> m_ConfigUsageType = new();
 
-        private static readonly List<string> m_AttributeTag = new List<string>();
+        private static readonly List<string> m_AttributeTag = new();
 
-        private static readonly Dictionary<string, ConfigUsageInformation> m_UsageToInformation =
-            new Dictionary<string, ConfigUsageInformation>();
+        private static readonly Dictionary<string, ConfigUsageInformation> m_UsageToInformation = new();
+
+        private static JsonData m_LibEnvJsonData;
 
         private static void ReadStringArrayFromJson(JsonData data, string key, List<string> destination)
         {
@@ -128,6 +130,29 @@ namespace TableCraft.Core
             }
 
             m_IsInited = true;
+            m_LibEnvJsonData = configData;
+        }
+        
+        /// <summary>
+        /// Create a configuration instance with specific <see cref="TableCraft.Core.Source.IDataSource"/>, a simple approach
+        /// </summary>
+        /// <param name="dataSourceType"></param>
+        /// <typeparam name="T"></typeparam>
+        /// <returns></returns>
+        internal static T GetDataSourceConfiguration<T>(Type dataSourceType)
+        {
+            if (!dataSourceType.IsAssignableTo(typeof(Source.IDataSource)))
+            {
+                Debugger.LogWarning($"[Configuration.GetDataSourceConfiguration] type '{dataSourceType}' is not a data source type");
+            }
+            
+            if (!m_LibEnvJsonData.ContainsKey(dataSourceType.Name))
+            {
+                Debugger.LogWarning($"[Configuration.GetDataSourceConfiguration] configuration for data source type '{dataSourceType}' not found");
+                return Activator.CreateInstance<T>(); // return a default one
+            }
+            
+            return JsonMapper.ToObject<T>(m_LibEnvJsonData[dataSourceType.Name].ToJson());
         }
 
         #region Validation
@@ -152,6 +177,15 @@ namespace TableCraft.Core
         #endregion
 
         #region Public API
+
+        /// <summary>
+        /// Get all extensions for all available Data Sources(no '.' prefix)
+        /// </summary>
+        /// <returns></returns>
+        public static string[] GetDataSourceExtensions()
+        {
+            return ConfigInfoFactory.GetDataSourceExtensions();
+        }
 
         public static string GetTemplateFilePathForUsage(string usage)
         {

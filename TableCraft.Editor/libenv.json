@@ -3,6 +3,10 @@
     "DataCollectionType": ["none", "array", "list"],
     "AttributeTag": ["primary", "comma-separate", "semicolon-separate"],
     "UTF8BOM": false,
+    "CsvSource":{
+        "HeaderLineIndex": 0,
+        "CommentLineIndex": 1
+    },
     "ConfigUsageType":{
         "client0":{
             "CodeTemplateName": "client0-template.tt",
