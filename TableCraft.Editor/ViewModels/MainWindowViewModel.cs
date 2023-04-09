@@ -243,8 +243,8 @@ public class MainWindowViewModel : ViewModelBase
             return;
         }
 
-        var configInfo = ConfigManager.singleton.AddNewConfigInfo(selectedTable.ConfigFilePath,
-            selectedTable.JsonFilePath, selectedTable.GetConfigType());
+        var configInfo = ConfigManager.singleton.CreateConfigInfo(selectedTable.ConfigFilePath,
+            new []{selectedTable.JsonFilePath});
         if (configInfo == null)
         {
             Log.Error("Failed to create config info for '{identifier}' with config home path '{HomePath}'",
@@ -286,7 +286,7 @@ public class MainWindowViewModel : ViewModelBase
         var configInfo = m_SelectedConfigInfo.GetConfigInfo();
         var jsonFileName = m_SelectedTable.GetTargetJsonFileName();
         var jsonFileFullPath = Path.Combine(JsonHomePath, jsonFileName);
-        var success = ConfigManager.singleton.SaveConfigInfoJsonFile(configInfo, jsonFileFullPath);
+        var success = ConfigManager.singleton.SaveConfigInfoWithDecorator(configInfo, jsonFileFullPath);
         if (!success)
         {
             Log.Error("Failed to save json file '{JsonFilePath}'", jsonFileFullPath);

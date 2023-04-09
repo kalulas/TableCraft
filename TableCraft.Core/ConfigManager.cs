@@ -81,6 +81,17 @@ namespace TableCraft.Core
         }
 
         /// <summary>
+        /// Create a ConfigInfo instance with DataSource and DataDecorators
+        /// </summary>
+        /// <param name="dataSourcePath"></param>
+        /// <param name="dataDecoratorPaths"></param>
+        /// <returns></returns>
+        public ConfigInfo CreateConfigInfo(string dataSourcePath, string[] dataDecoratorPaths)
+        {
+            return ConfigInfoFactory.CreateConfigInfo(dataSourcePath, dataDecoratorPaths);
+        }
+
+        /// <summary>
         /// Save related json file, a wrapper method of <see cref="ConfigInfo.SaveJsonFile"/>
         /// </summary>
         /// <param name="configInfo"></param>

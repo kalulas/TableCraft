@@ -9,7 +9,7 @@ using TableCraft.Core.Source;
 
 namespace TableCraft.Core.ConfigReader
 {
-    public static class ConfigInfoFactory
+    internal static class ConfigInfoFactory
     {
         static ConfigInfoFactory()
         {
@@ -87,7 +87,7 @@ namespace TableCraft.Core.ConfigReader
             }
         }
         
-        public static ConfigInfo CreateConfigInfo(EConfigType configType, string configFilePath)
+        internal static ConfigInfo CreateConfigInfo(EConfigType configType, string configFilePath)
         {
             var configName = Path.GetFileNameWithoutExtension(configFilePath);
             var relatedJsonPath = string.Empty;
@@ -102,7 +102,7 @@ namespace TableCraft.Core.ConfigReader
             }
         }
 
-        public static ConfigInfo CreateConfigInfo(EConfigType configType, string configFilePath, string jsonFilePath)
+        internal static ConfigInfo CreateConfigInfo(EConfigType configType, string configFilePath, string jsonFilePath)
         {
             var configName = Path.GetFileNameWithoutExtension(configFilePath);
             switch (configType)
@@ -116,7 +116,7 @@ namespace TableCraft.Core.ConfigReader
             }
         }
         
-        public static ConfigInfo CreateConfigInfo(string dataSourceFilePath, string[] dataDecoratorFilePaths)
+        internal static ConfigInfo CreateConfigInfo(string dataSourceFilePath, string[] dataDecoratorFilePaths)
         {
             var configName = Path.GetFileNameWithoutExtension(dataSourceFilePath);
             var source = CreateDataSource(dataSourceFilePath);
@@ -126,7 +126,7 @@ namespace TableCraft.Core.ConfigReader
             if (dataDecoratorFilePaths != null && dataDecoratorFilePaths.Length > 0)
             {
                 decoratorFilePath = dataDecoratorFilePaths[0];
-                decorators.AddRange(dataDecoratorFilePaths.Select(CreateDataDecorator));
+                decorators.AddRange(dataDecoratorFilePaths.Where(filepath => !string.IsNullOrEmpty(filepath)).Select(CreateDataDecorator));
             }
             else
             {
