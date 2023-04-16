@@ -21,6 +21,12 @@ namespace TableCraft.Core.IO;
 /// </summary>
 public static class FileHelper
 {
+    #region Fields
+
+    private static readonly List<IFileEvent> FileEvents = new();
+
+    #endregion
+    
     #region Properties
 
     private static Encoding PreferredEncoding => new UTF8Encoding(Configuration.UseUTF8WithBOM);
@@ -36,25 +42,32 @@ public static class FileHelper
     /// <returns></returns>
     public static async Task<string> ReadToEnd(string filePath)
     {
-        // before read
+        foreach (var fileEvent in FileEvents) fileEvent.BeforeRead(filePath);
+
         await using var fs = File.Open(filePath, FileMode.Open, FileAccess.Read);
         using var sr = new StreamReader(fs, PreferredEncoding);
         var result = await sr.ReadToEndAsync();
-        // after read
+        
+        foreach (var fileEvent in FileEvents) fileEvent.AfterRead(filePath);
+        
         return result;
     }
     
     public static string ReadAllText(string filePath)
     {
-        // before read
+        foreach (var fileEvent in FileEvents) fileEvent.BeforeRead(filePath);
+        
         var content = File.ReadAllText(filePath, PreferredEncoding);
-        // after read
+        
+        foreach (var fileEvent in FileEvents) fileEvent.AfterRead(filePath);
+        
         return content;
     }
 
     public static IEnumerable<string> ReadLines(string filePath)
     {
-        // before read
+        foreach (var fileEvent in FileEvents) fileEvent.BeforeRead(filePath);
+        
         var enumerator = File.ReadLines(filePath, PreferredEncoding);
         return enumerator;
     }
@@ -66,11 +79,13 @@ public static class FileHelper
     /// <param name="content"></param>
     public static async Task WriteAsync(string filePath, string content)
     {
-        // before write
+        foreach (var fileEvent in FileEvents) fileEvent.BeforeWrite(filePath);
+        
         await using var fs = File.Open(filePath, FileMode.Create, FileAccess.Write);
         await using var sw = new StreamWriter(fs, PreferredEncoding);
         await sw.WriteAsync(content);
-        // after write
+        
+        foreach (var fileEvent in FileEvents) fileEvent.AfterWrite(filePath);
     }
     
     /// <summary>
@@ -80,13 +95,26 @@ public static class FileHelper
     /// <param name="content"></param>
     public static void Write(string filePath, string content)
     {
-        // before write
+        foreach (var fileEvent in FileEvents) fileEvent.BeforeWrite(filePath);
+        
         using var fs = File.Open(filePath, FileMode.Create, FileAccess.Write);
         using var sw = new StreamWriter(fs, PreferredEncoding);
         sw.Write(content);
-        // after write
+        
+        foreach (var fileEvent in FileEvents) fileEvent.AfterWrite(filePath);
     }
 
+    public static void RegisterFileEvent(IFileEvent fileEvent)
+    {
+        FileEvents.Add(fileEvent);
+    }
+
+    public static bool UnregisterFileEvent(string label)
+    {
+        var removedCount = FileEvents.RemoveAll(fileEvent => fileEvent.GetLabel() == label);
+        return removedCount != 0;
+    }
+    
     #endregion
 
 }

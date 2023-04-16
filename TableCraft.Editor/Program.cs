@@ -14,11 +14,11 @@ class Program
 {
     public const string ListJsonFilename = "list.json";
     public const string LibEnvJsonFilename = "libenv.json";
-    
+
     private static readonly string m_FallbackCodeExportPath = Path.Combine(AppContext.BaseDirectory, "GeneratedCode");
     private static IHost? m_Host;
     private static IConfiguration? m_Configuration;
-    
+
     // Initialization code. Don't use any Avalonia, third-party APIs or any
     // SynchronizationContext-reliant code before AppMain is called: things aren't initialized
     // yet and stuff might break.
@@ -37,17 +37,20 @@ class Program
         try
         {
             var libEnvJsonFilePath = AppContext.BaseDirectory + LibEnvJsonFilename;
-            if (File.Exists(libEnvJsonFilePath))
-            {
-                // we initialize library here and build Avalonia app anyway,
-                // later we check if it's initialized in App.OnFrameworkInitializationCompleted
-                Core.Debugger.InitialCustomLogger(Log.Information, Core.Debugger.LogLevel.Information);
-                Core.Debugger.InitialCustomLogger(Log.Warning, Core.Debugger.LogLevel.Warning);
-                Core.Debugger.InitialCustomLogger(Log.Error, Core.Debugger.LogLevel.Error);
-                Log.Information("try initializing library with '{LibEnvJson}'", libEnvJsonFilePath);
-                Core.Configuration.ReadConfigurationFromJson(libEnvJsonFilePath);
-            }
+            if (!File.Exists(libEnvJsonFilePath))
+                throw new FileNotFoundException("library configuration file not found", LibEnvJsonFilename);
+            
+            // we initialize library here and build Avalonia app anyway,
+            // later we check if it's initialized in App.OnFrameworkInitializationCompleted
+            Core.Debugger.InitialCustomLogger(Log.Information, Core.Debugger.LogLevel.Information);
+            Core.Debugger.InitialCustomLogger(Log.Warning, Core.Debugger.LogLevel.Warning);
+            Core.Debugger.InitialCustomLogger(Log.Error, Core.Debugger.LogLevel.Error);
+            Log.Information("try initializing library with '{LibEnvJson}'", libEnvJsonFilePath);
+            Core.Configuration.ReadConfigurationFromJson(libEnvJsonFilePath);
 
+            // TODO register if it's required in appsetting.json
+            var dummyVersionControl = new Core.VersionControl.Perforce();
+            Core.IO.FileHelper.RegisterFileEvent(dummyVersionControl);
             BuildAvaloniaApp().StartWithClassicDesktopLifetime(args);
         }
         catch (Exception e)
@@ -67,18 +70,18 @@ class Program
             .UsePlatformDetect()
             .LogToTrace(LogEventLevel.Debug, LogArea.Control)
             .UseReactiveUI();
-    
+
     #region Application Setting
 
     // TODO to singleton later?
-    
+
     public static string GetConfigHomePath()
     {
         if (m_Configuration == null)
         {
             throw new Exception("m_Configuration from appsettings is null");
         }
-        
+
         var path = m_Configuration.GetValue<string>("ConfigHomePath");
         return path ?? string.Empty;
     }
@@ -87,9 +90,9 @@ class Program
     {
         if (m_Configuration == null)
         {
-            throw new Exception("m_Configuration from appsettings is null"); 
+            throw new Exception("m_Configuration from appsettings is null");
         }
-        
+
         var path = m_Configuration.GetValue<string>("JsonHomePath");
         return path ?? string.Empty;
     }
