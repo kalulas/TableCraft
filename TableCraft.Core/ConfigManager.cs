@@ -1,13 +1,10 @@
 ﻿using System;
 using System.IO;
-using System.Linq;
-using System.Reflection;
-using System.Text;
 using System.Threading.Tasks;
 using Mono.TextTemplating;
 using TableCraft.Core.ConfigReader;
 using TableCraft.Core.Generation;
-using TableCraft.Core.Source;
+using TableCraft.Core.IO;
 
 namespace TableCraft.Core
 {
@@ -101,17 +98,8 @@ namespace TableCraft.Core
                 Debugger.LogWarning("[ConfigManager.GenerateCodeForUsage] existed file '{0}' will be overwrite", outputFilePath);
             }
 
-            var encoding = new UTF8Encoding(Configuration.UseUTF8WithBOM);
             // read from template file
-            string templateContent;
-            // templateContent = File.ReadAllText(templateFilePath, encoding);
-            using (var fs = File.Open(templateFilePath, FileMode.Open, FileAccess.Read))
-            {
-                using (var sr = new StreamReader(fs, encoding))
-                {
-                    templateContent = await sr.ReadToEndAsync();
-                };
-            };
+            var templateContent = await FileHelper.ReadToEnd(templateFilePath);
 
             var generator = new CustomTemplateGenerator(templateFilePath, configInfo);
             var parsed = generator.ParseTemplate(templateFilePath, templateContent);
@@ -143,15 +131,7 @@ namespace TableCraft.Core
                 throw;
             }
             
-            using (var fs = File.Open(finalOutputFilePath, FileMode.Create, FileAccess.Write))
-            {
-                using (var sw = new StreamWriter(fs, encoding))
-                {
-                    await sw.WriteAsync(generatedContent);
-                }
-            }
-
-            // File.WriteAllText(outputFilePath, outputContent, encoding);
+            await FileHelper.WriteAsync(finalOutputFilePath, generatedContent);
             Debugger.Log(
                 $"[ConfigManager.GenerateCodeForUsage] finish writing generated content to file {finalOutputFilePath}");
             // generation errors to logger

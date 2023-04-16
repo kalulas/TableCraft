@@ -112,6 +112,7 @@ namespace TableCraft.Core
 
             var libEnvDir = Path.GetDirectoryName(libEnvJsonFile) ?? string.Empty;
 
+            // notice: configuration unknown, cannot use FileHelper.ReadAllText now
             var jsonContent = File.ReadAllText(libEnvJsonFile, Encoding.UTF8);
             var configData = JsonMapper.ToObject(jsonContent);
 
