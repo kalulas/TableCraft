@@ -106,13 +106,24 @@ public static class FileHelper
 
     public static void RegisterFileEvent(IFileEvent fileEvent)
     {
+        if (fileEvent == null)
+        {
+            return;
+        }
+        
         FileEvents.Add(fileEvent);
+        fileEvent.OnRegistered();
     }
 
     public static bool UnregisterFileEvent(string label)
     {
-        var removedCount = FileEvents.RemoveAll(fileEvent => fileEvent.GetLabel() == label);
-        return removedCount != 0;
+        var removed = FileEvents.FindAll(fileEvent => fileEvent.GetLabel() == label);
+        foreach (var fileEvent in removed)
+        {
+            fileEvent.OnUnregistered();
+        }
+        
+        return removed.Count != 0;
     }
     
     #endregion

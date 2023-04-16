@@ -14,4 +14,6 @@ public interface IFileEvent
     void AfterRead(string filePath);
     void BeforeWrite(string filePath);
     void AfterWrite(string filePath);
+    void OnRegistered();
+    void OnUnregistered();
 }

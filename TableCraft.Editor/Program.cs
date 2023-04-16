@@ -47,10 +47,9 @@ class Program
             Core.Debugger.InitialCustomLogger(Log.Error, Core.Debugger.LogLevel.Error);
             Log.Information("try initializing library with '{LibEnvJson}'", libEnvJsonFilePath);
             Core.Configuration.ReadConfigurationFromJson(libEnvJsonFilePath);
-
-            // TODO register if it's required in appsetting.json
-            var dummyVersionControl = new Core.VersionControl.Perforce();
-            Core.IO.FileHelper.RegisterFileEvent(dummyVersionControl);
+            
+            var perforce = GetVersionControlWithConfig();
+            Core.IO.FileHelper.RegisterFileEvent(perforce);
             BuildAvaloniaApp().StartWithClassicDesktopLifetime(args);
         }
         catch (Exception e)
@@ -120,6 +119,17 @@ class Program
     public static void HandleException(Exception e)
     {
         Log.Error(e, "Unhandled exception");
+    }
+
+    #endregion
+
+    #region Private Methods
+
+    private static Core.VersionControl.Perforce GetVersionControlWithConfig()
+    {
+        // TODO create one if it's required in appsetting.json
+        // return new Core.VersionControl.Perforce("","","","");
+        return null;
     }
 
     #endregion
