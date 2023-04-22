@@ -181,17 +181,8 @@ public class MainWindowViewModel : ViewModelBase
         // var tableFileRelative = PathExtend.MakeRelativePath(ConfigHomePath + Path.DirectorySeparatorChar, newTableFilePath);
         if (TableList.Any(elementViewModel => elementViewModel.ConfigFileRelativePath == tableFileRelative))
         {
-            var messageBox = MessageBox.Avalonia.MessageBoxManager.GetMessageBoxStandardWindow(new MessageBoxStandardParams
-            {
-                ButtonDefinitions = ButtonEnum.Ok,
-                ContentTitle = "Error",
-                ContentMessage = $"Config file already existed: '{tableFileRelative}', ignore",
-                WindowStartupLocation = WindowStartupLocation.CenterScreen,
-                MinHeight = App.StandardPopupHeight,
-                CanResize = true,
-            });
-
-            await messageBox.ShowDialog(App.GetMainWindow());
+            await MessageBoxManager.ShowMainWindowStandardMessageBoxDialog(MessageBoxManager.ErrorTitle,
+                $"Config file already existed: '{tableFileRelative}', ignore");
             return;
         }
         
@@ -300,17 +291,8 @@ public class MainWindowViewModel : ViewModelBase
         m_SelectedTable.NotifyJsonFileStatusChanged();
         
         // step4 success message popup
-        var messageBox = MessageBox.Avalonia.MessageBoxManager.GetMessageBoxStandardWindow(new MessageBoxStandardParams
-        {
-            ButtonDefinitions = ButtonEnum.Ok,
-            ContentTitle = "Success",
-            ContentMessage = $"Json file saved: '{jsonFileFullPath}'",
-            WindowStartupLocation = WindowStartupLocation.CenterScreen,
-            MinHeight = App.StandardPopupHeight,
-            CanResize = true,
-        });
-
-        await messageBox.ShowDialog(App.GetMainWindow());
+        await MessageBoxManager.ShowMainWindowStandardMessageBoxDialog(MessageBoxManager.SuccessTitle,
+            $"Json file saved: '{jsonFileFullPath}'");
     }
 
     private async Task GenerateCodeWithCurrentUsage()
@@ -325,21 +307,11 @@ public class MainWindowViewModel : ViewModelBase
 
         var success =
             await ConfigManager.singleton.GenerateCodeForUsage(m_ExportCodeUsage, configInfo, outputDir);
-        var popupTitle = success ? "Success" : "Error";
+        var popupTitle = success ? MessageBoxManager.SuccessTitle : MessageBoxManager.ErrorTitle;
         var popupMessage = success
             ? $"Generation success, output directory: '{outputDir}'"
             : "Generation failed, please refer to log for more details";
-        var messageBox = MessageBox.Avalonia.MessageBoxManager.GetMessageBoxStandardWindow(new MessageBoxStandardParams
-        {
-            ButtonDefinitions = ButtonEnum.Ok,
-            ContentTitle = popupTitle,
-            ContentMessage = popupMessage,
-            WindowStartupLocation = WindowStartupLocation.CenterScreen,
-            MinHeight = App.StandardPopupHeight,
-            CanResize = true,
-        });
-
-        await messageBox.ShowDialog(App.GetMainWindow());
+        await MessageBoxManager.ShowMainWindowStandardMessageBoxDialog(popupTitle, popupMessage);
     }
 
     #endregion
@@ -355,7 +327,7 @@ public class MainWindowViewModel : ViewModelBase
             AllowMultiple = false
         };
         
-        var mainWindow = App.GetMainWindow();
+        var mainWindow = MessageBoxManager.GetMainWindow();
         if (mainWindow == null)
         {
             return;

@@ -1,36 +1,21 @@
 using System;
 using System.IO;
+using System.Threading.Tasks;
 using Avalonia;
-using Avalonia.Controls;
 using Avalonia.Controls.ApplicationLifetimes;
 using Avalonia.Markup.Xaml;
 using TableCraft.Editor.Services;
 using TableCraft.Editor.ViewModels;
 using TableCraft.Editor.Views;
-using MessageBox.Avalonia.DTO;
-using MessageBox.Avalonia.Enums;
 using Serilog;
 
 namespace TableCraft.Editor;
 
 public partial class App : Application
 {
-    // TODO move to MessageBoxExtend or somewhere else ...
-    public const float StandardPopupHeight = 180.0f;
-    
     public override void Initialize()
     {
         AvaloniaXamlLoader.Load(this);
-    }
-
-    public static Window? GetMainWindow()
-    {
-        if (Current?.ApplicationLifetime is IClassicDesktopStyleApplicationLifetime desktop)
-        {
-            return desktop.MainWindow;
-        }
-
-        return null;
     }
 
     public override void OnFrameworkInitializationCompleted()
@@ -40,17 +25,7 @@ public partial class App : Application
             if (!Core.Configuration.IsInited)
             {
                 const string errorMessage = $"library's initialization failed, please check '{Program.LibEnvJsonFilename}'";
-                var messageBox = MessageBox.Avalonia.MessageBoxManager.GetMessageBoxStandardWindow(
-                    new MessageBoxStandardParams
-                    {
-                        ButtonDefinitions = ButtonEnum.Ok,
-                        ContentTitle = "Error",
-                        ContentMessage = errorMessage,
-                        WindowStartupLocation = WindowStartupLocation.CenterScreen,
-                        MinHeight = StandardPopupHeight
-                    });
-                
-                messageBox.Show();
+                MessageBoxManager.ShowStandardMessageBox(MessageBoxManager.ErrorTitle, errorMessage);
                 Log.Error(errorMessage);
                 // return here so main window will not be opened
                 return;
@@ -71,5 +46,12 @@ public partial class App : Application
         }
 
         base.OnFrameworkInitializationCompleted();
+        Task.Run(LoadAndRegisterVersionControl);
+    }
+
+    private static void LoadAndRegisterVersionControl()
+    {
+        var versionControl = Program.GetVersionControlWithConfig();
+        Core.IO.FileHelper.RegisterFileEvent(versionControl);
     }
 }

@@ -6,8 +6,10 @@
 #endregion
 
 using System;
+using System.IO;
 using Perforce.P4;
 using TableCraft.Core.IO;
+using File = System.IO.File;
 
 namespace TableCraft.Core.VersionControl;
 
@@ -18,15 +20,22 @@ public class Perforce : IFileEvent
     public const string Label = "Perforce";
 
     private readonly Server m_Server;
-    private readonly Repository m_Repository;
     private readonly Connection m_Connection;
+    /// <summary>
+    /// Encoded in base64
+    /// </summary>
     private readonly string m_Password;
+
+    /// <summary>
+    /// If file existed before write, 'edit' command will be used; otherwise 'add' command will be used
+    /// </summary>
+    private bool m_FileExisted;
 
     #endregion
 
     #region Properties
 
-    public bool Connected => m_Connection.Status == ConnectionStatus.Connected;
+    private bool Connected => m_Connection.connectionEstablished();
 
     #endregion
 
@@ -35,9 +44,8 @@ public class Perforce : IFileEvent
     public Perforce(string uri, string user, string clientName, string passwd)
     {
         m_Server = new Server(new ServerAddress(uri));
-        m_Repository = new Repository(m_Server);
         m_Password = passwd;
-        m_Connection = m_Repository.Connection;
+        m_Connection = new Repository(m_Server).Connection;
         m_Connection.UserName = user;
         m_Connection.Client = new Client
         {
@@ -56,45 +64,97 @@ public class Perforce : IFileEvent
 
     public void BeforeRead(string filePath)
     {
+        if (!Connected)
+        {
+            return;
+        }
+        
         // Debugger.Log($"[Perforce.BeforeRead] {filePath}");
     }
 
     public void AfterRead(string filePath)
     {
+        if (!Connected)
+        {
+            return;
+        }
+        
         // Debugger.Log($"[Perforce.AfterRead] {filePath}");
     }
 
     public void BeforeWrite(string filePath)
     {
-        // Debugger.Log($"[Perforce.BeforeWrite] {filePath}");
+        if (!Connected)
+        {
+            return;
+        }
+        
+        var relativePath = Path.GetRelativePath(m_Connection.Client.Root, filePath);
+        if (relativePath == filePath)
+        {
+            // Debugger.LogWarning($"[Perforce.BeforeWrite] filePath {filePath} is not under client root,skip");
+            return;
+        }
+        
+        m_FileExisted = File.Exists(filePath);
+        // if not existed, add after write
+        if (!m_FileExisted)
+        {
+            return;
+        }
+        
+        var fileSpec = new FileSpec(new LocalPath(filePath), null);
+        var options = new EditCmdOptions(EditFilesCmdFlags.None, 0, null);
+        m_Connection.Client.EditFiles(options, fileSpec);
+        Debugger.Log($"[Perforce.BeforeWrite] Edit file: {filePath}");
     }
 
     public void AfterWrite(string filePath)
     {
-        // Debugger.Log($"[Perforce.AfterWrite] {filePath}");
+        if (!Connected)
+        {
+            return;
+        }
+
+        var relativePath = Path.GetRelativePath(m_Connection.Client.Root, filePath);
+        if (relativePath == filePath)
+        {
+            // Debugger.LogWarning($"[Perforce.AfterWrite] filePath {filePath} is not under client root,skip");
+            return;
+        }
+
+        // if not existed, edit before write
+        if (m_FileExisted)
+        {
+            return;
+        }
+        
+        var fileSpec = new FileSpec(new LocalPath(filePath), null);
+        var options = new AddFilesCmdOptions(AddFilesCmdFlags.None, 0, null);
+        m_Connection.Client.AddFiles(options, fileSpec);
+        Debugger.Log($"[Perforce.AfterWrite] Add file: {filePath}");
     }
 
     public void OnRegistered()
     {
-        var connected = m_Connection.Connect(null);
-        if (!connected)
-        {
-            Debugger.LogError($"Connect to {m_Server.Address} failed!");
-            return;
-        }
-        
         try
         {
-            m_Connection.Login(m_Password);
+            var connected = m_Connection.Connect(null);
+            if (!connected)
+            {
+                Debugger.LogError($"Connect to {m_Server.Address.Uri} failed!");
+                return;
+            }
+            
+            var decodedPasswd = System.Text.Encoding.UTF8.GetString(Convert.FromBase64String(m_Password));
+            var cred = m_Connection.Login(decodedPasswd);
+            Debugger.Log($"Connected to {m_Server.Address.Uri}, login success with credential {cred}");
         }
         catch (Exception e)
         {
-            Debugger.LogError($"Login failed with {e.Message}");
+            Debugger.LogError($"Login '{m_Server.Address.Uri}' failed with {e.Message}");
             m_Connection.Disconnect();
         }
-
-        var info = m_Repository.GetServerMetaData(null);
-        Debugger.Log($"Connected to {info.Address.Uri}");
     }
 
     public void OnUnregistered()

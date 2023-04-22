@@ -2,6 +2,7 @@
 using Avalonia.ReactiveUI;
 using System;
 using System.IO;
+using System.Linq;
 using Avalonia.Logging;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
@@ -48,8 +49,6 @@ class Program
             Log.Information("try initializing library with '{LibEnvJson}'", libEnvJsonFilePath);
             Core.Configuration.ReadConfigurationFromJson(libEnvJsonFilePath);
             
-            var perforce = GetVersionControlWithConfig();
-            Core.IO.FileHelper.RegisterFileEvent(perforce);
             BuildAvaloniaApp().StartWithClassicDesktopLifetime(args);
         }
         catch (Exception e)
@@ -111,6 +110,27 @@ class Program
         var exportPath = section.GetValue<string>(usage);
         return exportPath ?? m_FallbackCodeExportPath;
     }
+    
+    public static Core.VersionControl.Perforce? GetVersionControlWithConfig()
+    {
+        if (m_Configuration == null) throw new NullReferenceException("m_Configuration from appsettings is null");
+        if (!m_Configuration.GetSection("P4Config").Exists())
+        {
+            return null;
+        }
+
+        var children = m_Configuration.GetSection("P4Config").GetChildren();
+        if (children.Any(section => string.IsNullOrEmpty(section.Value)))
+        {
+            return null;
+        }
+        
+        var uri = m_Configuration.GetValue<string>("P4Config:P4PORT");
+        var user = m_Configuration.GetValue<string>("P4Config:P4USER");
+        var client = m_Configuration.GetValue<string>("P4Config:P4CLIENT");
+        var password = m_Configuration.GetValue<string>("P4Config:P4PASSWD(base64)");
+        return new Core.VersionControl.Perforce(uri, user, client, password);
+    }
 
     #endregion
 
@@ -119,17 +139,6 @@ class Program
     public static void HandleException(Exception e)
     {
         Log.Error(e, "Unhandled exception");
-    }
-
-    #endregion
-
-    #region Private Methods
-
-    private static Core.VersionControl.Perforce GetVersionControlWithConfig()
-    {
-        // TODO create one if it's required in appsetting.json
-        // return new Core.VersionControl.Perforce("","","","");
-        return null;
     }
 
     #endregion
