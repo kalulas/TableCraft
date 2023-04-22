@@ -47,6 +47,12 @@ public static class MessageBoxManager
     
     public static async Task ShowMainWindowStandardMessageBoxDialog(string title, string message)
     {
+        var mainWindow = GetMainWindow();
+        if (mainWindow == null)
+        {
+            return;
+        }
+        
         var messageBox = MessageBox.Avalonia.MessageBoxManager.GetMessageBoxStandardWindow(
             new MessageBoxStandardParams
             {
@@ -57,6 +63,6 @@ public static class MessageBoxManager
                 MinHeight = StandardPopupHeight
             });
 
-        await messageBox.ShowDialog(GetMainWindow());
+        await messageBox.ShowDialog(mainWindow);
     }
 }

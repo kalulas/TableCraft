@@ -21,9 +21,6 @@ public class Perforce : IFileEvent
 
     private readonly Server m_Server;
     private readonly Connection m_Connection;
-    /// <summary>
-    /// Encoded in base64
-    /// </summary>
     private readonly string m_Password;
 
     /// <summary>
@@ -50,6 +47,18 @@ public class Perforce : IFileEvent
         m_Connection.Client = new Client
         {
             Name = clientName
+        };
+    }
+
+    public Perforce(PerforceUserConfig config)
+    {
+        m_Server = new Server(new ServerAddress(config.P4PORT));
+        m_Password = config.P4Passwd;
+        m_Connection = new Repository(m_Server).Connection;
+        m_Connection.UserName = config.P4USER;
+        m_Connection.Client = new Client
+        {
+            Name = config.P4CLIENT
         };
     }
 
@@ -146,8 +155,7 @@ public class Perforce : IFileEvent
                 return;
             }
             
-            var decodedPasswd = System.Text.Encoding.UTF8.GetString(Convert.FromBase64String(m_Password));
-            var cred = m_Connection.Login(decodedPasswd);
+            var cred = m_Connection.Login(m_Password);
             Debugger.Log($"Connected to {m_Server.Address.Uri}, login success with credential {cred}");
         }
         catch (Exception e)

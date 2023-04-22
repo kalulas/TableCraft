@@ -51,7 +51,14 @@ public partial class App : Application
 
     private static void LoadAndRegisterVersionControl()
     {
-        var versionControl = Program.GetVersionControlWithConfig();
+        var versionControlConfig = Program.GetVersionControlConfig();
+        if (!versionControlConfig.IsReady())
+        {
+            Log.Information("[App.LoadAndRegisterVersionControl] perforce config not ready, exit");
+            return;
+        }
+
+        var versionControl = new Core.VersionControl.Perforce(versionControlConfig);
         Core.IO.FileHelper.RegisterFileEvent(versionControl);
     }
 }

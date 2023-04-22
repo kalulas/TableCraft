@@ -8,6 +8,8 @@ using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 using Serilog;
+using TableCraft.Core.VersionControl;
+using TableCraft.Editor.Services;
 
 namespace TableCraft.Editor;
 
@@ -111,25 +113,32 @@ class Program
         return exportPath ?? m_FallbackCodeExportPath;
     }
     
-    public static Core.VersionControl.Perforce? GetVersionControlWithConfig()
+    public static PerforceUserConfig GetVersionControlConfig()
     {
         if (m_Configuration == null) throw new NullReferenceException("m_Configuration from appsettings is null");
-        if (!m_Configuration.GetSection("P4Config").Exists())
+
+        var emptyConfig = new PerforceUserConfig();
+        var section = m_Configuration.GetSection("P4Config");
+        if (!section.Exists())
         {
-            return null;
+            return emptyConfig;
         }
 
-        var children = m_Configuration.GetSection("P4Config").GetChildren();
-        if (children.Any(section => string.IsNullOrEmpty(section.Value)))
+        var children = section.GetChildren();
+        if (children.Any(child => string.IsNullOrEmpty(child.Value)))
         {
-            return null;
+            return emptyConfig;
+        }
+
+        var config = section.Get<PerforceUserConfig>();
+        if (config == null || config.P4PORT == null)
+        {
+            Log.Error("[Program.GetVersionControlConfig] get PerforceUserConfig from appsettings failed!");
+            return emptyConfig;
         }
         
-        var uri = m_Configuration.GetValue<string>("P4Config:P4PORT");
-        var user = m_Configuration.GetValue<string>("P4Config:P4USER");
-        var client = m_Configuration.GetValue<string>("P4Config:P4CLIENT");
-        var password = m_Configuration.GetValue<string>("P4Config:P4PASSWD(base64)");
-        return new Core.VersionControl.Perforce(uri, user, client, password);
+        config.Decode();
+        return config;
     }
 
     #endregion
@@ -139,6 +148,9 @@ class Program
     public static void HandleException(Exception e)
     {
         Log.Error(e, "Unhandled exception");
+#pragma warning disable CS4014
+        MessageBoxManager.ShowMainWindowStandardMessageBoxDialog("Unhandled exception", e.ToString());
+#pragma warning restore CS4014
     }
 
     #endregion
