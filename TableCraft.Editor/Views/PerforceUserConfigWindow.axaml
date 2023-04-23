@@ -15,6 +15,12 @@
              to set the actual DataContext for runtime, set the DataContext property in code (look at App.axaml.cs) -->
         <vm:PerforceUserConfigViewModel />
     </Design.DataContext>
+    
+    <Window.Styles>
+        <Style Selector="TextBox.ConnectionBox">
+            <Setter Property="IsEnabled" Value="{Binding !IsConnecting}"></Setter>
+        </Style>
+    </Window.Styles>
 
     <DockPanel>
         <Grid Margin="8" ColumnDefinitions="10*,30*" DockPanel.Dock="Top">
@@ -26,26 +32,42 @@
             </Grid.RowDefinitions>
 
             <TextBlock Grid.Row="0" Grid.Column="0" Classes="PropertyTitle">P4PORT </TextBlock>
-            <TextBox Grid.Row="0" Grid.Column="1" Classes="PropertyLine" Text="{Binding Port}"></TextBox>
+            <TextBox Grid.Row="0" Grid.Column="1" Classes="PropertyLine ConnectionBox" Text="{Binding Port}"></TextBox>
 
             <TextBlock Grid.Row="1" Grid.Column="0" Classes="PropertyTitle">P4USER </TextBlock>
-            <TextBox Grid.Row="1" Grid.Column="1" Classes="PropertyLine" Text="{Binding User}"></TextBox>
+            <TextBox Grid.Row="1" Grid.Column="1" Classes="PropertyLine ConnectionBox" Text="{Binding User}"></TextBox>
 
             <TextBlock Grid.Row="2" Grid.Column="0" Classes="PropertyTitle">P4CLIENT </TextBlock>
-            <TextBox Grid.Row="2" Grid.Column="1" Classes="PropertyLine" Text="{Binding Client}"></TextBox>
+            <TextBox Grid.Row="2" Grid.Column="1" Classes="PropertyLine ConnectionBox" Text="{Binding Client}"></TextBox>
 
             <TextBlock Grid.Row="3" Grid.Column="0" Classes="PropertyTitle">P4PASSWD </TextBlock>
             <StackPanel Grid.Row="3" Grid.Column="1" Classes="PropertyLine" Orientation="Horizontal">
-                <TextBox Text="{Binding Password}" PasswordChar="*" Width="280" Height="20"></TextBox>
-                <Button Margin="10, 0">Show</Button>
+                <TextBox Text="{Binding Password}" Classes="ConnectionBox" 
+                         PasswordChar="*" RevealPassword="{Binding PasswordShown}" Width="280" Height="20"></TextBox>
+                <Button Command="{Binding ShowPasswdCommand}" Margin="10, 0">Show</Button>
             </StackPanel>
 
         </Grid>
 
         <StackPanel Classes="PropertyLine" Orientation="Horizontal" HorizontalAlignment="Right" 
                     VerticalAlignment="Bottom" Margin="0, 10" DockPanel.Dock="Bottom">
-            <Button Margin="0, 0, 10, 0">Test Connection</Button>
-            <Button Margin="0, 0, 10, 0">Save</Button>
+            <Panel IsVisible="{Binding IsConnecting}">
+                <TextBlock Margin="10" >Connecting...</TextBlock>
+            </Panel>
+            
+            <StackPanel Orientation="Horizontal" IsVisible="{Binding IsConnected}">
+                <Image Source="/Assets/accept-32.png" Height="18"></Image>
+                <TextBlock Margin="10" >Connected!</TextBlock>
+            </StackPanel>
+            
+            <StackPanel Orientation="Horizontal" IsVisible="{Binding IsConnectionFailed}">
+                <Image Source="/Assets/close-32.png" Height="18"></Image>
+                <TextBlock Margin="10" >Failed.</TextBlock>
+            </StackPanel>
+            
+            <Button Command="{Binding TestConnectionCommand}" IsEnabled="{Binding !IsConnecting}" 
+                    Margin="0, 0, 10, 0">Test Connection</Button>
+            <Button Command="{Binding SaveCommand}" Margin="0, 0, 10, 0">Save</Button>
         </StackPanel>
     </DockPanel>
 </Window>

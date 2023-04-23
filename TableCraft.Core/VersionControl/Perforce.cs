@@ -7,6 +7,7 @@
 
 using System;
 using System.IO;
+using System.Threading.Tasks;
 using Perforce.P4;
 using TableCraft.Core.IO;
 using File = System.IO.File;
@@ -32,7 +33,7 @@ public class Perforce : IFileEvent
 
     #region Properties
 
-    private bool Connected => m_Connection.connectionEstablished();
+    public bool Connected => m_Connection.connectionEstablished();
 
     #endregion
 
@@ -60,6 +61,37 @@ public class Perforce : IFileEvent
         {
             Name = config.P4CLIENT
         };
+    }
+
+    #endregion
+
+    #region Private Methods
+
+    private void TryConnectAndLogin()
+    {
+        try
+        {
+            if (Connected)
+            {
+                Debugger.Log($"Already connected to perforce server {m_Server.Address.Uri}");
+                return;
+            }
+            
+            var connected = m_Connection.Connect(null);
+            if (!connected)
+            {
+                Debugger.LogError($"Connect to {m_Server.Address.Uri} failed!");
+                return;
+            }
+
+            var cred = m_Connection.Login(m_Password);
+            Debugger.Log($"Connected to {m_Server.Address.Uri}, login success with credential {cred}");
+        }
+        catch (Exception e)
+        {
+            Debugger.LogError($"Login '{m_Server.Address.Uri}' failed with {e.Message}");
+            m_Connection.Disconnect();
+        }
     }
 
     #endregion
@@ -146,23 +178,7 @@ public class Perforce : IFileEvent
 
     public void OnRegistered()
     {
-        try
-        {
-            var connected = m_Connection.Connect(null);
-            if (!connected)
-            {
-                Debugger.LogError($"Connect to {m_Server.Address.Uri} failed!");
-                return;
-            }
-            
-            var cred = m_Connection.Login(m_Password);
-            Debugger.Log($"Connected to {m_Server.Address.Uri}, login success with credential {cred}");
-        }
-        catch (Exception e)
-        {
-            Debugger.LogError($"Login '{m_Server.Address.Uri}' failed with {e.Message}");
-            m_Connection.Disconnect();
-        }
+        TryConnectAndLogin();
     }
 
     public void OnUnregistered()
@@ -173,6 +189,12 @@ public class Perforce : IFileEvent
         }
 
         m_Connection.Disconnect();
+        Debugger.Log("[Perforce.OnUnregistered] Disconnected");
+    }
+    
+    public async Task TryConnectAndLoginAsync()
+    {
+        await Task.Run(TryConnectAndLogin);
     }
 
     #endregion

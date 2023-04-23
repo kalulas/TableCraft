@@ -11,12 +11,11 @@
         
         <Style Selector="TextBlock.PropertyTitle">
             <Setter Property="FontSize" Value="16"/>
-            <Setter Property="FontWeight" Value="Bold"/>
+            <!-- <Setter Property="FontWeight" Value="Bold"/> -->
             <Setter Property="VerticalAlignment" Value="Center"></Setter>
         </Style>
         
         <Style Selector="TextBox.PropertyLine">
-            <!-- <Setter Property="Width" Value="300"/> -->
             <!-- <Setter Property="HorizontalAlignment" Value="Right"/> -->
             <!-- <Setter Property="VerticalAlignment" Value="Center"/> -->
             <Setter Property="Height" Value="20"></Setter>

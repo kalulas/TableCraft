@@ -368,8 +368,14 @@ public class MainWindowViewModel : ViewModelBase
     {
         var config = Program.GetVersionControlConfig();
         var viewModel = new PerforceUserConfigViewModel(config);
-        var result = await ShowPerforceWindow.Handle(viewModel);
-        // TODO try connect on window close
+        await ShowPerforceWindow.Handle(viewModel);
+
+        if (config.IsReady())
+        {
+            Log.Information("Retry login with new perforce configuration {Config}", config);
+            Core.IO.FileHelper.UnregisterFileEvent(Core.VersionControl.Perforce.Label);
+            Core.IO.FileHelper.RegisterFileEvent(new Core.VersionControl.Perforce(config));
+        }
     }
 
     #endregion

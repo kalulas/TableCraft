@@ -32,5 +32,11 @@ public class PerforceUserConfig
     public void UpdatePasswd(string password)
     {
         P4Passwd = password;
+        P4PASSWDBASE64 = Convert.ToBase64String(System.Text.Encoding.UTF8.GetBytes(password));
+    }
+
+    public override string ToString()
+    {
+        return $"P4PORT: {P4PORT}, P4USER: {P4USER}, P4CLIENT: {P4CLIENT}, P4PASSWDBASE64: {P4PASSWDBASE64}";
     }
 }
