@@ -24,7 +24,7 @@ public static class MessageBoxManager
     {
         if (Application.Current?.ApplicationLifetime is IClassicDesktopStyleApplicationLifetime desktop)
         {
-            return desktop.MainWindow;
+            return desktop.Windows[^1];
         }
 
         return null;
@@ -45,7 +45,7 @@ public static class MessageBoxManager
         await messageBox.Show();
     }
     
-    public static async Task ShowMainWindowStandardMessageBoxDialog(string title, string message)
+    public static async Task ShowStandardMessageBoxDialog(string title, string message)
     {
         var mainWindow = GetMainWindow();
         if (mainWindow == null)

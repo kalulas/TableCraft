@@ -184,7 +184,7 @@ public class MainWindowViewModel : ViewModelBase
         // var tableFileRelative = PathExtend.MakeRelativePath(ConfigHomePath + Path.DirectorySeparatorChar, newTableFilePath);
         if (TableList.Any(elementViewModel => elementViewModel.ConfigFileRelativePath == tableFileRelative))
         {
-            await MessageBoxManager.ShowMainWindowStandardMessageBoxDialog(MessageBoxManager.ErrorTitle,
+            await MessageBoxManager.ShowStandardMessageBoxDialog(MessageBoxManager.ErrorTitle,
                 $"Config file already existed: '{tableFileRelative}', ignore");
             return;
         }
@@ -294,7 +294,7 @@ public class MainWindowViewModel : ViewModelBase
         m_SelectedTable.NotifyJsonFileStatusChanged();
         
         // step4 success message popup
-        await MessageBoxManager.ShowMainWindowStandardMessageBoxDialog(MessageBoxManager.SuccessTitle,
+        await MessageBoxManager.ShowStandardMessageBoxDialog(MessageBoxManager.SuccessTitle,
             $"Json file saved: '{jsonFileFullPath}'");
     }
 
@@ -314,7 +314,7 @@ public class MainWindowViewModel : ViewModelBase
         var popupMessage = success
             ? $"Generation success, output directory: '{outputDir}'"
             : "Generation failed, please refer to log for more details";
-        await MessageBoxManager.ShowMainWindowStandardMessageBoxDialog(popupTitle, popupMessage);
+        await MessageBoxManager.ShowStandardMessageBoxDialog(popupTitle, popupMessage);
     }
 
     #endregion

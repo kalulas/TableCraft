@@ -123,7 +123,7 @@ public class PerforceUserConfigViewModel : ViewModelBase
         ConnectionState = PerforceConnectionState.None;
         if (!m_PerforceUserConfig.IsReady())
         {
-            await MessageBoxManager.ShowMainWindowStandardMessageBoxDialog(MessageBoxManager.ErrorTitle, "Please fill in all fields");
+            await MessageBoxManager.ShowStandardMessageBoxDialog(MessageBoxManager.ErrorTitle, "Please fill in all fields");
             return;
         }
 

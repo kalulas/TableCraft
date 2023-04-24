@@ -149,7 +149,7 @@ class Program
     {
         Log.Error(e, "Unhandled exception");
 #pragma warning disable CS4014
-        MessageBoxManager.ShowMainWindowStandardMessageBoxDialog("Unhandled exception", e.ToString());
+        MessageBoxManager.ShowStandardMessageBoxDialog("Unhandled exception", e.ToString());
 #pragma warning restore CS4014
     }
 
