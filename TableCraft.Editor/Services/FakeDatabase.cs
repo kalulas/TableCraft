@@ -4,9 +4,9 @@ using System.IO;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
-using Avalonia.Logging;
 using LitJson;
 using Serilog;
+using TableCraft.Core.IO;
 using TableCraft.Editor.Models;
 
 namespace TableCraft.Editor.Services;
@@ -31,8 +31,7 @@ public class FakeDatabase
             throw new FileNotFoundException(m_ListJsonFilePath + " not found");
         }
 
-        var encoding = new UTF8Encoding(Core.Configuration.UseUTF8WithBOM);
-        var listJsonFileContent = File.ReadAllText(m_ListJsonFilePath, encoding);
+        var listJsonFileContent = FileHelper.ReadAllText(m_ListJsonFilePath);
         var jsonData = JsonMapper.ToObject(listJsonFileContent);
         if (!jsonData.IsArray)
         {
@@ -69,10 +68,7 @@ public class FakeDatabase
         elementList.Sort();
         
         JsonMapper.ToJson(elementList, writer);
-        var encoding = new UTF8Encoding(Core.Configuration.UseUTF8WithBOM);
-        using var fs = File.Open(m_ListJsonFilePath, FileMode.Create);
-        using var sw = new StreamWriter(fs, encoding);
-        await sw.WriteAsync(builder.ToString());
+        await FileHelper.WriteAsync(m_ListJsonFilePath, builder.ToString());
         Log.Information("write ListJsonFile {Path} finished", m_ListJsonFilePath);
     }
 }

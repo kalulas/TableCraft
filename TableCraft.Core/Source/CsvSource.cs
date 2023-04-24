@@ -9,10 +9,10 @@
 
 using System;
 using System.IO;
-using System.Text;
 using System.Text.RegularExpressions;
 using TableCraft.Core.Attributes;
 using TableCraft.Core.ConfigReader;
+using TableCraft.Core.IO;
 
 namespace TableCraft.Core.Source;
 
@@ -111,11 +111,12 @@ public class CsvSource : IDataSource
         var curLineIndex = 0;
         var headers = Array.Empty<string>();
         var comments = Array.Empty<string>();
-        var encoding = new UTF8Encoding(Core.Configuration.UseUTF8WithBOM);
         
         var dataSourceConfig = Core.Configuration.GetDataSourceConfiguration<Configuration>(typeof(CsvSource)).Fix();
         var maxLineIndex = Math.Max(dataSourceConfig.HeaderLineIndex, dataSourceConfig.CommentLineIndex);
-        foreach (var line in File.ReadAllLines(m_FilePath, encoding))
+        // When you are working with very large files, ReadLines can be more efficient.
+        // (https://learn.microsoft.com/en-us/dotnet/api/System.IO.File.ReadLines?view=net-6.0)
+        foreach(var line in FileHelper.ReadLines(m_FilePath))
         {
             if (curLineIndex > maxLineIndex)
             {

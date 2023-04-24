@@ -1,16 +1,14 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
-using System.IO;
 using System.Linq;
 using System.Reactive;
+using System.Reactive.Linq;
 using System.Threading.Tasks;
 using Avalonia.Controls;
 using TableCraft.Core;
 using TableCraft.Editor.Models;
 using TableCraft.Editor.Services;
-using MessageBox.Avalonia.DTO;
-using MessageBox.Avalonia.Enums;
 using ReactiveUI;
 using Serilog;
 using Path = System.IO.Path;
@@ -93,6 +91,8 @@ public class MainWindowViewModel : ViewModelBase
     public ReactiveCommand<Unit, Unit>? AddNewTableFileCommand { get; private set; }
     public ReactiveCommand<Unit, Unit>? SaveJsonFileCommand { get; private set; }
     public ReactiveCommand<Unit, Unit>? GenerateCodeCommand { get; private set; }
+    public ReactiveCommand<Unit, Unit>? OpenPerforceWindowCommand { get; private set; }
+    public Interaction<PerforceUserConfigViewModel, PerforceUserConfigViewModel?> ShowPerforceWindow { get; }
     public EventHandler<SelectionChangedEventArgs>? SelectedTableChangedEventHandler { get; private set; }
     public EventHandler<SelectionChangedEventArgs>? SelectedAttributeChangedEventHandler { get; private set; }
 
@@ -106,6 +106,7 @@ public class MainWindowViewModel : ViewModelBase
         AppendNewTableFileFilter();
         CreateSubViewModels(db);
         CreateCommands();
+        ShowPerforceWindow = new Interaction<PerforceUserConfigViewModel, PerforceUserConfigViewModel?>();
     }
 
     private void AppendNewTableFileFilter()
@@ -138,6 +139,8 @@ public class MainWindowViewModel : ViewModelBase
         SaveJsonFileCommand.ThrownExceptions.Subscribe(Program.HandleException);
         GenerateCodeCommand = ReactiveCommand.CreateFromTask(GenerateCodeWithCurrentUsage);
         GenerateCodeCommand.ThrownExceptions.Subscribe(Program.HandleException);
+        OpenPerforceWindowCommand = ReactiveCommand.CreateFromTask(OnOpenPerforceWindowButtonClicked);
+        OpenPerforceWindowCommand.ThrownExceptions.Subscribe(Program.HandleException);
         SelectedTableChangedEventHandler = OnSelectedTableChanged;
         SelectedAttributeChangedEventHandler = OnSelectedAttributeChanged;
     }
@@ -181,17 +184,8 @@ public class MainWindowViewModel : ViewModelBase
         // var tableFileRelative = PathExtend.MakeRelativePath(ConfigHomePath + Path.DirectorySeparatorChar, newTableFilePath);
         if (TableList.Any(elementViewModel => elementViewModel.ConfigFileRelativePath == tableFileRelative))
         {
-            var messageBox = MessageBox.Avalonia.MessageBoxManager.GetMessageBoxStandardWindow(new MessageBoxStandardParams
-            {
-                ButtonDefinitions = ButtonEnum.Ok,
-                ContentTitle = "Error",
-                ContentMessage = $"Config file already existed: '{tableFileRelative}', ignore",
-                WindowStartupLocation = WindowStartupLocation.CenterScreen,
-                MinHeight = App.StandardPopupHeight,
-                CanResize = true,
-            });
-
-            await messageBox.ShowDialog(App.GetMainWindow());
+            await MessageBoxManager.ShowStandardMessageBoxDialog(MessageBoxManager.ErrorTitle,
+                $"Config file already existed: '{tableFileRelative}', ignore");
             return;
         }
         
@@ -300,17 +294,8 @@ public class MainWindowViewModel : ViewModelBase
         m_SelectedTable.NotifyJsonFileStatusChanged();
         
         // step4 success message popup
-        var messageBox = MessageBox.Avalonia.MessageBoxManager.GetMessageBoxStandardWindow(new MessageBoxStandardParams
-        {
-            ButtonDefinitions = ButtonEnum.Ok,
-            ContentTitle = "Success",
-            ContentMessage = $"Json file saved: '{jsonFileFullPath}'",
-            WindowStartupLocation = WindowStartupLocation.CenterScreen,
-            MinHeight = App.StandardPopupHeight,
-            CanResize = true,
-        });
-
-        await messageBox.ShowDialog(App.GetMainWindow());
+        await MessageBoxManager.ShowStandardMessageBoxDialog(MessageBoxManager.SuccessTitle,
+            $"Json file saved: '{jsonFileFullPath}'");
     }
 
     private async Task GenerateCodeWithCurrentUsage()
@@ -325,21 +310,11 @@ public class MainWindowViewModel : ViewModelBase
 
         var success =
             await ConfigManager.singleton.GenerateCodeForUsage(m_ExportCodeUsage, configInfo, outputDir);
-        var popupTitle = success ? "Success" : "Error";
+        var popupTitle = success ? MessageBoxManager.SuccessTitle : MessageBoxManager.ErrorTitle;
         var popupMessage = success
             ? $"Generation success, output directory: '{outputDir}'"
             : "Generation failed, please refer to log for more details";
-        var messageBox = MessageBox.Avalonia.MessageBoxManager.GetMessageBoxStandardWindow(new MessageBoxStandardParams
-        {
-            ButtonDefinitions = ButtonEnum.Ok,
-            ContentTitle = popupTitle,
-            ContentMessage = popupMessage,
-            WindowStartupLocation = WindowStartupLocation.CenterScreen,
-            MinHeight = App.StandardPopupHeight,
-            CanResize = true,
-        });
-
-        await messageBox.ShowDialog(App.GetMainWindow());
+        await MessageBoxManager.ShowStandardMessageBoxDialog(popupTitle, popupMessage);
     }
 
     #endregion
@@ -355,7 +330,7 @@ public class MainWindowViewModel : ViewModelBase
             AllowMultiple = false
         };
         
-        var mainWindow = App.GetMainWindow();
+        var mainWindow = MessageBoxManager.GetMainWindow();
         if (mainWindow == null)
         {
             return;
@@ -387,6 +362,20 @@ public class MainWindowViewModel : ViewModelBase
     private void OnExportCodeUsageChanged()
     {
         ExportCodePath = Program.GetCodeExportPath(m_ExportCodeUsage);
+    }
+
+    private async Task OnOpenPerforceWindowButtonClicked()
+    {
+        var config = Program.GetVersionControlConfig();
+        var viewModel = new PerforceUserConfigViewModel(config);
+        await ShowPerforceWindow.Handle(viewModel);
+
+        if (config.IsReady())
+        {
+            Log.Information("Retry login with new perforce configuration {Config}", config);
+            Core.IO.FileHelper.UnregisterFileEvent(Core.VersionControl.Perforce.Label);
+            Core.IO.FileHelper.RegisterFileEvent(new Core.VersionControl.Perforce(config));
+        }
     }
 
     #endregion

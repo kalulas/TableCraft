@@ -13,6 +13,7 @@ using System.Text;
 using LitJson;
 using TableCraft.Core.Attributes;
 using TableCraft.Core.ConfigReader;
+using TableCraft.Core.IO;
 
 namespace TableCraft.Core.Decorator;
 
@@ -161,8 +162,7 @@ public class JsonDecorator : IDataDecorator
             return null;
         }
 
-        var encoding = new UTF8Encoding(Configuration.UseUTF8WithBOM);
-        var jsonContent = File.ReadAllText(m_FilePath, encoding);
+        var jsonContent = FileHelper.ReadAllText(m_FilePath);
         var jsonData = JsonMapper.ToObject(jsonContent);
         if (!jsonData.ContainsKey(CONFIG_NAME_KEY))
         {
@@ -242,10 +242,7 @@ public class JsonDecorator : IDataDecorator
             Directory.CreateDirectory(directoryName);
         }
         
-        var encoding = new UTF8Encoding(Configuration.UseUTF8WithBOM);
-        using var fs = File.Open(m_FilePath, FileMode.Create);
-        using var sw = new StreamWriter(fs, encoding);
-        sw.Write(builder.ToString());
+        FileHelper.Write(m_FilePath, builder.ToString());
         return true;
     }
 

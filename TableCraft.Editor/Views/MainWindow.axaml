@@ -5,10 +5,11 @@
         xmlns:lib="clr-namespace:TableCraft.Core;assembly=TableCraft.Core"
         xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+        x:Class="TableCraft.Editor.Views.MainWindow"
         mc:Ignorable="d" d:DesignWidth="800" d:DesignHeight="450"
         SizeToContent="Height"
-        x:Class="TableCraft.Editor.Views.MainWindow"
-        Icon="/Assets/avalonia-logo.ico"
+        WindowStartupLocation="CenterScreen"
+        Icon="/Assets/CraftingTable_256.ico"
         Title="TableCraft">
 
     <Design.DataContext>
@@ -18,10 +19,11 @@
     </Design.DataContext>
     
     <StackPanel>
-        <Grid Background="#BE8FED" RowDefinitions="Auto">
-            <TextBlock HorizontalAlignment="Center" VerticalAlignment="Center" Grid.Column="0" FontSize="32" Margin="12">
-                Welcome to the TableCraft
-            </TextBlock>
+        <Grid Background="#D9854F" RowDefinitions="Auto, Auto">
+            <StackPanel Grid.Row="0" Orientation="Horizontal">
+                <Button Content="Perforce" Command="{Binding OpenPerforceWindowCommand}" Margin="12,12,0,12"></Button>
+                <Button Content="About" Margin="12,12,0,12"></Button>
+            </StackPanel>
         </Grid>
         
         <Grid RowDefinitions="Auto,Auto" Margin="16,10">
