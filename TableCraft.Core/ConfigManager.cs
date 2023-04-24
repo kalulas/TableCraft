@@ -101,7 +101,7 @@ namespace TableCraft.Core
             // read from template file
             var templateContent = await FileHelper.ReadToEnd(templateFilePath);
 
-            var generator = new CustomTemplateGenerator(templateFilePath, configInfo);
+            var generator = new CustomTemplateGenerator(usage, templateFilePath, configInfo);
             var parsed = generator.ParseTemplate(templateFilePath, templateContent);
             // additional settings available
             var settings = TemplatingEngine.GetSettings(generator, parsed);
