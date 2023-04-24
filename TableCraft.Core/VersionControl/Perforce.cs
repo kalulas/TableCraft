@@ -178,7 +178,8 @@ public class Perforce : IFileEvent
 
     public void OnRegistered()
     {
-        TryConnectAndLogin();
+        // Synchronous call will block the main thread
+        Task.Run(TryConnectAndLogin);
     }
 
     public void OnUnregistered()
