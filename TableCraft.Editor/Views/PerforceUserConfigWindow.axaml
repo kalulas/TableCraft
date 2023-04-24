@@ -3,6 +3,7 @@
         xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
         xmlns:vm="using:TableCraft.Editor.ViewModels"
+        xmlns:converters="clr-namespace:TableCraft.Editor.Converters"
         mc:Ignorable="d" d:DesignWidth="400" d:DesignHeight="300"
         x:Class="TableCraft.Editor.Views.PerforceUserConfigWindow"
         Width="480" Height="270"
@@ -10,6 +11,11 @@
         WindowStartupLocation="CenterOwner"
         Icon="/Assets/avalonia-logo.ico"
         Title="Perforce">
+    
+    <Window.Resources>
+        <converters:PerforceConnectionStateConverter x:Key="StateConverter" />
+    </Window.Resources>
+    
     <Design.DataContext>
         <!-- This only sets the DataContext for the previewer in an IDE,
              to set the actual DataContext for runtime, set the DataContext property in code (look at App.axaml.cs) -->
@@ -55,12 +61,16 @@
                 <TextBlock Margin="10" >Connecting...</TextBlock>
             </Panel>
             
-            <StackPanel Orientation="Horizontal" IsVisible="{Binding IsConnected}">
+            <StackPanel Orientation="Horizontal" IsVisible="{Binding ConnectionState,
+            Converter={StaticResource StateConverter}, 
+            ConverterParameter={x:Static vm:PerforceConnectionState.Connected}}">
                 <Image Source="/Assets/accept-32.png" Height="18"></Image>
                 <TextBlock Margin="10" >Connected!</TextBlock>
             </StackPanel>
             
-            <StackPanel Orientation="Horizontal" IsVisible="{Binding IsConnectionFailed}">
+            <StackPanel Orientation="Horizontal" IsVisible="{Binding ConnectionState, 
+            Converter={StaticResource StateConverter}, 
+            ConverterParameter={x:Static vm:PerforceConnectionState.Failed}}">
                 <Image Source="/Assets/close-32.png" Height="18"></Image>
                 <TextBlock Margin="10" >Failed.</TextBlock>
             </StackPanel>

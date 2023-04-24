@@ -156,6 +156,7 @@ class Program
     /// <returns></returns>
     public static async Task<bool> UpdateVersionControlConfig(PerforceUserConfig config)
     {
+        config.Encode(); // make sure we have encoded password
         var appSettingsFilePath = Path.Combine(AppContext.BaseDirectory, AppSettingsFilename);
         if (!File.Exists(appSettingsFilePath))
         {

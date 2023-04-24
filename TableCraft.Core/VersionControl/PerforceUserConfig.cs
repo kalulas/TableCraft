@@ -29,10 +29,17 @@ public class PerforceUserConfig
         P4Passwd = System.Text.Encoding.UTF8.GetString(Convert.FromBase64String(P4PASSWDBASE64));
     }
 
+    /// <summary>
+    /// Encode password to base64, make sure this is called before saving to file
+    /// </summary>
+    public void Encode()
+    {
+        P4PASSWDBASE64 = Convert.ToBase64String(System.Text.Encoding.UTF8.GetBytes(P4Passwd));
+    }
+
     public void UpdatePasswd(string password)
     {
         P4Passwd = password;
-        P4PASSWDBASE64 = Convert.ToBase64String(System.Text.Encoding.UTF8.GetBytes(password));
     }
 
     public override string ToString()

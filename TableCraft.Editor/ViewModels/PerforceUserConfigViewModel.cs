@@ -65,8 +65,6 @@ public class PerforceUserConfigViewModel : ViewModelBase
         {
             this.RaiseAndSetIfChanged(ref m_ConnectionState, value);
             this.RaisePropertyChanged(nameof(IsConnecting));
-            this.RaisePropertyChanged(nameof(IsConnected));
-            this.RaisePropertyChanged(nameof(IsConnectionFailed));
         }
     }
 
@@ -76,12 +74,12 @@ public class PerforceUserConfigViewModel : ViewModelBase
         set => this.RaiseAndSetIfChanged(ref m_PasswordShown, value);
     }
 
+    /// <summary>
+    /// Binding on ConnectionState and check if it's connecting with Converter need more code, so we add this 'IsConnection' property for convenience.
+    /// RaisePropertyChanged in <see cref="ConnectionState"/>
+    /// </summary>
     public bool IsConnecting => m_ConnectionState == PerforceConnectionState.Connecting;
 
-    public bool IsConnected => m_ConnectionState == PerforceConnectionState.Connected;
-    
-    public bool IsConnectionFailed => m_ConnectionState == PerforceConnectionState.Failed;
-    
     public ReactiveCommand<Unit,Unit> ShowPasswdCommand { get; }
     public ReactiveCommand<Unit,Unit> SaveCommand { get; }
     
