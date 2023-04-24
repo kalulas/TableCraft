@@ -115,7 +115,10 @@ public class PerforceUserConfigViewModel : ViewModelBase
 
     private async Task OnSaveButtonClicked()
     {
-        // TODO save to appsettings.json
+        var result = await Program.UpdateVersionControlConfig(m_PerforceUserConfig);
+        var popupTitle = result ? MessageBoxManager.SuccessTitle : MessageBoxManager.ErrorTitle;
+        var popupContent = result ? "Perforce configuration saved!" : "Failed to save Perforce configuration";
+        await MessageBoxManager.ShowStandardMessageBoxDialog(popupTitle, popupContent);
     }
     
     private async Task OnTestConnectionButtonClicked()

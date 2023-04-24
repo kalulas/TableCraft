@@ -3,7 +3,9 @@ using Avalonia.ReactiveUI;
 using System;
 using System.IO;
 using System.Linq;
+using System.Threading.Tasks;
 using Avalonia.Logging;
+using LitJson;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
@@ -17,6 +19,7 @@ class Program
 {
     public const string ListJsonFilename = "list.json";
     public const string LibEnvJsonFilename = "libenv.json";
+    public const string AppSettingsFilename = "appsettings.json";
 
     private static readonly string m_FallbackCodeExportPath = Path.Combine(AppContext.BaseDirectory, "GeneratedCode");
     private static IHost? m_Host;
@@ -139,6 +142,49 @@ class Program
         
         config.Decode();
         return config;
+    }
+    
+    /// <summary>
+    /// <para> This is a bad approach to update perforce configuration in appsettings.json:
+    /// we deserialize the whole appsettings json file, update / add related content, then serialize and write it back </para>
+    /// 
+    /// <para> Update appsettings.json can be done by ConfigurationBuilder, but we dont have a config class
+    /// (also we dont want Serilog information in that class).
+    /// Hoping that we can still replace LitJson with Newtonsoft.Json in the future. </para>
+    /// </summary>
+    /// <param name="config"></param>
+    /// <returns></returns>
+    public static async Task<bool> UpdateVersionControlConfig(PerforceUserConfig config)
+    {
+        var appSettingsFilePath = Path.Combine(AppContext.BaseDirectory, AppSettingsFilename);
+        if (!File.Exists(appSettingsFilePath))
+        {
+            return false;
+        }
+
+        var appSettingsContent = await Core.IO.FileHelper.ReadToEnd(appSettingsFilePath);
+        if (string.IsNullOrEmpty(appSettingsContent))
+        {
+            return false;
+        }
+
+        var appSettingsJsonData = JsonMapper.ToObject(appSettingsContent);
+        
+        var p4ConfigJsonStr = JsonMapper.ToJson(config);
+        var p4ConfigJsonData = JsonMapper.ToObject(p4ConfigJsonStr);
+        // something that we don't want to save in clear text
+        p4ConfigJsonData.Remove(nameof(config.P4Passwd));
+        // overwrite or create new configuration, update appsettings.json
+        appSettingsJsonData["P4Config"] = p4ConfigJsonData;
+        
+        var writer = new JsonWriter
+        {
+            PrettyPrint = true
+        };
+
+        appSettingsJsonData.ToJson(writer);
+        await Core.IO.FileHelper.WriteAsync(appSettingsFilePath, writer.ToString());
+        return true;
     }
 
     #endregion
