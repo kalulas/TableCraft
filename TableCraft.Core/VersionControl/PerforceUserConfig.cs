@@ -44,6 +44,6 @@ public class PerforceUserConfig
 
     public override string ToString()
     {
-        return $"P4PORT: {P4PORT}, P4USER: {P4USER}, P4CLIENT: {P4CLIENT}, P4PASSWDBASE64: {P4PASSWDBASE64}";
+        return $"P4PORT: {P4PORT}, P4USER: {P4USER}, P4CLIENT: {P4CLIENT}";
     }
 }
