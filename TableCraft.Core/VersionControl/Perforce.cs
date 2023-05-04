@@ -189,8 +189,12 @@ public class Perforce : IFileEvent
             return;
         }
 
-        m_Connection.Disconnect();
-        Debugger.Log("[Perforce.OnUnregistered] Disconnected");
+        // Synchronous call will block the main thread
+        Task.Run(() =>
+        {
+            m_Connection.Disconnect();
+            Debugger.Log("[Perforce.OnUnregistered] Disconnected");
+        });
     }
     
     public async Task TryConnectAndLoginAsync()
