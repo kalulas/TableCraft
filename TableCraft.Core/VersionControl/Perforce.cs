@@ -129,8 +129,14 @@ public class Perforce : IFileEvent
         {
             return;
         }
+
+        var rootPath = m_Connection.Client.Root;
+        if (string.IsNullOrEmpty(rootPath))
+        {
+            return;
+        }
         
-        var relativePath = Path.GetRelativePath(m_Connection.Client.Root, filePath);
+        var relativePath = Path.GetRelativePath(rootPath, filePath);
         if (relativePath == filePath)
         {
             // Debugger.LogWarning($"[Perforce.BeforeWrite] filePath {filePath} is not under client root,skip");
@@ -156,8 +162,14 @@ public class Perforce : IFileEvent
         {
             return;
         }
+        
+        var rootPath = m_Connection.Client.Root;
+        if (string.IsNullOrEmpty(rootPath))
+        {
+            return;
+        }
 
-        var relativePath = Path.GetRelativePath(m_Connection.Client.Root, filePath);
+        var relativePath = Path.GetRelativePath(rootPath, filePath);
         if (relativePath == filePath)
         {
             // Debugger.LogWarning($"[Perforce.AfterWrite] filePath {filePath} is not under client root,skip");
