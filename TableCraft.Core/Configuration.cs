@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using System.IO;
 using System.Text;
 using LitJson;
-using TableCraft.Core.ConfigReader;
+using TableCraft.Core.ConfigElements;
 
 namespace TableCraft.Core
 {

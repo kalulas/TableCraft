@@ -5,7 +5,7 @@ using TableCraft.Core;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
-using TableCraft.Core.ConfigReader;
+using TableCraft.Core.ConfigElements;
 
 namespace TableCraft.Console
 {
@@ -36,9 +36,6 @@ namespace TableCraft.Console
             var experimentalInfo = ConfigManager.singleton.CreateConfigInfo(targetCsvConfigFilePath, new[] {jsonFilePath});
             var success = ConfigManager.singleton.SaveConfigInfoWithDecorator(experimentalInfo,
                 Path.Combine(AppContext.BaseDirectory, "experimental.json"));
-            // var identifier = ConfigManager.singleton.GetConfigIdentifier(targetCsvConfigFilePath);
-            // var relatedJsonFilePath = $"{jsonHomeDir}\\{identifier}.json";
-            // var configInfo = ConfigManager.singleton.AddNewConfigInfo(targetCsvConfigFilePath, jsonFilePath, Core.ConfigReader.EConfigType.CSV);
             await ConfigManager.singleton.GenerateCodeForUsage(Configuration.ConfigUsageType[0], experimentalInfo,
                 AppContext.BaseDirectory);
         }

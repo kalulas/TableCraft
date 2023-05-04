@@ -12,7 +12,7 @@ using System.IO;
 using System.Text;
 using LitJson;
 using TableCraft.Core.Attributes;
-using TableCraft.Core.ConfigReader;
+using TableCraft.Core.ConfigElements;
 using TableCraft.Core.IO;
 
 namespace TableCraft.Core.Decorator;

@@ -2,7 +2,7 @@
 using System.IO;
 using System.Threading.Tasks;
 using Mono.TextTemplating;
-using TableCraft.Core.ConfigReader;
+using TableCraft.Core.ConfigElements;
 using TableCraft.Core.Generation;
 using TableCraft.Core.IO;
 

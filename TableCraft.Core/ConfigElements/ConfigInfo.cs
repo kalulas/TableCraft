@@ -4,7 +4,7 @@ using System.Linq;
 using TableCraft.Core.Decorator;
 using TableCraft.Core.Source;
 
-namespace TableCraft.Core.ConfigReader
+namespace TableCraft.Core.ConfigElements
 {
     /// <summary>
     /// Information about a single config file, for example: SomeTable.csv

@@ -8,13 +8,13 @@
 using System.Collections.ObjectModel;
 using System.IO;
 using TableCraft.Core;
-using TableCraft.Core.ConfigReader;
+using TableCraft.Core.ConfigElements;
 using ReactiveUI;
 
 namespace TableCraft.Editor.ViewModels;
 
 /// <summary>
-/// A viewmodel wrapper of <see cref="TableCraft.Core.ConfigReader.ConfigInfo"/>
+/// A viewmodel wrapper of <see cref="TableCraft.Core.ConfigElements.ConfigInfo"/>
 /// </summary>
 public class ConfigInfoViewModel : ViewModelBase
 {

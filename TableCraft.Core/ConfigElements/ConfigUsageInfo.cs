@@ -5,7 +5,7 @@
 // Description:
 #endregion
 
-namespace TableCraft.Core.ConfigReader;
+namespace TableCraft.Core.ConfigElements;
 
 public class ConfigUsageInfo
 {

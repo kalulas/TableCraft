@@ -7,13 +7,13 @@
 
 using System.Collections.ObjectModel;
 using System.Windows.Input;
-using TableCraft.Core.ConfigReader;
+using TableCraft.Core.ConfigElements;
 using ReactiveUI;
 
 namespace TableCraft.Editor.ViewModels;
 
 /// <summary>
-/// Another viewmodel wrapper of <see cref="Core.ConfigReader.ConfigAttributeInfo"/>, for attribute editor panel
+/// Another viewmodel wrapper of <see cref="TableCraft.Core.ConfigElements.ConfigAttributeInfo"/>, for attribute editor panel
 /// </summary>
 public class ConfigAttributeDetailsViewModel : ViewModelBase
 {
