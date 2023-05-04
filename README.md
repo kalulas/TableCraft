@@ -2,6 +2,8 @@
 
 [![Commitizen friendly](https://img.shields.io/badge/commitizen-friendly-brightgreen.svg)](http://commitizen.github.io/cz-cli/)
 
+[README.en.md](README.en.md)
+
 ## 简介
 
 TableCraft是一个通用、可拓展的解析配置源文件，生成配置描述文件与客制化配置读取代码解决方案。
@@ -36,7 +38,7 @@ TableCraft是一个通用、可拓展的解析配置源文件，生成配置描�
 
 使用运行时库TableCraft.Core需要配置`libenv.json`文件，并在使用前通过接口`TableCraft.Core.Configuration.ReadConfigurationFromJson`进行初始化
 
-```json
+```jsonc
 {
     // 规定数值类型
     "DataValueType": ["int", "uint", "float", "boolean", "string"],
@@ -69,7 +71,7 @@ TableCraft是一个通用、可拓展的解析配置源文件，生成配置描�
 
 `appsettings.json`中配置了一些重要的文件目录，也用于保存版本控制相关的用户信息
 
-```json
+```jsonc
 {
     // 配置文件所在的共同根目录，用于读取配置文件
     "ConfigHomePath": "",

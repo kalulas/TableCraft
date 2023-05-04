@@ -36,7 +36,7 @@ The project provides a .NET6 runtime library, as well as a command-line tool bas
 
 To use the runtime library TableCraft.Core, you need to configure the `libenv.json` file and initialize it before use through the interface `TableCraft.Core.Configuration.ReadConfigurationFromJson`.
 
-```json
+```jsonc
 {
     // Define data value types
     "DataValueType": ["int", "uint", "float", "boolean", "string"],
@@ -69,14 +69,14 @@ To use the runtime library TableCraft.Core, you need to configure the `libenv.js
 
 `appsettings.json` configures some important directory paths and also saves user information related to version control.
 
-```json
+```jsonc
 {
-    	// Common root directory of configuration files for reading configuration files.
-    	"ConfigHomePath":"",
-    	// Common root directory of configuration description files for saving description files.
-    	"JsonHomePath":"",
-    	// Export directory
-     "ExportPath":{
+    // Common root directory of configuration files for reading configuration files.
+    "ConfigHomePath":"",
+    // Common root directory of configuration description files for saving description files.
+    "JsonHomePath":"",
+    // Export directory
+    "ExportPath":{
         "usage0":""
      },
      // Perforce version control related information. No need to manually configure here, just edit and save in the application.
