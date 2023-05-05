@@ -7,6 +7,7 @@
 
 using System;
 using System.IO;
+using System.Linq;
 using System.Threading.Tasks;
 using Perforce.P4;
 using TableCraft.Core.IO;
@@ -21,6 +22,7 @@ public class Perforce : IFileEvent
     public const string Label = "Perforce";
 
     private readonly Server m_Server;
+    private readonly Repository m_Repository;
     private readonly Connection m_Connection;
     private readonly string m_Password;
 
@@ -55,7 +57,8 @@ public class Perforce : IFileEvent
     {
         m_Server = new Server(new ServerAddress(config.P4PORT));
         m_Password = config.P4Passwd;
-        m_Connection = new Repository(m_Server).Connection;
+        m_Repository = new Repository(m_Server);
+        m_Connection = m_Repository.Connection;
         m_Connection.UserName = config.P4USER;
         m_Connection.Client = new Client
         {
@@ -143,9 +146,7 @@ public class Perforce : IFileEvent
             return;
         }
         
-        m_FileExisted = File.Exists(filePath);
-        // if not existed, add after write
-        if (!m_FileExisted)
+        if (!File.Exists(filePath))
         {
             return;
         }
@@ -176,13 +177,15 @@ public class Perforce : IFileEvent
             return;
         }
 
-        // if not existed, edit before write
-        if (m_FileExisted)
+        var opts = new ChangesCmdOptions(ChangesCmdFlags.None, null, 0, ChangeListStatus.None, null);
+        var fileSpec = new FileSpec(new LocalPath(filePath), null);
+        var changes = m_Repository.GetChangelists(opts, fileSpec);
+        // already in other changelist, ignore
+        if (changes != null && changes.Any())
         {
             return;
         }
         
-        var fileSpec = new FileSpec(new LocalPath(filePath), null);
         var options = new AddFilesCmdOptions(AddFilesCmdFlags.None, 0, null);
         m_Connection.Client.AddFiles(options, fileSpec);
         Debugger.Log($"[Perforce.AfterWrite] Add file: {filePath}");
