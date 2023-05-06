@@ -26,11 +26,6 @@ public class Perforce : IFileEvent
     private readonly Connection m_Connection;
     private readonly string m_Password;
 
-    /// <summary>
-    /// If file existed before write, 'edit' command will be used; otherwise 'add' command will be used
-    /// </summary>
-    private bool m_FileExisted;
-
     #endregion
 
     #region Properties
