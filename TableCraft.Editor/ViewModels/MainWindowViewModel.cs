@@ -385,7 +385,7 @@ public class MainWindowViewModel : ViewModelBase
     {
         const string newLine = "\r\n\r\n";
         await MessageBoxManager.ShowCustomMarkdownMessageBoxDialog("About",
-            $"## Want to learn more about TableCraft? {newLine}" +
+            $"## Learn more about TableCraft.{newLine}" +
             $"view it on [github](https://github.com/kalulas/TableCraft) {newLine}" +
             $"Author: **boming.chen / kalulas** {newLine}");
     }
