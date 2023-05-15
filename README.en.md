@@ -57,7 +57,9 @@ To use the runtime library TableCraft.Core, you need to configure the `libenv.js
             // T4 template file used to generate code. This file needs to be placed in the Templates directory at the same level as the executable file.
             "CodeTemplateName":"usage0-template.tt",
             // The type of generated file. In this example, c# code is generated.
-            "TargetFileType":".cs"
+            "TargetFileType":".cs",
+            // The format string of the generated file name, if this string contains a file type, it will be replaced by TargetFileType
+            "OutputFormat": "{0}_base"
         }
      }
 }
