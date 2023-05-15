@@ -1,4 +1,4 @@
-﻿namespace TableCraft.Core.ConfigReader
+﻿namespace TableCraft.Core.ConfigElements
 {
     /// <summary>
     /// Contains attribute's information at specific usage

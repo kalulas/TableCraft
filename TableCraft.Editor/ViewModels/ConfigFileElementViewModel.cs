@@ -1,7 +1,7 @@
 ﻿using System;
 using TableCraft.Editor.Models;
 using System.IO;
-using TableCraft.Core.ConfigReader;
+using TableCraft.Core.ConfigElements;
 using ReactiveUI;
 
 namespace TableCraft.Editor.ViewModels;

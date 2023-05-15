@@ -11,7 +11,7 @@ using System;
 using System.IO;
 using System.Text.RegularExpressions;
 using TableCraft.Core.Attributes;
-using TableCraft.Core.ConfigReader;
+using TableCraft.Core.ConfigElements;
 using TableCraft.Core.IO;
 
 namespace TableCraft.Core.Source;

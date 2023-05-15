@@ -92,6 +92,7 @@ public class MainWindowViewModel : ViewModelBase
     public ReactiveCommand<Unit, Unit>? SaveJsonFileCommand { get; private set; }
     public ReactiveCommand<Unit, Unit>? GenerateCodeCommand { get; private set; }
     public ReactiveCommand<Unit, Unit>? OpenPerforceWindowCommand { get; private set; }
+    public ReactiveCommand<Unit, Unit>? OpenAboutWindowCommand { get; private set; }
     public Interaction<PerforceUserConfigViewModel, PerforceUserConfigViewModel?> ShowPerforceWindow { get; }
     public EventHandler<SelectionChangedEventArgs>? SelectedTableChangedEventHandler { get; private set; }
     public EventHandler<SelectionChangedEventArgs>? SelectedAttributeChangedEventHandler { get; private set; }
@@ -139,6 +140,8 @@ public class MainWindowViewModel : ViewModelBase
         SaveJsonFileCommand.ThrownExceptions.Subscribe(Program.HandleException);
         GenerateCodeCommand = ReactiveCommand.CreateFromTask(GenerateCodeWithCurrentUsage);
         GenerateCodeCommand.ThrownExceptions.Subscribe(Program.HandleException);
+        OpenAboutWindowCommand = ReactiveCommand.CreateFromTask(OnOpenAboutWindowButtonClicked);
+        OpenAboutWindowCommand.ThrownExceptions.Subscribe(Program.HandleException);
         OpenPerforceWindowCommand = ReactiveCommand.CreateFromTask(OnOpenPerforceWindowButtonClicked);
         OpenPerforceWindowCommand.ThrownExceptions.Subscribe(Program.HandleException);
         SelectedTableChangedEventHandler = OnSelectedTableChanged;
@@ -361,7 +364,10 @@ public class MainWindowViewModel : ViewModelBase
     
     private void OnExportCodeUsageChanged()
     {
-        ExportCodePath = Program.GetCodeExportPath(m_ExportCodeUsage);
+        var codeExportHomePath = Program.GetCodeExportPath(m_ExportCodeUsage);
+        ExportCodePath = SelectedConfigInfo != null
+            ? Path.Combine(codeExportHomePath, Configuration.GetTargetFilenameForUsage(m_ExportCodeUsage, SelectedConfigInfo.GetConfigInfo()))
+            : codeExportHomePath;
     }
 
     private async Task OnOpenPerforceWindowButtonClicked()
@@ -376,6 +382,15 @@ public class MainWindowViewModel : ViewModelBase
             Core.IO.FileHelper.UnregisterFileEvent(Core.VersionControl.Perforce.Label);
             Core.IO.FileHelper.RegisterFileEvent(new Core.VersionControl.Perforce(config));
         }
+    }
+    
+    private static async Task OnOpenAboutWindowButtonClicked()
+    {
+        const string newLine = "\r\n\r\n";
+        await MessageBoxManager.ShowCustomMarkdownMessageBoxDialog("About",
+            $"## Learn more about TableCraft.{newLine}" +
+            $"view it on [github](https://github.com/kalulas/TableCraft) {newLine}" +
+            $"Author: **boming.chen / kalulas** {newLine}");
     }
 
     #endregion

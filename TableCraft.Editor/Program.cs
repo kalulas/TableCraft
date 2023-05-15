@@ -35,7 +35,10 @@ class Program
         m_Configuration = m_Host.Services.GetRequiredService<IConfiguration>();
 
         Log.Logger = new LoggerConfiguration()
-            .ReadFrom.Configuration(m_Configuration)
+            .MinimumLevel.Debug()
+            .WriteTo.Console()
+            .WriteTo.File("Logs/log-.txt", rollingInterval: RollingInterval.Day, retainedFileCountLimit: 10)
+            // .ReadFrom.Configuration(m_Configuration)
             .CreateLogger();
 
         Log.Information("Logger is initialized");

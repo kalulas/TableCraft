@@ -5,12 +5,12 @@
 // Description:
 #endregion
 
-using TableCraft.Core.ConfigReader;
+using TableCraft.Core.ConfigElements;
 
 namespace TableCraft.Editor.ViewModels;
 
 /// <summary>
-/// A viewmodel wrapper of <see cref="TableCraft.Core.ConfigReader.ConfigAttributeInfo"/>
+/// A viewmodel wrapper of <see cref="TableCraft.Core.ConfigElements.ConfigAttributeInfo"/>
 /// </summary>
 public class ConfigAttributeListItemViewModel : ViewModelBase
 {

@@ -7,7 +7,7 @@ using TableCraft.Core.Attributes;
 using TableCraft.Core.Decorator;
 using TableCraft.Core.Source;
 
-namespace TableCraft.Core.ConfigReader
+namespace TableCraft.Core.ConfigElements
 {
     internal static class ConfigInfoFactory
     {

@@ -2,7 +2,7 @@
 using System.Collections.Generic;
 using System.Linq;
 
-namespace TableCraft.Core.ConfigReader
+namespace TableCraft.Core.ConfigElements
 {
     /// <summary>
     /// Information about a single attribute in config file

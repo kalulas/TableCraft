@@ -7,7 +7,7 @@
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
         x:Class="TableCraft.Editor.Views.MainWindow"
         mc:Ignorable="d" d:DesignWidth="800" d:DesignHeight="450"
-        SizeToContent="Height"
+        Height="1000" MinHeight="640"
         WindowStartupLocation="CenterScreen"
         Icon="/Assets/CraftingTable_256.ico"
         Title="TableCraft">
@@ -18,124 +18,119 @@
         <vm:MainWindowViewModel/>
     </Design.DataContext>
     
-    <StackPanel>
-        <Grid Background="#D9854F" RowDefinitions="Auto, Auto">
-            <StackPanel Grid.Row="0" Orientation="Horizontal">
-                <Button Content="Perforce" Command="{Binding OpenPerforceWindowCommand}" Margin="12,12,0,12"></Button>
-                <Button Content="About" Margin="12,12,0,12"></Button>
-            </StackPanel>
-        </Grid>
+    <DockPanel>
+        <StackPanel Orientation="Vertical" DockPanel.Dock="Top">
+            <Grid Background="#D9854F" RowDefinitions="Auto, Auto">
+                <StackPanel Grid.Row="0" Orientation="Horizontal">
+                    <Button Content="Perforce" Command="{Binding OpenPerforceWindowCommand}" Margin="12,12,0,12"></Button>
+                    <Button Content="About" Command="{Binding OpenAboutWindowCommand}" Margin="12,12,0,12"></Button>
+                </StackPanel>
+            </Grid>
         
-        <Grid RowDefinitions="Auto,Auto" Margin="16,10">
-            <TextBlock Grid.Row="0" FontSize="24">
-                Environment
+            <Grid RowDefinitions="Auto,Auto" Margin="16,10">
+                <TextBlock Grid.Row="0" FontSize="24">
+                    Environment
+                </TextBlock>
+                <StackPanel Grid.Row="1">
+                    <TextBlock Text="{Binding ConfigHomePath}"></TextBlock>
+                    <TextBlock Text="{Binding JsonHomePath}"></TextBlock>
+                </StackPanel>
+            </Grid>
+        </StackPanel>
+        
+        <StackPanel Orientation="Vertical" VerticalAlignment="Bottom" DockPanel.Dock="Bottom">
+            <StackPanel Orientation="Horizontal" HorizontalAlignment="Right" Margin="16,0, 16, 10">
+                <StackPanel
+                    IsEnabled="{Binding SelectedConfigInfo, Converter={x:Static ObjectConverters.IsNotNull}}"
+                    VerticalAlignment="Center">
+                    <ComboBox Items="{x:Static lib:Configuration.ConfigUsageType}" 
+                              SelectedItem="{Binding ExportCodeUsage}" Width="150">
+                    </ComboBox>
+                </StackPanel>
+                <Button 
+                    IsEnabled="{Binding SelectedConfigInfo, Converter={x:Static ObjectConverters.IsNotNull}}"
+                    Command="{Binding GenerateCodeCommand}"
+                    Margin="20, 0, 0, 0">
+                    <StackPanel Orientation="Horizontal">
+                        <Image Source="/Assets/script-128.png" Height="32"></Image>
+                        <Label VerticalAlignment="Center"> Generate </Label>
+                    </StackPanel>
+                </Button>
+                <Button 
+                    IsEnabled="{Binding SelectedConfigInfo, Converter={x:Static ObjectConverters.IsNotNull}}"
+                    Command="{Binding SaveJsonFileCommand}"
+                    Margin="20, 0, 0, 0">
+                    <StackPanel Orientation="Horizontal">
+                        <Image Source="/Assets/json-128.png" Height="32"></Image>
+                        <Label VerticalAlignment="Center"> Save </Label>
+                    </StackPanel>
+                </Button>
+            </StackPanel>
+        
+            <TextBlock HorizontalAlignment="Right" Margin="16,0, 16, 10"
+                       IsVisible="{Binding ExportCodeUsage, Converter={x:Static StringConverters.IsNotNullOrEmpty}}"
+                       Text="{Binding ExportCodePath, StringFormat='Target: {0}'}">
             </TextBlock>
-            <StackPanel Grid.Row="1">
-                <TextBlock Text="{Binding ConfigHomePath}"></TextBlock>
-                <TextBlock Text="{Binding JsonHomePath}"></TextBlock>
-            </StackPanel>
-        </Grid>
+        </StackPanel>
         
-        <Grid RowDefinitions="Auto" ColumnDefinitions="10*,10*,20*" Margin="16,10">
-            <StackPanel Grid.Column="0" Margin="0,0,20,0">
-                <TextBlock
+        <Grid ColumnDefinitions="10*,10*,20*" Margin="16,10">
+            <!-- <StackPanel Grid.Column="0" Margin="0,0,20,0" ClipToBounds="True"> -->
+            <Grid RowDefinitions="Auto, *, Auto" Margin="5">
+                <TextBlock Grid.Row="0"
                     IsVisible="{Binding !TableList.Count}"
                     Text="{Binding ListJsonFilename, StringFormat='No table found in {0}'}"
                     FontSize="20">
                 </TextBlock>
                 
-                <TextBlock
+                <TextBlock Grid.Row="0"
                     Name="TablesTitle"
                     IsVisible="{Binding TableList.Count}"
                     FontSize="20">
                     Tables
                 </TextBlock>
 
-                <ListBox
+                <ListBox Grid.Row="1"
                     Items="{Binding TableList}" 
                     SelectedItem="{Binding SelectedTable}"
-                    SelectionChanged="SelectingTableItemsControl_OnSelectionChanged"
-                    MaxHeight="700">
+                    SelectionChanged="SelectingTableItemsControl_OnSelectionChanged">
                 </ListBox>
                 
-                <WrapPanel HorizontalAlignment="Right" Margin="0 10 0 0">
+                <WrapPanel Grid.Row="2" HorizontalAlignment="Right" Margin="0 10 0 0">
                     <Button Content="Add" Command="{Binding AddNewTableFileCommand}"></Button>
                 </WrapPanel>
-            </StackPanel>
+            </Grid>
+            <!-- </StackPanel> -->
 
-            <StackPanel Grid.Column="1" Margin="0,0,20,0">
-                <TextBlock FontSize="20"> Attributes </TextBlock>
-                <ListBox 
+            <!-- <StackPanel Grid.Column="1" Margin="0,0,20,0" ClipToBounds="True"> -->
+            <Grid Grid.Column="1" RowDefinitions="Auto, *" Margin="5">
+                <TextBlock Grid.Row="0" FontSize="20"> Attributes </TextBlock>
+                <ListBox Grid.Row="1"
                     IsVisible="{Binding SelectedConfigInfo, Converter={x:Static ObjectConverters.IsNotNull}}"
                     Items="{Binding SelectedConfigInfo.Attributes}"
-                    SelectionChanged="SelectingAttributeItemsControl_OnSelectionChanged"
-                    MaxHeight="700">
+                    SelectionChanged="SelectingAttributeItemsControl_OnSelectionChanged">
                 </ListBox>
-                
-                <!-- This is how you apply different templates to the same viewmodel, maybe  -->
-                <!-- <ItemsControl -->
-                <!--     IsVisible="{Binding SelectedConfigInfo, Converter={x:Static ObjectConverters.IsNotNull}}" -->
-                <!--     Items="{Binding SelectedConfigInfo.Attributes}"> -->
-                <!--     <ItemsControl.ItemTemplate> -->
-                <!--         <DataTemplate> -->
-                <!--              -->
-                <!--         </DataTemplate> -->
-                <!--         <views:ConfigAttributeListItemView> -->
-                <!--     </ItemsControl.ItemTemplate> -->
-                <!-- </ItemsControl> -->
-            </StackPanel>
+            </Grid>
+            <!-- </StackPanel> -->
             
-            <StackPanel Grid.Column="2">
-                <TextBlock 
-                    FontSize="20"
-                    IsVisible="{Binding SelectedConfigInfo, Converter={x:Static ObjectConverters.IsNotNull}}">
+            <Grid Grid.Column="2" RowDefinitions="Auto, Auto, Auto, *" Margin="5" ClipToBounds="True">
+                <TextBlock Grid.Row="0" FontSize="20"
+                           IsVisible="{Binding SelectedConfigInfo, Converter={x:Static ObjectConverters.IsNotNull}}">
                      About Selected Table
                 </TextBlock>
-                <UserControl
-                    IsVisible="{Binding SelectedConfigInfo, Converter={x:Static ObjectConverters.IsNotNull}}"
-                    Content="{Binding SelectedConfigInfo}">
+                <UserControl Grid.Row="1" 
+                             IsVisible="{Binding SelectedConfigInfo, Converter={x:Static ObjectConverters.IsNotNull}}"
+                             Content="{Binding SelectedConfigInfo}">
                 </UserControl>
                 
-                <TextBlock FontSize="20"> Attribute Information </TextBlock>
-                <UserControl
+                <TextBlock Grid.Row="2" FontSize="20"> Attribute Information </TextBlock>
+                <UserControl Grid.Row="3"
                     IsVisible="{Binding SelectedAttribute, Converter={x:Static ObjectConverters.IsNotNull}}"
                     Content="{Binding SelectedAttribute}">
                 </UserControl>
-            </StackPanel>
+            </Grid>
         </Grid>
         
-        <StackPanel Orientation="Horizontal" HorizontalAlignment="Right" Margin="16,0, 16, 10">
-            <StackPanel
-                IsEnabled="{Binding SelectedConfigInfo, Converter={x:Static ObjectConverters.IsNotNull}}"
-                VerticalAlignment="Center">
-                <ComboBox Items="{x:Static lib:Configuration.ConfigUsageType}" 
-                          SelectedItem="{Binding ExportCodeUsage}" Width="150">
-                </ComboBox>
-            </StackPanel>
-            <Button 
-                IsEnabled="{Binding SelectedConfigInfo, Converter={x:Static ObjectConverters.IsNotNull}}"
-                Command="{Binding GenerateCodeCommand}"
-                Margin="20, 0, 0, 0">
-                <StackPanel Orientation="Horizontal">
-                    <Image Source="/Assets/script-128.png" Height="32"></Image>
-                    <Label VerticalAlignment="Center"> Generate </Label>
-                </StackPanel>
-            </Button>
-            <Button 
-                IsEnabled="{Binding SelectedConfigInfo, Converter={x:Static ObjectConverters.IsNotNull}}"
-                Command="{Binding SaveJsonFileCommand}"
-                Margin="20, 0, 0, 0">
-                <StackPanel Orientation="Horizontal">
-                    <Image Source="/Assets/json-128.png" Height="32"></Image>
-                    <Label VerticalAlignment="Center"> Save </Label>
-                </StackPanel>
-            </Button>
-        </StackPanel>
-        
-        <TextBlock HorizontalAlignment="Right" Margin="16,0, 16, 10"
-                   IsVisible="{Binding ExportCodeUsage, Converter={x:Static StringConverters.IsNotNullOrEmpty}}"
-                   Text="{Binding ExportCodePath}">
-        </TextBlock>
-    </StackPanel>
+
+    </DockPanel>
 
 </Window>

@@ -5,7 +5,7 @@
 // Description:
 #endregion
 
-using TableCraft.Core.ConfigReader;
+using TableCraft.Core.ConfigElements;
 
 namespace TableCraft.Core.Source;
 

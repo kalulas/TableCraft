@@ -5,12 +5,15 @@
 // Description:
 #endregion
 
+using System;
+using System.IO;
 using System.Threading.Tasks;
 using Avalonia;
 using Avalonia.Controls;
 using Avalonia.Controls.ApplicationLifetimes;
 using MessageBox.Avalonia.DTO;
 using MessageBox.Avalonia.Enums;
+using MessageBox.Avalonia.Models;
 
 namespace TableCraft.Editor.Services;
 
@@ -57,6 +60,27 @@ public static class MessageBoxManager
             new MessageBoxStandardParams
             {
                 ButtonDefinitions = ButtonEnum.Ok,
+                ContentTitle = title,
+                ContentMessage = message,
+                WindowStartupLocation = WindowStartupLocation.CenterScreen,
+                MinHeight = StandardPopupHeight
+            });
+
+        await messageBox.ShowDialog(mainWindow);
+    }
+
+    public static async Task ShowCustomMarkdownMessageBoxDialog(string title, string message)
+    {
+        var mainWindow = GetMainWindow();
+        if (mainWindow == null)
+        {
+            return;
+        }
+        
+        var messageBox = MessageBox.Avalonia.MessageBoxManager.GetMessageBoxCustomWindow(
+            new MessageBoxCustomParams
+            {
+                Markdown = true,
                 ContentTitle = title,
                 ContentMessage = message,
                 WindowStartupLocation = WindowStartupLocation.CenterScreen,

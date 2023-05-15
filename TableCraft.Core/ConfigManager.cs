@@ -2,7 +2,7 @@
 using System.IO;
 using System.Threading.Tasks;
 using Mono.TextTemplating;
-using TableCraft.Core.ConfigReader;
+using TableCraft.Core.ConfigElements;
 using TableCraft.Core.Generation;
 using TableCraft.Core.IO;
 
@@ -84,6 +84,7 @@ namespace TableCraft.Core
             
             var templateFilePath = Configuration.GetTemplateFilePathForUsage(usage);
             var outputExtension = Configuration.GetTargetFileTypeForUsage(usage);
+            // extension checking just in case
             if (string.IsNullOrEmpty(templateFilePath) || string.IsNullOrEmpty(outputExtension) || !File.Exists(templateFilePath))
             {
                 Debugger.LogWarning("[ConfigManager.GenerateCodeForUsage] template file {1} not found for usage '{0}'",
@@ -91,8 +92,8 @@ namespace TableCraft.Core
                 return false;
             }
 
-            var outputFileName = Path.ChangeExtension(configInfo.GetExportName(usage), outputExtension);
-            var outputFilePath = Path.Combine(outputDirectory, outputFileName ?? string.Empty);
+            var outputFilename = Configuration.GetTargetFilenameForUsage(usage, configInfo);
+            var outputFilePath = Path.Combine(outputDirectory, outputFilename);
             if (File.Exists(outputFilePath))
             {
                 Debugger.LogWarning("[ConfigManager.GenerateCodeForUsage] existed file '{0}' will be overwrite", outputFilePath);

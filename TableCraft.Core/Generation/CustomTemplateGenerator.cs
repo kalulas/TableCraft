@@ -8,7 +8,7 @@
 using System;
 using System.CodeDom.Compiler;
 using Mono.TextTemplating;
-using TableCraft.Core.ConfigReader;
+using TableCraft.Core.ConfigElements;
 
 namespace TableCraft.Core.Generation
 {
@@ -77,7 +77,7 @@ namespace TableCraft.Core.Generation
             // all 'using' statements
             Imports.Add("System.Text");
             Imports.Add("System.Collections.Generic");
-            Imports.Add("TableCraft.Core.ConfigReader");
+            Imports.Add("TableCraft.Core.ConfigElements");
             Imports.Add("TableCraft.Core"); // now you can use Debugger and other stuff in the template, but maybe Debugger to another namespace?
             
             PrepareParameters();
