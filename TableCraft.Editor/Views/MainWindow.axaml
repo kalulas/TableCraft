@@ -69,7 +69,7 @@
         
             <TextBlock HorizontalAlignment="Right" Margin="16,0, 16, 10"
                        IsVisible="{Binding ExportCodeUsage, Converter={x:Static StringConverters.IsNotNullOrEmpty}}"
-                       Text="{Binding ExportCodePath}">
+                       Text="{Binding ExportCodePath, StringFormat='Target: {0}'}">
             </TextBlock>
         </StackPanel>
         

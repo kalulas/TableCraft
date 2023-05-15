@@ -25,6 +25,10 @@ namespace TableCraft.Core
             /// example: ".cs"
             /// </summary>
             public string TargetFileType { get; set; }
+            /// <summary>
+            /// Format string for output filename
+            /// </summary>
+            public string OutputFormat { get; set; }
         }
         
         public static string CodeTemplatePath { get; private set; }
@@ -209,6 +213,44 @@ namespace TableCraft.Core
             }
 
             return m_UsageToInformation[usage].TargetFileType;
+        }
+
+        public static string GetTargetFilenameForUsage(string usage, ConfigInfo configInfo)
+        {
+            var exportName = configInfo.GetExportName(usage);
+            var outputExtension = GetTargetFileTypeForUsage(usage);
+            var exportFormat = GetOutputFormatForUsage(usage);
+            try
+            {
+                if (!string.IsNullOrEmpty(exportFormat))
+                {
+                    exportName = string.Format(exportFormat, exportName);
+                }
+            }
+            catch (Exception e)
+            {
+                Debugger.LogError($"[ConfigManager.GetTargetFilenameForUsage] format {exportName} with {exportFormat} failed with exception {e}");
+                exportName = configInfo.GetExportName(usage);// fallback to original
+            }
+
+            // if (Path.HasExtension(exportName))
+            // {
+            //     Debugger.LogWarning($"[ConfigManager.GetTargetFilenameForUsage] original extension in '{exportName}' will be replaced by '{outputExtension}'");
+            // }
+            
+            var outputFileName = Path.ChangeExtension(exportName, outputExtension);
+            return outputFileName;
+        }
+        
+        private static string GetOutputFormatForUsage(string usage)
+        {
+            if (!m_UsageToInformation.ContainsKey(usage))
+            {
+                Debugger.LogError("[Configuration.GetOutputFormatForUsage] usage '{0}' not found", usage);
+                return string.Empty;
+            }
+
+            return m_UsageToInformation[usage].OutputFormat;
         }
 
         #endregion

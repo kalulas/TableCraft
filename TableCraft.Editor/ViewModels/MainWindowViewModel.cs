@@ -364,7 +364,10 @@ public class MainWindowViewModel : ViewModelBase
     
     private void OnExportCodeUsageChanged()
     {
-        ExportCodePath = Program.GetCodeExportPath(m_ExportCodeUsage);
+        var codeExportHomePath = Program.GetCodeExportPath(m_ExportCodeUsage);
+        ExportCodePath = SelectedConfigInfo != null
+            ? Path.Combine(codeExportHomePath, Configuration.GetTargetFilenameForUsage(m_ExportCodeUsage, SelectedConfigInfo.GetConfigInfo()))
+            : codeExportHomePath;
     }
 
     private async Task OnOpenPerforceWindowButtonClicked()

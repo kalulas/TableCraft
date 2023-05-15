@@ -10,7 +10,8 @@
     "ConfigUsageType":{
         "client0":{
             "CodeTemplateName": "client0-template.tt",
-            "TargetFileType": ".cs"
+            "TargetFileType": ".cs",
+            "OutputFormat": "{0}_base"
         },
         "client1":{
             "CodeTemplateName": "client1-template.tt",
