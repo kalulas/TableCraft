@@ -38,8 +38,11 @@
             </Grid>
         </StackPanel>
         
-        <StackPanel Orientation="Vertical" VerticalAlignment="Bottom" DockPanel.Dock="Bottom">
-            <StackPanel Orientation="Horizontal" HorizontalAlignment="Right" Margin="16,0, 16, 10">
+        <StackPanel Orientation="Vertical" VerticalAlignment="Bottom" Spacing="10" Margin="16" DockPanel.Dock="Bottom">
+            <CheckBox HorizontalAlignment="Right" IsChecked="{Binding SaveJsonOnGenerateCode}">
+                Save on generate
+            </CheckBox>
+            <StackPanel Orientation="Horizontal" HorizontalAlignment="Right" Spacing="20">
                 <StackPanel
                     IsEnabled="{Binding SelectedConfigInfo, Converter={x:Static ObjectConverters.IsNotNull}}"
                     VerticalAlignment="Center">
@@ -49,8 +52,7 @@
                 </StackPanel>
                 <Button 
                     IsEnabled="{Binding SelectedConfigInfo, Converter={x:Static ObjectConverters.IsNotNull}}"
-                    Command="{Binding GenerateCodeCommand}"
-                    Margin="20, 0, 0, 0">
+                    Command="{Binding GenerateCodeCommand}">
                     <StackPanel Orientation="Horizontal">
                         <Image Source="/Assets/script-128.png" Height="32"></Image>
                         <Label VerticalAlignment="Center"> Generate </Label>
@@ -58,8 +60,7 @@
                 </Button>
                 <Button 
                     IsEnabled="{Binding SelectedConfigInfo, Converter={x:Static ObjectConverters.IsNotNull}}"
-                    Command="{Binding SaveJsonFileCommand}"
-                    Margin="20, 0, 0, 0">
+                    Command="{Binding SaveJsonFileCommand}">
                     <StackPanel Orientation="Horizontal">
                         <Image Source="/Assets/json-128.png" Height="32"></Image>
                         <Label VerticalAlignment="Center"> Save </Label>
@@ -67,7 +68,7 @@
                 </Button>
             </StackPanel>
         
-            <TextBlock HorizontalAlignment="Right" Margin="16,0, 16, 10"
+            <TextBlock HorizontalAlignment="Right"
                        IsVisible="{Binding ExportCodeUsage, Converter={x:Static StringConverters.IsNotNullOrEmpty}}"
                        Text="{Binding ExportCodePath, StringFormat='Target: {0}'}">
             </TextBlock>

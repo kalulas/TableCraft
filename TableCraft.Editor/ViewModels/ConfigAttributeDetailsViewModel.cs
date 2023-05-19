@@ -20,6 +20,7 @@ public class ConfigAttributeDetailsViewModel : ViewModelBase
     #region Fields
 
     private readonly ConfigAttributeInfo m_AttributeInfo;
+    private string m_CollectionType;
     private string m_SelectedUsageType = string.Empty;
     private string m_SelectedAttributeTag = string.Empty;
 
@@ -38,13 +39,22 @@ public class ConfigAttributeDetailsViewModel : ViewModelBase
     public string ValueType
     {
         get => m_AttributeInfo.ValueType;
-        set => m_AttributeInfo.ValueType = value;
+        set
+        {
+            var previousValueType = m_AttributeInfo.ValueType;
+            m_AttributeInfo.ValueType = value;
+            OnValueTypeChanged(previousValueType, value);
+        }
     }
 
     public string CollectionType
     {
         get => m_AttributeInfo.CollectionType;
-        set => m_AttributeInfo.CollectionType = value;
+        set
+        {
+            m_AttributeInfo.CollectionType = value;
+            this.RaiseAndSetIfChanged(ref m_CollectionType, value);
+        }
     }
 
     public string DefaultValue
@@ -80,6 +90,7 @@ public class ConfigAttributeDetailsViewModel : ViewModelBase
     public ConfigAttributeDetailsViewModel(ConfigAttributeInfo attributeInfo)
     {
         m_AttributeInfo = attributeInfo;
+        m_CollectionType = m_AttributeInfo.CollectionType;
         Usages = new ObservableCollection<ConfigAttributeUsageViewModel>();
         foreach (var usageInfo in m_AttributeInfo.AttributeUsageInfos)
         {
@@ -142,6 +153,33 @@ public class ConfigAttributeDetailsViewModel : ViewModelBase
         }
         
         Tags.Add(new ConfigAttributeTagViewModel(m_SelectedAttributeTag, this));
+    }
+
+    #endregion
+
+    #region Private Methods
+
+    private void OnValueTypeChanged(string previousValueType, string newValueType)
+    {
+        if (string.Equals(previousValueType, newValueType))
+        {
+            return;
+        }
+
+        // if already set, ignore
+        if (!string.IsNullOrEmpty(m_CollectionType))
+        {
+            return;
+        }
+
+        var availableCollectionType = Core.Configuration.DataCollectionType;
+        if (availableCollectionType.Length == 0)
+        {
+            return;
+        }
+        
+        // auto select the first collection type for user
+        CollectionType = availableCollectionType[0];
     }
 
     #endregion
