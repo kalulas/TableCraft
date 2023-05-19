@@ -51,6 +51,8 @@ public class MainWindowViewModel : ViewModelBase
         get => m_ExportCodePath;
         set => this.RaiseAndSetIfChanged(ref m_ExportCodePath, value);
     }
+    
+    public bool SaveJsonOnGenerateCode { get; set; } = true;
 
     private ConfigFileElementViewModel? m_SelectedTable;
 
@@ -136,9 +138,9 @@ public class MainWindowViewModel : ViewModelBase
     {
         AddNewTableFileCommand = ReactiveCommand.CreateFromTask(OnAddNewTableButtonClicked);
         AddNewTableFileCommand.ThrownExceptions.Subscribe(Program.HandleException);
-        SaveJsonFileCommand = ReactiveCommand.CreateFromTask(SaveJsonFileWithCurrentSelected);
+        SaveJsonFileCommand = ReactiveCommand.CreateFromTask(OnSaveJsonFileButtonClicked);
         SaveJsonFileCommand.ThrownExceptions.Subscribe(Program.HandleException);
-        GenerateCodeCommand = ReactiveCommand.CreateFromTask(GenerateCodeWithCurrentUsage);
+        GenerateCodeCommand = ReactiveCommand.CreateFromTask(OnGenerateCodeButtonClicked);
         GenerateCodeCommand.ThrownExceptions.Subscribe(Program.HandleException);
         OpenAboutWindowCommand = ReactiveCommand.CreateFromTask(OnOpenAboutWindowButtonClicked);
         OpenAboutWindowCommand.ThrownExceptions.Subscribe(Program.HandleException);
@@ -266,13 +268,13 @@ public class MainWindowViewModel : ViewModelBase
         var configInfo = listItemViewModel.GetAttributeInfo();
         SelectedAttribute = new ConfigAttributeDetailsViewModel(configInfo);
     }
-
-    private async Task SaveJsonFileWithCurrentSelected()
+    
+    private async Task<bool> SaveJsonFileWithCurrentSelected()
     {
         if (m_SelectedConfigInfo == null || m_SelectedTable == null)
         {
             Log.Error("No selected config info, cannot save json file");
-            return;
+            return false;
         }
 
         // step1 save json file
@@ -283,7 +285,7 @@ public class MainWindowViewModel : ViewModelBase
         if (!success)
         {
             Log.Error("Failed to save json file '{JsonFilePath}'", jsonFileFullPath);
-            return;
+            return false;
         }
         
         Log.Information("Saved json file '{JsonFilePath}'", jsonFileFullPath);
@@ -295,29 +297,7 @@ public class MainWindowViewModel : ViewModelBase
         
         // step3 update 'json file found' status
         m_SelectedTable.NotifyJsonFileStatusChanged();
-        
-        // step4 success message popup
-        await MessageBoxManager.ShowStandardMessageBoxDialog(MessageBoxManager.SuccessTitle,
-            $"Json file saved: '{jsonFileFullPath}'");
-    }
-
-    private async Task GenerateCodeWithCurrentUsage()
-    {
-        var outputDir = Program.GetCodeExportPath(m_ExportCodeUsage);
-        var configInfo = m_SelectedConfigInfo?.GetConfigInfo();
-        if (configInfo == null)
-        {
-            Log.Error("[MainWindowViewModel.GenerateCodeWithCurrentUsage] selected configInfo is null, exit");
-            return;
-        }
-
-        var success =
-            await ConfigManager.singleton.GenerateCodeForUsage(m_ExportCodeUsage, configInfo, outputDir);
-        var popupTitle = success ? MessageBoxManager.SuccessTitle : MessageBoxManager.ErrorTitle;
-        var popupMessage = success
-            ? $"Generation success, output directory: '{outputDir}'"
-            : "Generation failed, please refer to log for more details";
-        await MessageBoxManager.ShowStandardMessageBoxDialog(popupTitle, popupMessage);
+        return true;
     }
 
     #endregion
@@ -391,6 +371,47 @@ public class MainWindowViewModel : ViewModelBase
             $"## Learn more about TableCraft.{newLine}" +
             $"view it on [github](https://github.com/kalulas/TableCraft) {newLine}" +
             $"Author: **boming.chen / kalulas** {newLine}");
+    }
+    
+    private async Task OnSaveJsonFileButtonClicked()
+    {
+        var success = await SaveJsonFileWithCurrentSelected();
+        // final step, show message box
+        if (!success)
+        {
+            await MessageBoxManager.ShowStandardMessageBoxDialog(MessageBoxManager.ErrorTitle,
+                "Failed to save json file, please refer to log for more details");
+            return;
+        }
+        
+        var jsonFileFullPath = Path.Combine(JsonHomePath, m_SelectedTable?.GetTargetJsonFileName() ?? string.Empty);
+        await MessageBoxManager.ShowStandardMessageBoxDialog(MessageBoxManager.SuccessTitle,
+            $"Json file saved: '{jsonFileFullPath}'");
+    }
+    
+    private async Task OnGenerateCodeButtonClicked()
+    {
+        if (SaveJsonOnGenerateCode)
+        {
+            var saveJsonSuccess = await SaveJsonFileWithCurrentSelected();
+            if (!saveJsonSuccess)
+            {
+                await MessageBoxManager.ShowStandardMessageBoxDialog(MessageBoxManager.ErrorTitle,
+                    "Failed to save json file, please refer to log for more details");
+                return;
+            }
+        }
+        
+        var outputDir = Program.GetCodeExportPath(m_ExportCodeUsage);
+        var configInfo = m_SelectedConfigInfo?.GetConfigInfo();
+        // if 'ConfigInfo' is null, GenerateCodeForUsage will handle it and return false
+        var success =
+            await ConfigManager.singleton.GenerateCodeForUsage(m_ExportCodeUsage, configInfo, outputDir);
+        var popupTitle = success ? MessageBoxManager.SuccessTitle : MessageBoxManager.ErrorTitle;
+        var popupMessage = success
+            ? $"Generation success, output directory: '{outputDir}'"
+            : "Generation failed, please refer to log for more details";
+        await MessageBoxManager.ShowStandardMessageBoxDialog(popupTitle, popupMessage);
     }
 
     #endregion
