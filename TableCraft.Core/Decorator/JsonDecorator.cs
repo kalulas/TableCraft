@@ -60,6 +60,7 @@ public class JsonDecorator : IDataDecorator
             if (!configInfo.TryGetUsageInfo(usage, out var existedUsageInfo))
             {
                 Debugger.LogWarning($"[JsonDecorator.DecorateConfigUsage] Usage '{usage}' is not available under current configuration, ignore");
+                continue;
             }
 
             existedUsageInfo.ExportName = usageInfo.ExportName;
