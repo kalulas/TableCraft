@@ -2,6 +2,14 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+## [1.1.0](https://github.com/kalulas/ConfigCodeGen/compare/v1.0.1...v1.1.0) (2023-05-19)
+
+
+### Features
+
+* **editor:** add a save-on-generate toggle above button group ([d754beb](https://github.com/kalulas/ConfigCodeGen/commit/d754beb04b4063e6879be37b227f77c7d54bf05d))
+* **editor:** auto select the first collection type on select value type ([35871e5](https://github.com/kalulas/ConfigCodeGen/commit/35871e560b6322ccdefcad471c1cd14ebffa9dfd))
+
 ### [1.0.1](https://github.com/kalulas/ConfigCodeGen/compare/v1.0.0...v1.0.1) (2023-05-19)
 
 
