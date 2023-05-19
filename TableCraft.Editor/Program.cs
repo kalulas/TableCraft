@@ -10,6 +10,7 @@ using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 using Serilog;
+using TableCraft.Core.IO;
 using TableCraft.Core.VersionControl;
 using TableCraft.Editor.Services;
 
@@ -181,13 +182,23 @@ class Program
         // overwrite or create new configuration, update appsettings.json
         appSettingsJsonData["P4Config"] = p4ConfigJsonData;
         
-        var writer = new JsonWriter
+        try
         {
-            PrettyPrint = true
-        };
+            var writer = new JsonWriter
+            {
+                PrettyPrint = true
+            };
 
-        appSettingsJsonData.ToJson(writer);
-        await Core.IO.FileHelper.WriteAsync(appSettingsFilePath, writer.ToString());
+            appSettingsJsonData.ToJson(writer);
+            await FileHelper.WriteAsync(appSettingsFilePath, writer.ToString());
+        }
+        catch (UnauthorizedAccessException exception)
+        {
+            await MessageBoxManager.ShowStandardMessageBoxDialog("UnauthorizedAccessException",
+                $"Failed to write '{appSettingsFilePath}', checkout the file yourself if you're using Perforce \n\nstack trace:\n{exception}");
+            return false;
+        }
+        
         return true;
     }
 
