@@ -2,6 +2,14 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+### [1.0.1](https://github.com/kalulas/ConfigCodeGen/compare/v1.0.0...v1.0.1) (2023-05-19)
+
+
+### Bug Fixes
+
+* **core:** fix the NullReferenceException if ConfigJson contains illegal usage ([5caf48a](https://github.com/kalulas/ConfigCodeGen/commit/5caf48ab64e2c587448041ec15918bb1973d5799))
+* **editor:** handle UnauthorizedAccessException on UpdateVersionControlConfig ([94c74e2](https://github.com/kalulas/ConfigCodeGen/commit/94c74e22350316dc8a41ee2bded52694dea59d63))
+
 ## [1.0.0](https://github.com/Kalulas/TableCraft/compare/v0.4.0-alpha...v1.0.0) (2023-05-15)
 
 
