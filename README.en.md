@@ -61,7 +61,14 @@ To use the runtime library TableCraft.Core, you need to configure the `libenv.js
             // The format string of the generated file name, if this string contains a file type, it will be replaced by TargetFileType
             "OutputFormat": "{0}_base"
         }
-     }
+     },
+    // Specify group to support exporting multiple files for each usage
+    "ConfigUsageGroup":{
+        "group0":[
+            "usage0",
+            "usage1"
+        ]
+    }
 }
 ```
 

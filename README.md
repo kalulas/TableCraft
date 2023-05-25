@@ -63,6 +63,13 @@ TableCraft是一个通用、可拓展的解析配置源文件，生成配置描�
             // 生成文件名的格式字符串，若此字符串中包含文件类型，将被TargetFileType替换
             "OutputFormat": "{0}_base"
         }
+    },
+    // 导出途径组，用于同时导出多种途径
+    "ConfigUsageGroup":{
+        "group0":[
+        	"usage0",
+        	"usage1"
+        ]
     }
 }
 ```
