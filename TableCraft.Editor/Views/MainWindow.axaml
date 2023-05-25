@@ -46,7 +46,7 @@
                 <StackPanel
                     IsEnabled="{Binding SelectedConfigInfo, Converter={x:Static ObjectConverters.IsNotNull}}"
                     VerticalAlignment="Center">
-                    <ComboBox Items="{x:Static lib:Configuration.ConfigUsageType}" 
+                    <ComboBox Items="{Binding ExportMethods}" 
                               SelectedItem="{Binding ExportCodeUsage}" Width="150">
                     </ComboBox>
                 </StackPanel>
@@ -69,8 +69,13 @@
             </StackPanel>
         
             <TextBlock HorizontalAlignment="Right"
-                       IsVisible="{Binding ExportCodeUsage, Converter={x:Static StringConverters.IsNotNullOrEmpty}}"
+                       IsVisible="{Binding IsExportUsageSelected}"
                        Text="{Binding ExportCodePath, StringFormat='Target: {0}'}">
+            </TextBlock>
+            
+            <TextBlock HorizontalAlignment="Right"
+                       IsVisible="{Binding IsExportGroupSelected}"
+                       Text="{Binding ExportGroupDesc, StringFormat='Group: {0}'}">
             </TextBlock>
         </StackPanel>
         

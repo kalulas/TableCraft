@@ -34,12 +34,18 @@ public class MainWindowViewModel : ViewModelBase
 
     private string m_ExportCodeUsage = string.Empty;
 
+    /// <summary>
+    /// ExportCodeUsage could be a single usage, or a usage group contains multiple usages
+    /// </summary>
     public string ExportCodeUsage
     {
         get => m_ExportCodeUsage;
         set
         {
             this.RaiseAndSetIfChanged(ref m_ExportCodeUsage, value);
+            this.RaisePropertyChanged(nameof(IsExportUsageSelected));
+            this.RaisePropertyChanged(nameof(IsExportGroupSelected));
+            
             OnExportCodeUsageChanged();
         }
     }
@@ -51,6 +57,18 @@ public class MainWindowViewModel : ViewModelBase
         get => m_ExportCodePath;
         set => this.RaiseAndSetIfChanged(ref m_ExportCodePath, value);
     }
+
+    private string m_ExportGroupDesc = string.Empty;
+
+    public string ExportGroupDesc
+    {
+        get => m_ExportGroupDesc;
+        set => this.RaiseAndSetIfChanged(ref m_ExportGroupDesc, value);
+    }
+
+    public bool IsExportUsageSelected => !string.IsNullOrEmpty(ExportCodeUsage) && Configuration.IsDefinedUsage(ExportCodeUsage);
+    
+    public bool IsExportGroupSelected => !string.IsNullOrEmpty(ExportCodeUsage) && Configuration.IsDefinedUsageGroup(ExportCodeUsage);
     
     public bool SaveJsonOnGenerateCode { get; set; } = true;
 
@@ -84,6 +102,22 @@ public class MainWindowViewModel : ViewModelBase
     {
         get => m_SelectedAttribute;
         set => this.RaiseAndSetIfChanged(ref m_SelectedAttribute, value);
+    }
+
+    /// <summary>
+    /// Contains all export methods containing [UsageGroup ..., Usage ...]
+    /// </summary>
+    public static string[] ExportMethods
+    {
+        get
+        {
+            var groups = Configuration.ConfigUsageGroupNames;
+            var usages = Configuration.ConfigUsageType;
+            var methods = new string[groups.Length + usages.Length];
+            Array.Copy(groups, methods, groups.Length);
+            Array.Copy(usages, 0, methods, groups.Length, usages.Length);
+            return methods;
+        }
     }
 
     #endregion
@@ -157,14 +191,14 @@ public class MainWindowViewModel : ViewModelBase
 
     private void UpdateSelectedExportCodeUsage()
     {
-        var usages = Configuration.ConfigUsageType;
-        if (usages.Length == 0)
+        var methods = ExportMethods;
+        if (methods.Length == 0)
         {
             ExportCodeUsage = string.Empty;
             return;
         }
 
-        ExportCodeUsage = usages[0]; // default selection
+        ExportCodeUsage = methods[0]; // default selection
     }
     
     private async Task FlushTableListToDatabase()
@@ -344,10 +378,21 @@ public class MainWindowViewModel : ViewModelBase
     
     private void OnExportCodeUsageChanged()
     {
-        var codeExportHomePath = Program.GetCodeExportPath(m_ExportCodeUsage);
-        ExportCodePath = SelectedConfigInfo != null
-            ? Path.Combine(codeExportHomePath, Configuration.GetTargetFilenameForUsage(m_ExportCodeUsage, SelectedConfigInfo.GetConfigInfo()))
-            : codeExportHomePath;
+        var isUsageGroup = Configuration.IsDefinedUsageGroup(m_ExportCodeUsage);
+        if (!isUsageGroup) // single usage
+        {
+            var codeExportHomePath = Program.GetCodeExportPath(m_ExportCodeUsage);
+            ExportCodePath = SelectedConfigInfo != null
+                ? Path.Combine(codeExportHomePath, Configuration.GetTargetFilenameForUsage(m_ExportCodeUsage, SelectedConfigInfo.GetConfigInfo()))
+                : codeExportHomePath;
+        }
+        else // usageGroup
+        {
+            var usages = Configuration.GetUsagesForGroup(m_ExportCodeUsage);
+            var groupUsagesDesc = string.Join(", ", usages);
+            ExportGroupDesc = groupUsagesDesc;
+        }
+
     }
 
     private async Task OnOpenPerforceWindowButtonClicked()
@@ -401,15 +446,33 @@ public class MainWindowViewModel : ViewModelBase
                 return;
             }
         }
-        
-        var outputDir = Program.GetCodeExportPath(m_ExportCodeUsage);
+
+        bool success;
         var configInfo = m_SelectedConfigInfo?.GetConfigInfo();
-        // if 'ConfigInfo' is null, GenerateCodeForUsage will handle it and return false
-        var success =
-            await ConfigManager.singleton.GenerateCodeForUsage(m_ExportCodeUsage, configInfo, outputDir);
+        var isUsageGroup = Configuration.IsDefinedUsageGroup(m_ExportCodeUsage);
+        if (!isUsageGroup)
+        {
+            var outputDir = Program.GetCodeExportPath(m_ExportCodeUsage);
+            // if 'ConfigInfo' is null, GenerateCodeForUsage will handle it and return false
+            success =
+                await ConfigManager.singleton.GenerateCodeForUsage(m_ExportCodeUsage, configInfo, outputDir);
+        }
+        else
+        {
+            var usages = Configuration.GetUsagesForGroup(m_ExportCodeUsage);
+            var outputDirectories = new string[usages.Length];
+            for (var i = 0; i < usages.Length; i++)
+            {
+                outputDirectories[i] = Program.GetCodeExportPath(usages[i]);
+            }
+            
+            // generate multiple code files for each usage
+            success = await ConfigManager.singleton.GenerateCodeForUsageGroup(m_ExportCodeUsage, configInfo, outputDirectories);
+        }
+        
         var popupTitle = success ? MessageBoxManager.SuccessTitle : MessageBoxManager.ErrorTitle;
         var popupMessage = success
-            ? $"Generation success, output directory: '{outputDir}'"
+            ? "Generation finished"
             : "Generation failed, please refer to log for more details";
         await MessageBoxManager.ShowStandardMessageBoxDialog(popupTitle, popupMessage);
     }
