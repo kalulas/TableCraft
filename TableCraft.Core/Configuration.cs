@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.IO;
+using System.Linq;
 using System.Text;
 using LitJson;
 using TableCraft.Core.ConfigElements;
@@ -30,7 +31,23 @@ namespace TableCraft.Core
             /// </summary>
             public string OutputFormat { get; set; }
         }
-        
+
+        /// <summary>
+        /// A ConfigUsageGroup contains a group of ConfigUsageInformation
+        /// </summary>
+        private class ConfigUsageGroup
+        {
+            public string GroupName { get; private set; }
+            public string[] Usages { get; }
+
+            public ConfigUsageGroup(string name, string[] usages)
+            {
+                GroupName = name;
+                Usages = new string[usages.Length];
+                Array.Copy(usages, Usages, usages.Length);
+            }
+        }
+
         public static string CodeTemplatePath { get; private set; }
 
         public static bool UseUTF8WithBOM { get; private set; } = true;
@@ -40,6 +57,16 @@ namespace TableCraft.Core
         public static string[] DataCollectionType => m_DataCollectionType.ToArray();
 
         public static string[] ConfigUsageType => m_ConfigUsageType.ToArray();
+        
+        public static string[] ConfigUsageGroupNames
+        {
+            get
+            {
+                var keyArr = m_ConfigUsageGroups.Keys.ToArray();
+                Array.Sort(keyArr); // alphabet order
+                return keyArr;
+            }
+        }
 
         public static string[] AttributeTag => m_AttributeTag.ToArray();
 
@@ -60,6 +87,8 @@ namespace TableCraft.Core
         /// define usages like 'client', 'server'
         /// </summary>
         private static readonly List<string> m_ConfigUsageType = new();
+        
+        private static readonly Dictionary<string, ConfigUsageGroup> m_ConfigUsageGroups = new();
 
         private static readonly List<string> m_AttributeTag = new();
 
@@ -102,6 +131,32 @@ namespace TableCraft.Core
             m_UsageToInformation.Add(usage, JsonMapper.ToObject<ConfigUsageInformation>(information.ToJson()));
         }
 
+        private static void AddConfigUsageGroup(string groupName, JsonData groupJsonData)
+        {
+            if (m_ConfigUsageGroups.ContainsKey(groupName))
+            {
+                Debugger.LogWarning("[Configuration.AddConfigUsageGroup] group \'{0}\' is already defined.", groupName);
+                return;
+            }
+            
+            // groupJsonData is array of usage string
+            var usages = new string[groupJsonData.Count];
+            for (var i = 0; i < groupJsonData.Count; i++)
+            {
+                var definedUsage = (string)groupJsonData[i];
+                if (!m_ConfigUsageType.Contains(definedUsage))
+                {
+                    throw new Exception(
+                        $"[Configuration.AddConfigUsageGroup] usage {definedUsage} of group {groupName} is not defined in `ConfigUsageType`");
+                }
+                
+                usages[i] = (string)groupJsonData[i];
+            }
+
+            var newUsageGroup = new ConfigUsageGroup(groupName, usages);
+            m_ConfigUsageGroups[groupName] = newUsageGroup; // override
+        }
+
         /// <summary>
         /// execute only once
         /// </summary>
@@ -133,6 +188,13 @@ namespace TableCraft.Core
                 var usage = (KeyValuePair<string,JsonData>)usageConfig;
                 AddConfigUsageType(usage.Key, usage.Value);
             }
+            
+            m_ConfigUsageGroups.Clear();
+            foreach (var groupConfig in configData["ConfigUsageGroup"])
+            {
+                var groupDefine = (KeyValuePair<string,JsonData>)groupConfig;
+                AddConfigUsageGroup(groupDefine.Key, groupDefine.Value);
+            }
 
             m_IsInited = true;
             m_LibEnvJsonData = configData;
@@ -161,6 +223,16 @@ namespace TableCraft.Core
         }
 
         #region Validation
+
+        public static bool IsDefinedUsageGroup(string groupName)
+        {
+            return m_ConfigUsageGroups.ContainsKey(groupName);
+        }
+
+        public static bool IsDefinedUsage(string usageName)
+        {
+            return IsUsageValid(usageName);
+        }
 
         internal static bool IsValueTypeValid(string valueType)
         {
@@ -240,6 +312,11 @@ namespace TableCraft.Core
             
             var outputFileName = Path.ChangeExtension(exportName, outputExtension);
             return outputFileName;
+        }
+
+        public static string[] GetUsagesForGroup(string groupName)
+        {
+            return !m_ConfigUsageGroups.ContainsKey(groupName) ? Array.Empty<string>() : m_ConfigUsageGroups[groupName].Usages;
         }
         
         private static string GetOutputFormatForUsage(string usage)

@@ -140,6 +140,56 @@ namespace TableCraft.Core
             return success;
         }
 
+        /// <summary>
+        /// Generate code for every usage under specific usage group to <paramref name="outputDirectories"/>
+        /// </summary>
+        /// <param name="groupName"></param>
+        /// <param name="configInfo"></param>
+        /// <param name="outputDirectories"> directories which follow the same order with usage group declaration </param>
+        /// <returns></returns>
+        /// <exception cref="ArgumentNullException"></exception>
+        public async Task<bool> GenerateCodeForUsageGroup(string groupName, ConfigInfo configInfo,
+            string[] outputDirectories)
+        {
+            if (configInfo == null)
+            {
+                Debugger.LogWarning($"[ConfigManager.GenerateCodeForUsageGroup] {nameof(configInfo)} is null");
+                return false;
+            }
+
+            if (outputDirectories == null)
+            {
+                Debugger.LogWarning($"[ConfigManager.GenerateCodeForUsageGroup] {nameof(outputDirectories)} is null");
+                return false;
+            }
+
+            if (!Configuration.IsDefinedUsageGroup(groupName))
+            {
+                Debugger.LogWarning($"[ConfigManager.GenerateCodeForUsageGroup] usage group '{groupName}' is not defined");
+                return false;
+            }
+            
+            var usages = Configuration.GetUsagesForGroup(groupName);
+            if (outputDirectories.Length != usages.Length)
+            {
+                Debugger.LogError(
+                    $"[ConfigManager.GenerateCodeForUsageGroup] outputDirectories length {outputDirectories.Length} not match usages length {usages.Length}");
+                return false;
+            }
+
+            var generateCodeTaskArr = new Task[usages.Length];
+            for (var i = 0; i < usages.Length; i++)
+            {
+                var usage = usages[i];
+                var outputDirectory = outputDirectories[i];
+                generateCodeTaskArr[i] = GenerateCodeForUsage(usage, configInfo, outputDirectory);
+            }
+
+            // run all tasks parallel
+            await Task.WhenAll(generateCodeTaskArr);
+            return true;
+        }
+        
         #endregion
     }
 }
