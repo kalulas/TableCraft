@@ -116,9 +116,9 @@ Before following the steps below, please ensure that the two JSON files mentione
 ![image-20230504223332644](https://s2.loli.net/2023/05/04/J8R2q1uhjpsDGoz.png)
 
 6. After selecting a specific field, you can edit its description (comment), data type, collection type, default value, export name under specific usage (often used for variable names with different naming styles), and add tags here.
-7. Specify target usage for generated files.
-8. Click this button to export files (export path is shown below button).
-9.Click this button to save data description file to "JsonHome".
+7. Specify target usage, or a usage group for generated files.
+8. Click this button to export files (if a target usage is selected, export path is shown below button).
+9. Click this button to save data description file to "JsonHome".
 
 ## Third-party dependencies
 
