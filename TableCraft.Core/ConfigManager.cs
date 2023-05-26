@@ -1,5 +1,6 @@
 ﻿using System;
 using System.IO;
+using System.Linq;
 using System.Threading.Tasks;
 using Mono.TextTemplating;
 using TableCraft.Core.ConfigElements;
@@ -177,7 +178,7 @@ namespace TableCraft.Core
                 return false;
             }
 
-            var generateCodeTaskArr = new Task[usages.Length];
+            var generateCodeTaskArr = new Task<bool>[usages.Length];
             for (var i = 0; i < usages.Length; i++)
             {
                 var usage = usages[i];
@@ -186,8 +187,9 @@ namespace TableCraft.Core
             }
 
             // run all tasks parallel
-            await Task.WhenAll(generateCodeTaskArr);
-            return true;
+            var result = await Task.WhenAll(generateCodeTaskArr);
+            // return true only if all true
+            return result.All(ret => ret);
         }
         
         #endregion

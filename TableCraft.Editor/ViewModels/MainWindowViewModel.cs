@@ -472,7 +472,7 @@ public class MainWindowViewModel : ViewModelBase
         
         var popupTitle = success ? MessageBoxManager.SuccessTitle : MessageBoxManager.ErrorTitle;
         var popupMessage = success
-            ? "Generation finished"
+            ? "Generation successfully finished"
             : "Generation failed, please refer to log for more details";
         await MessageBoxManager.ShowStandardMessageBoxDialog(popupTitle, popupMessage);
     }
