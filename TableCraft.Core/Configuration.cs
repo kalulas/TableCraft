@@ -147,7 +147,7 @@ namespace TableCraft.Core
                 if (!m_ConfigUsageType.Contains(definedUsage))
                 {
                     throw new Exception(
-                        $"[Configuration.AddConfigUsageGroup] usage {definedUsage} of group {groupName} is not defined in `ConfigUsageType`");
+                        $"usage '{definedUsage}' of group '{groupName}' is not defined in `ConfigUsageType`");
                 }
                 
                 usages[i] = (string)groupJsonData[i];
@@ -190,10 +190,15 @@ namespace TableCraft.Core
             }
             
             m_ConfigUsageGroups.Clear();
-            foreach (var groupConfig in configData["ConfigUsageGroup"])
+            const string configUsageGroupKey = "ConfigUsageGroup";
+            // config usage group is optional
+            if (configData.ContainsKey(configUsageGroupKey) && configData[configUsageGroupKey].IsObject)
             {
-                var groupDefine = (KeyValuePair<string,JsonData>)groupConfig;
-                AddConfigUsageGroup(groupDefine.Key, groupDefine.Value);
+                foreach (var groupConfig in configData[configUsageGroupKey])
+                {
+                    var groupDefine = (KeyValuePair<string,JsonData>)groupConfig;
+                    AddConfigUsageGroup(groupDefine.Key, groupDefine.Value);
+                }
             }
 
             m_IsInited = true;
