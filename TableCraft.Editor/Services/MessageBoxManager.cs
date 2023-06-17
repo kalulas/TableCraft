@@ -21,7 +21,8 @@ public static class MessageBoxManager
 {
     public const string ErrorTitle = "Error";
     public const string SuccessTitle = "Success";
-    public const float StandardPopupHeight = 180.0f;
+    private const float m_StandardPopupWidth = 300.0f;
+    private const float m_StandardPopupHeight = 180.0f;
     
     public static Window? GetMainWindow()
     {
@@ -42,7 +43,8 @@ public static class MessageBoxManager
                 ContentTitle = title,
                 ContentMessage = message,
                 WindowStartupLocation = WindowStartupLocation.CenterScreen,
-                MinHeight = StandardPopupHeight
+                MinWidth = m_StandardPopupWidth,
+                MinHeight = m_StandardPopupHeight
             });
         
         await messageBox.Show();
@@ -63,7 +65,8 @@ public static class MessageBoxManager
                 ContentTitle = title,
                 ContentMessage = message,
                 WindowStartupLocation = WindowStartupLocation.CenterScreen,
-                MinHeight = StandardPopupHeight
+                MinWidth = m_StandardPopupWidth,
+                MinHeight = m_StandardPopupHeight
             });
 
         await messageBox.ShowDialog(mainWindow);
@@ -84,7 +87,8 @@ public static class MessageBoxManager
                 ContentTitle = title,
                 ContentMessage = message,
                 WindowStartupLocation = WindowStartupLocation.CenterScreen,
-                MinHeight = StandardPopupHeight
+                MinWidth = m_StandardPopupWidth,
+                MinHeight = m_StandardPopupHeight
             });
 
         await messageBox.ShowDialog(mainWindow);
