@@ -79,6 +79,7 @@ namespace TableCraft.Core.Generation
             Imports.Add("System.Collections.Generic");
             Imports.Add("TableCraft.Core.ConfigElements");
             Imports.Add("TableCraft.Core"); // now you can use Debugger and other stuff in the template, but maybe Debugger to another namespace?
+            Imports.Add("TableCraft.Core.Generation");
             
             PrepareParameters();
         }
@@ -99,6 +100,24 @@ namespace TableCraft.Core.Generation
             }
 
             return !Errors.HasErrors;
+        }
+
+        /// <summary>
+        /// Export absolute path of the output file to the template file
+        /// </summary>
+        /// <returns></returns>
+        public string GetOutputPathInternal()
+        {
+            return OutputFile;
+        }
+        
+        /// <summary>
+        /// Provide a not recommended way to hack the output path
+        /// </summary>
+        /// <param name="path"></param>
+        public void SetOutputPathInternal(string path)
+        {
+            OutputFile = path;
         }
 
         #endregion
