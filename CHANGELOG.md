@@ -2,6 +2,21 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+## [1.2.0](https://github.com/kalulas/TableCraft/compare/v1.1.0...v1.2.0) (2023-06-17)
+
+
+### Features
+
+* **core:** provide new Generator's API to get/set the output file path(not recommended) ([0398c7b](https://github.com/kalulas/TableCraft/commit/0398c7bfbe2c8ed196c2b3e611978b04322d3b33))
+* **core:** usage group configuration / export support ([d4cf515](https://github.com/kalulas/TableCraft/commit/d4cf515363ab7dc861a6d2ccf014dfbb7c288db6))
+* **editor:** usage group information / export support ([88e622d](https://github.com/kalulas/TableCraft/commit/88e622d2297cffc7096b42845e1db776ee8b19dd))
+
+
+### Bug Fixes
+
+* **core/editor:** usage group export changes ([543f89d](https://github.com/kalulas/TableCraft/commit/543f89d76b35bcf36cd2ddea80b7035c1a2eed55))
+* **core:** optimize error log / change usage group to optional ([71decdd](https://github.com/kalulas/TableCraft/commit/71decdd8bf938bc6787c31dde7a831c9db0072a8))
+
 ## [1.1.0](https://github.com/kalulas/ConfigCodeGen/compare/v1.0.1...v1.1.0) (2023-05-19)
 
 
