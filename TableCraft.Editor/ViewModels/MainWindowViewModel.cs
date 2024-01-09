@@ -6,6 +6,7 @@ using System.Reactive;
 using System.Reactive.Linq;
 using System.Threading.Tasks;
 using Avalonia.Controls;
+using Avalonia.Input;
 using TableCraft.Core;
 using TableCraft.Editor.Models;
 using TableCraft.Editor.Services;
@@ -71,6 +72,10 @@ public class MainWindowViewModel : ViewModelBase
     public bool IsExportGroupSelected => !string.IsNullOrEmpty(ExportCodeUsage) && Configuration.IsDefinedUsageGroup(ExportCodeUsage);
     
     public bool SaveJsonOnGenerateCode { get; set; } = true;
+    
+    #region Tables and Selections
+
+    public ObservableCollection<ConfigFileElementViewModel>? TableList { get; private set; }
 
     private ConfigFileElementViewModel? m_SelectedTable;
 
@@ -82,8 +87,6 @@ public class MainWindowViewModel : ViewModelBase
         get => m_SelectedTable;
         set => this.RaiseAndSetIfChanged(ref m_SelectedTable, value);
     }
-    
-    public ObservableCollection<ConfigFileElementViewModel>? TableList { get; private set; }
 
     private ConfigInfoViewModel? m_SelectedConfigInfo;
 
@@ -103,6 +106,8 @@ public class MainWindowViewModel : ViewModelBase
         get => m_SelectedAttribute;
         set => this.RaiseAndSetIfChanged(ref m_SelectedAttribute, value);
     }
+
+    #endregion
 
     /// <summary>
     /// Contains all export methods containing [UsageGroup ..., Usage ...]
@@ -132,6 +137,8 @@ public class MainWindowViewModel : ViewModelBase
     public Interaction<PerforceUserConfigViewModel, PerforceUserConfigViewModel?> ShowPerforceWindow { get; }
     public EventHandler<SelectionChangedEventArgs>? SelectedTableChangedEventHandler { get; private set; }
     public EventHandler<SelectionChangedEventArgs>? SelectedAttributeChangedEventHandler { get; private set; }
+    
+    public EventHandler<TextInputEventArgs>? TableListSearchBoxChangedEventHandler { get; private set; }
 
     #endregion
 
@@ -182,6 +189,7 @@ public class MainWindowViewModel : ViewModelBase
         OpenPerforceWindowCommand.ThrownExceptions.Subscribe(Program.HandleException);
         SelectedTableChangedEventHandler = OnSelectedTableChanged;
         SelectedAttributeChangedEventHandler = OnSelectedAttributeChanged;
+        TableListSearchBoxChangedEventHandler = OnTableListSearchBoxChanged;
     }
 
     private void CancelSelectedAttribute()
@@ -374,6 +382,11 @@ public class MainWindowViewModel : ViewModelBase
         var selected = e.AddedItems.Count > 0 ? e.AddedItems[0] : null;
         var selectedListItem = selected as ConfigAttributeListItemViewModel;
         UpdateSelectedAttributeWithListItem(selectedListItem);
+    }
+    
+    private void OnTableListSearchBoxChanged(object? sender, TextInputEventArgs e)
+    {
+        var input = e.Text;
     }
     
     private void OnExportCodeUsageChanged()

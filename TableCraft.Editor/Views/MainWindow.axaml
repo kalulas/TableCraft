@@ -46,7 +46,7 @@
                 <StackPanel
                     IsEnabled="{Binding SelectedConfigInfo, Converter={x:Static ObjectConverters.IsNotNull}}"
                     VerticalAlignment="Center">
-                    <ComboBox Items="{Binding ExportMethods}" 
+                    <ComboBox ItemsSource="{Binding ExportMethods}" 
                               SelectedItem="{Binding ExportCodeUsage}" Width="150">
                     </ComboBox>
                 </StackPanel>
@@ -96,9 +96,9 @@
                 </TextBlock>
 
                 <ListBox Grid.Row="1"
-                    Items="{Binding TableList}" 
-                    SelectedItem="{Binding SelectedTable}"
-                    SelectionChanged="SelectingTableItemsControl_OnSelectionChanged">
+                         ItemsSource="{Binding TableList}" 
+                         SelectedItem="{Binding SelectedTable}"
+                         SelectionChanged="SelectingTableItemsControl_OnSelectionChanged">
                 </ListBox>
                 
                 <WrapPanel Grid.Row="2" HorizontalAlignment="Right" Margin="0 10 0 0">
@@ -112,7 +112,7 @@
                 <TextBlock Grid.Row="0" FontSize="20"> Attributes </TextBlock>
                 <ListBox Grid.Row="1"
                     IsVisible="{Binding SelectedConfigInfo, Converter={x:Static ObjectConverters.IsNotNull}}"
-                    Items="{Binding SelectedConfigInfo.Attributes}"
+                    ItemsSource="{Binding SelectedConfigInfo.Attributes}"
                     SelectionChanged="SelectingAttributeItemsControl_OnSelectionChanged">
                 </ListBox>
             </Grid>
