@@ -50,7 +50,7 @@
     </Content>
   </ItemGroup>
 
-  <ItemGroup>
-    <ReferencePathWithRefAssemblies Update="C:\Users\Kalulas\.nuget\packages\markdown.avalonia.tight\0.10.11\lib\net461\Markdown.Avalonia.dll" />
-  </ItemGroup>
+<!--  <ItemGroup>-->
+<!--    <ReferencePathWithRefAssemblies Update="C:\Users\Kalulas\.nuget\packages\markdown.avalonia.tight\0.10.11\lib\net461\Markdown.Avalonia.dll" />-->
+<!--  </ItemGroup>-->
 </Project>
