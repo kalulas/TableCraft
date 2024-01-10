@@ -16,14 +16,17 @@ public partial class MainWindow : ReactiveWindow<MainWindowViewModel>
 
     private void SelectingTableItemsControl_OnSelectionChanged(object? sender, SelectionChangedEventArgs e)
     {
-        var viewModel = DataContext as MainWindowViewModel;
-        viewModel?.SelectedTableChangedEventHandler?.Invoke(sender, e);
+        ViewModel?.SelectedTableChangedEventHandler?.Invoke(sender, e);
     }
 
     private void SelectingAttributeItemsControl_OnSelectionChanged(object? sender, SelectionChangedEventArgs e)
     {
-        var viewModel = DataContext as MainWindowViewModel;
-        viewModel?.SelectedAttributeChangedEventHandler?.Invoke(sender, e);
+        ViewModel?.SelectedAttributeChangedEventHandler?.Invoke(sender, e);
+    }
+    
+    private void TableListInputSearchBox_OnTextChanged(object? sender, TextChangedEventArgs e)
+    {
+        ViewModel?.TableListSearchBoxTextChangedEventHandler?.Invoke(sender, e);
     }
     
     private async Task DoShowDialogAsync(InteractionContext<PerforceUserConfigViewModel, PerforceUserConfigViewModel?> interaction)

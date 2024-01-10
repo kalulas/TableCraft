@@ -1,7 +1,6 @@
 ﻿using System;
 using TableCraft.Editor.Models;
 using System.IO;
-using TableCraft.Core.ConfigElements;
 using ReactiveUI;
 
 namespace TableCraft.Editor.ViewModels;
@@ -49,4 +48,13 @@ public class ConfigFileElementViewModel : ViewModelBase
     {
         this.RaisePropertyChanged(nameof(IsJsonDescriptionFound));
     }
+
+    #region Sorting
+
+    public static int SortByRelativePath(ConfigFileElementViewModel elementA, ConfigFileElementViewModel elementB)
+    {
+        return string.Compare(elementA.ConfigFileRelativePath, elementB.ConfigFileRelativePath, StringComparison.Ordinal);
+    }
+
+    #endregion
 }
