@@ -6,7 +6,6 @@
 #endregion
 
 using System.Collections.ObjectModel;
-using System.IO;
 using TableCraft.Core;
 using TableCraft.Core.ConfigElements;
 using ReactiveUI;

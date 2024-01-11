@@ -6,15 +6,12 @@ using System.Reactive;
 using System.Reactive.Linq;
 using System.Threading.Tasks;
 using Avalonia.Controls;
-using Avalonia.Input;
-using DynamicData;
 using FuzzySharp;
 using TableCraft.Core;
 using TableCraft.Editor.Models;
 using TableCraft.Editor.Services;
 using ReactiveUI;
 using Serilog;
-using Serilog.Core;
 using TableCraft.Editor.Extensions;
 using Path = System.IO.Path;
 
