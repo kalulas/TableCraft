@@ -6,6 +6,7 @@ using System.Reactive;
 using System.Reactive.Linq;
 using System.Threading.Tasks;
 using Avalonia.Controls;
+using Avalonia.Platform.Storage;
 using FuzzySharp;
 using TableCraft.Core;
 using TableCraft.Editor.Models;
@@ -21,8 +22,12 @@ public class MainWindowViewModel : ViewModelBase
 {
     #region Fields
 
+    private const string m_FilePickerWindowTitle = "Pick your table file";
+    
+    private static readonly FilePickerFileType m_DataSourceType = new("sources")
+        {Patterns = Configuration.GetDataSourceExtensions().Select(extension => $"*.{extension}").ToArray()};
+    
     private readonly FakeDatabase m_Database;
-    private readonly List<FileDialogFilter> m_NewTableFileFilters = new();
     /// <summary>
     /// ConfigFileRelativeFilePath -> ConfigInfoViewModel, create on selected
     /// </summary>
@@ -159,23 +164,9 @@ public class MainWindowViewModel : ViewModelBase
     public MainWindowViewModel(FakeDatabase db)
     {
         m_Database = db;
-        AppendNewTableFileFilter();
         CreateSubViewModels(db);
         CreateCommands();
         ShowPerforceWindow = new Interaction<PerforceUserConfigViewModel, PerforceUserConfigViewModel?>();
-    }
-
-    private void AppendNewTableFileFilter()
-    {
-        var extensions = new List<string>(Configuration.GetDataSourceExtensions());
-        
-        var fileFilter = new FileDialogFilter
-        {
-            Extensions = extensions,
-            Name = "Data Sources",
-        };
-
-        m_NewTableFileFilters.Add(fileFilter);
     }
 
     private void CreateSubViewModels(FakeDatabase fakeDatabase)
@@ -231,11 +222,18 @@ public class MainWindowViewModel : ViewModelBase
     private async Task AddNewSelectedTableFile(string newTableFilePath)
     {
         var tableFileRelative = Path.GetRelativePath(ConfigHomePath, newTableFilePath);
-        // var tableFileRelative = PathExtend.MakeRelativePath(ConfigHomePath + Path.DirectorySeparatorChar, newTableFilePath);
+        // don't share the same root
+        if (string.Equals(tableFileRelative, newTableFilePath))
+        {
+            await MessageBoxManager.ShowStandardMessageBoxDialog(MessageBoxManager.ErrorTitle,
+                $"Selected table file: '{newTableFilePath}' is not under config home path '{ConfigHomePath}'!");
+            return;
+        }
+        
         if (TableList.Any(elementViewModel => elementViewModel.ConfigFileRelativePath == tableFileRelative))
         {
             await MessageBoxManager.ShowStandardMessageBoxDialog(MessageBoxManager.ErrorTitle,
-                $"Config file already existed: '{tableFileRelative}', ignore");
+                $"Table file already existed: '{tableFileRelative}'!");
             return;
         }
         
@@ -393,25 +391,28 @@ public class MainWindowViewModel : ViewModelBase
 
     private async Task OnAddNewTableButtonClicked()
     {
-        var dialog = new OpenFileDialog
-        {
-            Directory = ConfigHomePath,
-            Filters = m_NewTableFileFilters,
-            AllowMultiple = false
-        };
-        
         var mainWindow = MessageBoxManager.GetMainWindow();
         if (mainWindow == null)
         {
             return;
         }
         
-        var result = await dialog.ShowAsync(mainWindow);
-        if (result != null)
+        var folder = await mainWindow.StorageProvider.TryGetFolderFromPathAsync(ConfigHomePath);
+        var options = new FilePickerOpenOptions
         {
-            var selected = result[0];
-            Log.Information("Selected file from dialog: '{SelectedFile}'", selected);
-            await AddNewSelectedTableFile(selected);
+            Title = m_FilePickerWindowTitle,
+            SuggestedStartLocation = folder,
+            FileTypeFilter = new[] {m_DataSourceType},
+            AllowMultiple = false
+        };
+        
+        var results = await mainWindow.StorageProvider.OpenFilePickerAsync(options);
+        if (results.Count != 0)
+        {
+            var selected = results[0];
+            Log.Information("Selected table file from dialog: '{SelectedFile}'", selected.Path.LocalPath);
+            // use Path.LocalPath instead of Path.AbsolutePath, for Path.LocalPath is a local operating-system presentation(windows: '\' separator)
+            await AddNewSelectedTableFile(selected.Path.LocalPath);
         }
     }
 
