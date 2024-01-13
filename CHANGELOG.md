@@ -2,6 +2,18 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+## [1.3.0](https://github.com/kalulas/TableCraft/compare/v1.2.0...v1.3.0) (2024-01-13)
+
+
+### Features
+
+* **editor:** add a fuzzy search box for table list ([8a50e84](https://github.com/kalulas/TableCraft/commit/8a50e84aad94840271d0c0bf57908c46078bf226))
+
+
+### Bug Fixes
+
+* **editor:** remove a absolute reference path in .csproj ([6dad365](https://github.com/kalulas/TableCraft/commit/6dad3656cb84fb9c46d334af7f23d7be781f9f31))
+
 ## [1.2.0](https://github.com/kalulas/TableCraft/compare/v1.1.0...v1.2.0) (2023-06-17)
 
 
