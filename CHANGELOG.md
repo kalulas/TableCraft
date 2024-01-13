@@ -2,6 +2,13 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+### [1.3.1](https://github.com/kalulas/TableCraft/compare/v1.3.0...v1.3.1) (2024-01-13)
+
+
+### Bug Fixes
+
+* **editor:** fix the "About" button's enable state ([a9788cc](https://github.com/kalulas/TableCraft/commit/a9788cc8b86ff918316393a6d99fb2e13a36aea1))
+
 ## [1.3.0](https://github.com/kalulas/TableCraft/compare/v1.2.0...v1.3.0) (2024-01-13)
 
 
