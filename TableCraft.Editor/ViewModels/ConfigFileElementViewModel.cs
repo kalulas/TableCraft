@@ -10,6 +10,11 @@ public class ConfigFileElementViewModel : ViewModelBase
     private readonly ConfigFileElement m_Element;
 
     public bool IsJsonDescriptionFound => File.Exists(JsonFilePath);
+    
+    /// <summary>
+    /// Score assigned during <see cref="MainWindowViewModel.UpdateSearchResultTableList"/>
+    /// </summary>
+    public int TmpWeightedRatioScore { get; set; }
 
     public string ConfigFileRelativePath => m_Element.ConfigFileRelativePath;
     
@@ -54,6 +59,17 @@ public class ConfigFileElementViewModel : ViewModelBase
     public static int SortByRelativePath(ConfigFileElementViewModel elementA, ConfigFileElementViewModel elementB)
     {
         return string.Compare(elementA.ConfigFileRelativePath, elementB.ConfigFileRelativePath, StringComparison.Ordinal);
+    }
+
+    /// <summary>
+    /// Sort the scores in descending order
+    /// </summary>
+    /// <param name="elementA"></param>
+    /// <param name="elementB"></param>
+    /// <returns></returns>
+    public static int SortByScore(ConfigFileElementViewModel elementA, ConfigFileElementViewModel elementB)
+    {
+        return elementB.TmpWeightedRatioScore.CompareTo(elementA.TmpWeightedRatioScore);
     }
 
     #endregion

@@ -254,7 +254,7 @@ public class MainWindowViewModel : ViewModelBase
         TableList.Insert(insertAt, createdTableViewModel);
         SearchResultTableList.Add(createdTableViewModel);
         
-        UpdateSearchResultTableList(TableListSearchText, false);
+        UpdateSearchResultTableList(TableListSearchText);
         
         // select new added
         SelectedTable = createdTableViewModel;
@@ -315,7 +315,7 @@ public class MainWindowViewModel : ViewModelBase
         SelectedAttribute = new ConfigAttributeDetailsViewModel(configInfo);
     }
 
-    private void UpdateSearchResultTableList(string searchText, bool select)
+    private void UpdateSearchResultTableList(string searchText)
     {
         if (SearchResultTableList.Count == 0)
         {
@@ -329,28 +329,13 @@ public class MainWindowViewModel : ViewModelBase
         else
         {
             var tableNames = TableList.Select(viewModel => viewModel.ConfigFileRelativePath).ToArray();
-            var results = Process.ExtractSorted(searchText, tableNames).ToArray();
-        
+            var results = Process.ExtractAll(searchText, tableNames);
             foreach (var result in results)
             {
-                var resultKey = TableList[result.Index].ConfigFileRelativePath;
-                m_TableListFuzzySearchScore[resultKey] = result.Score;
+                TableList[result.Index].TmpWeightedRatioScore = result.Score;
             }
         
-            SearchResultTableList.Sort((elementA, elementB) =>
-            {
-                var keyA = elementA.ConfigFileRelativePath;
-                var keyB = elementB.ConfigFileRelativePath;
-                m_TableListFuzzySearchScore.TryGetValue(keyA, out var scoreA);
-                m_TableListFuzzySearchScore.TryGetValue(keyB, out var scoreB);
-                return scoreB.CompareTo(scoreA);
-            });
-        }
-
-        if (select)
-        {
-            // select with the highest score
-            SelectedTable = SearchResultTableList[0];
+            SearchResultTableList.Sort(ConfigFileElementViewModel.SortByScore);
         }
     }
     
@@ -433,7 +418,12 @@ public class MainWindowViewModel : ViewModelBase
     private void OnTableListSearchBoxTextChanged(object? sender, TextChangedEventArgs textChangedEventArgs)
     {
         if (sender is not TextBox textBox) { return; }
-        UpdateSearchResultTableList(textBox.Text ?? string.Empty, true);
+        UpdateSearchResultTableList(textBox.Text ?? string.Empty);
+        // select with the highest score
+        if (SearchResultTableList.Count != 0)
+        {
+            SelectedTable = SearchResultTableList[0];
+        }
     }
     
     private void OnExportCodeUsageChanged()
