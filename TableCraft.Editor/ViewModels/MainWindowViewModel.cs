@@ -4,6 +4,7 @@ using System.Collections.ObjectModel;
 using System.Linq;
 using System.Reactive;
 using System.Reactive.Linq;
+using System.Reflection;
 using System.Threading.Tasks;
 using Avalonia.Controls;
 using Avalonia.Platform.Storage;
@@ -40,6 +41,10 @@ public class MainWindowViewModel : ViewModelBase
     #endregion
 
     #region Propreties
+
+    public string AssemblyVersion =>
+        Assembly.GetEntryAssembly()?.GetCustomAttribute<AssemblyInformationalVersionAttribute>()
+            ?.InformationalVersion ?? string.Empty;
 
     public string ListJsonFilename => Program.ListJsonFilename;
 

@@ -1,8 +1,6 @@
 <Window xmlns="https://github.com/avaloniaui"
         xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
         xmlns:vm="using:TableCraft.Editor.ViewModels"
-        xmlns:views="using:TableCraft.Editor.Views"
-        xmlns:lib="clr-namespace:TableCraft.Core;assembly=TableCraft.Core"
         xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
         x:Class="TableCraft.Editor.Views.MainWindow"
@@ -10,7 +8,7 @@
         Height="1000" MinHeight="640"
         WindowStartupLocation="CenterScreen"
         Icon="/Assets/CraftingTable_256.ico"
-        Title="TableCraft">
+        Title="{Binding AssemblyVersion, StringFormat='TableCraft {0}'}">
 
     <Design.DataContext>
         <!-- This only sets the DataContext for the previewer in an IDE,
