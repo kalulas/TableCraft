@@ -29,7 +29,7 @@
         <StackPanel Grid.Row="1" Grid.Column="1" Orientation="Horizontal" Margin="0, 0, 0, 10">
             <StackPanel>
                 <ComboBox Width="200" 
-                          Items="{x:Static lib:Configuration.ConfigUsageType}" 
+                          ItemsSource="{x:Static lib:Configuration.ConfigUsageType}" 
                           SelectedItem="{Binding PreviewInfoUsage}">
                 </ComboBox>
             </StackPanel>

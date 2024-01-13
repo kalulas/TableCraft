@@ -25,7 +25,7 @@
         
         <TextBlock Grid.Row="2" Grid.Column="0" FontSize="16">ValueType </TextBlock>
         <StackPanel Grid.Row="2" Grid.Column="1">
-            <ComboBox Name="ValueTypeComboBox" Items="{x:Static lib:Configuration.DataValueType}" 
+            <ComboBox Name="ValueTypeComboBox" ItemsSource="{x:Static lib:Configuration.DataValueType}" 
                       SelectedItem="{Binding ValueType}" Width="300" Margin="0, 0, 0, 10">
                 <!-- This is the default template -->
                 <!-- <ComboBox.ItemTemplate> -->
@@ -38,7 +38,7 @@
         
         <TextBlock Grid.Row="3" Grid.Column="0" FontSize="16">CollectionType </TextBlock>
         <StackPanel Grid.Row="3" Grid.Column="1">
-            <ComboBox Name="CollectionTypeComboBox" Items="{x:Static lib:Configuration.DataCollectionType}" 
+            <ComboBox Name="CollectionTypeComboBox" ItemsSource="{x:Static lib:Configuration.DataCollectionType}" 
                       SelectedItem="{Binding CollectionType}" Width="300" Margin="0, 0, 0, 10">
             </ComboBox>
         </StackPanel>
@@ -52,7 +52,7 @@
         <StackPanel Grid.Row="5" Grid.Column="1">
             <StackPanel Orientation="Horizontal" Margin="0,0,0,5">
                 <StackPanel>
-                    <ComboBox Items="{x:Static lib:Configuration.ConfigUsageType}" 
+                    <ComboBox ItemsSource="{x:Static lib:Configuration.ConfigUsageType}" 
                               SelectedItem="{Binding SelectedUsageType}" Width="150">
                     </ComboBox>
                 </StackPanel>
@@ -64,14 +64,14 @@
                 </Button>
             </StackPanel>
             
-            <ItemsControl Items="{Binding Usages}"></ItemsControl>
+            <ItemsControl ItemsSource="{Binding Usages}"></ItemsControl>
         </StackPanel>
         
         <TextBlock Grid.Row="6" Grid.Column="0" FontSize="16">Tag </TextBlock>
         <StackPanel Grid.Row="6" Grid.Column="1">
             <StackPanel Orientation="Horizontal" Margin="0,0,0,5">
                 <StackPanel>
-                    <ComboBox Items="{x:Static lib:Configuration.AttributeTag}"
+                    <ComboBox ItemsSource="{x:Static lib:Configuration.AttributeTag}"
                               SelectedItem="{Binding SelectedAttributeTag}" Width="150">
                     </ComboBox>
                 </StackPanel>
@@ -83,7 +83,7 @@
                 </Button>
             </StackPanel>
 
-            <ItemsControl Items="{Binding Tags}"></ItemsControl>
+            <ItemsControl ItemsSource="{Binding Tags}"></ItemsControl>
         </StackPanel>
     </Grid>
 

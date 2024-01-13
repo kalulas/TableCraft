@@ -5,15 +5,12 @@
 // Description:
 #endregion
 
-using System;
-using System.IO;
 using System.Threading.Tasks;
 using Avalonia;
 using Avalonia.Controls;
 using Avalonia.Controls.ApplicationLifetimes;
-using MessageBox.Avalonia.DTO;
-using MessageBox.Avalonia.Enums;
-using MessageBox.Avalonia.Models;
+using MsBox.Avalonia.Dto;
+using MsBox.Avalonia.Enums;
 
 namespace TableCraft.Editor.Services;
 
@@ -36,7 +33,7 @@ public static class MessageBoxManager
     
     public static async void ShowStandardMessageBox(string title, string message)
     {
-        var messageBox = MessageBox.Avalonia.MessageBoxManager.GetMessageBoxStandardWindow(
+        var messageBox = MsBox.Avalonia.MessageBoxManager.GetMessageBoxStandard(
             new MessageBoxStandardParams
             {
                 ButtonDefinitions = ButtonEnum.Ok,
@@ -46,8 +43,8 @@ public static class MessageBoxManager
                 MinWidth = m_StandardPopupWidth,
                 MinHeight = m_StandardPopupHeight
             });
-        
-        await messageBox.Show();
+
+        await messageBox.ShowAsync();
     }
     
     public static async Task ShowStandardMessageBoxDialog(string title, string message)
@@ -58,7 +55,7 @@ public static class MessageBoxManager
             return;
         }
         
-        var messageBox = MessageBox.Avalonia.MessageBoxManager.GetMessageBoxStandardWindow(
+        var messageBox = MsBox.Avalonia.MessageBoxManager.GetMessageBoxStandard(
             new MessageBoxStandardParams
             {
                 ButtonDefinitions = ButtonEnum.Ok,
@@ -69,7 +66,7 @@ public static class MessageBoxManager
                 MinHeight = m_StandardPopupHeight
             });
 
-        await messageBox.ShowDialog(mainWindow);
+        await messageBox.ShowWindowDialogAsync(mainWindow);
     }
 
     public static async Task ShowCustomMarkdownMessageBoxDialog(string title, string message)
@@ -80,7 +77,7 @@ public static class MessageBoxManager
             return;
         }
         
-        var messageBox = MessageBox.Avalonia.MessageBoxManager.GetMessageBoxCustomWindow(
+        var messageBox = MsBox.Avalonia.MessageBoxManager.GetMessageBoxCustom(
             new MessageBoxCustomParams
             {
                 Markdown = true,
@@ -91,6 +88,6 @@ public static class MessageBoxManager
                 MinHeight = m_StandardPopupHeight
             });
 
-        await messageBox.ShowDialog(mainWindow);
+        await messageBox.ShowWindowDialogAsync(mainWindow);
     }
 }

@@ -1,8 +1,6 @@
 <Window xmlns="https://github.com/avaloniaui"
         xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
         xmlns:vm="using:TableCraft.Editor.ViewModels"
-        xmlns:views="using:TableCraft.Editor.Views"
-        xmlns:lib="clr-namespace:TableCraft.Core;assembly=TableCraft.Core"
         xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
         x:Class="TableCraft.Editor.Views.MainWindow"
@@ -10,7 +8,7 @@
         Height="1000" MinHeight="640"
         WindowStartupLocation="CenterScreen"
         Icon="/Assets/CraftingTable_256.ico"
-        Title="TableCraft">
+        Title="{Binding AssemblyVersion, StringFormat='TableCraft {0}'}">
 
     <Design.DataContext>
         <!-- This only sets the DataContext for the previewer in an IDE,
@@ -46,7 +44,7 @@
                 <StackPanel
                     IsEnabled="{Binding SelectedConfigInfo, Converter={x:Static ObjectConverters.IsNotNull}}"
                     VerticalAlignment="Center">
-                    <ComboBox Items="{Binding ExportMethods}" 
+                    <ComboBox ItemsSource="{Binding ExportMethods}" 
                               SelectedItem="{Binding ExportCodeUsage}" Width="150">
                     </ComboBox>
                 </StackPanel>
@@ -81,7 +79,7 @@
         
         <Grid ColumnDefinitions="10*,10*,20*" Margin="16,10">
             <!-- <StackPanel Grid.Column="0" Margin="0,0,20,0" ClipToBounds="True"> -->
-            <Grid RowDefinitions="Auto, *, Auto" Margin="5">
+            <Grid RowDefinitions="Auto, Auto, *, Auto" Margin="5">
                 <TextBlock Grid.Row="0"
                     IsVisible="{Binding !TableList.Count}"
                     Text="{Binding ListJsonFilename, StringFormat='No table found in {0}'}"
@@ -89,19 +87,26 @@
                 </TextBlock>
                 
                 <TextBlock Grid.Row="0"
-                    Name="TablesTitle"
                     IsVisible="{Binding TableList.Count}"
                     FontSize="20">
                     Tables
                 </TextBlock>
+                
+                <!-- 'clearButton' is a built-in styles in Avalonia -->
+                <TextBox Classes="clearButton" Grid.Row="1"
+                         Name="TableListInputSearchBox"
+                         IsVisible="{Binding TableList.Count}"
+                         Margin="0, 5" Watermark="search for tables"
+                         Text="{Binding TableListSearchText}"
+                         TextChanged="TableListInputSearchBox_OnTextChanged"/>
 
-                <ListBox Grid.Row="1"
-                    Items="{Binding TableList}" 
-                    SelectedItem="{Binding SelectedTable}"
-                    SelectionChanged="SelectingTableItemsControl_OnSelectionChanged">
+                <ListBox Grid.Row="2"
+                         ItemsSource="{Binding SearchResultTableList}" 
+                         SelectedItem="{Binding SelectedTable}"
+                         SelectionChanged="SelectingTableItemsControl_OnSelectionChanged">
                 </ListBox>
                 
-                <WrapPanel Grid.Row="2" HorizontalAlignment="Right" Margin="0 10 0 0">
+                <WrapPanel Grid.Row="3" HorizontalAlignment="Right" Margin="0 10 0 0">
                     <Button Content="Add" Command="{Binding AddNewTableFileCommand}"></Button>
                 </WrapPanel>
             </Grid>
@@ -112,7 +117,7 @@
                 <TextBlock Grid.Row="0" FontSize="20"> Attributes </TextBlock>
                 <ListBox Grid.Row="1"
                     IsVisible="{Binding SelectedConfigInfo, Converter={x:Static ObjectConverters.IsNotNull}}"
-                    Items="{Binding SelectedConfigInfo.Attributes}"
+                    ItemsSource="{Binding SelectedConfigInfo.Attributes}"
                     SelectionChanged="SelectingAttributeItemsControl_OnSelectionChanged">
                 </ListBox>
             </Grid>
@@ -135,7 +140,6 @@
                 </UserControl>
             </Grid>
         </Grid>
-        
 
     </DockPanel>
 
