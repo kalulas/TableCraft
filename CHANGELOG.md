@@ -2,6 +2,13 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+### [1.4.2](https://github.com/kalulas/TableCraft/compare/v1.4.0...v1.4.2) (2025-08-03)
+
+
+### Bug Fixes
+
+* **editor:** ensure logging works when appsettings.json is invalid ([7de8b7a](https://github.com/kalulas/TableCraft/commit/7de8b7af53bc67978c9cf8e6cc113d46f132b304))
+
 ## [1.4.0](https://github.com/kalulas/TableCraft/compare/v1.3.1...v1.4.0) (2025-08-03)
 
 ### [1.3.1](https://github.com/kalulas/TableCraft/compare/v1.3.0...v1.3.1) (2024-01-13)
