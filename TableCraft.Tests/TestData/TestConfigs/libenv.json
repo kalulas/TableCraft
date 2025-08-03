@@ -1,0 +1,34 @@
+{
+  "DataValueType": [
+    "int",
+    "uint",
+    "float",
+    "boolean",
+    "string"
+  ],
+  "DataCollectionType": [
+    "none",
+    "array"
+  ],
+  "AttributeTag": [
+    "primary",
+    "required"
+  ],
+  "UTF8BOM": false,
+  "CsvSource": {
+    "HeaderLineIndex": 0,
+    "CommentLineIndex": 1
+  },
+  "ConfigUsageType": {
+    "test-usage": {
+      "CodeTemplateName": "test-template.tt",
+      "TargetFileType": ".cs",
+      "OutputFormat": "{0}_Generated"
+    }
+  },
+  "ConfigUsageGroup": {
+    "test-group": [
+      "test-usage"
+    ]
+  }
+}

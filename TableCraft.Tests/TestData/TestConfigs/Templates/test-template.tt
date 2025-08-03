@@ -1,0 +1,25 @@
+<#@ template debug="true" hostspecific="true" language="C#" #>
+<#@ parameter type="System.String" name="CurrentUsage"#>
+<#
+    var configInfoObject = Host.GetHostOption("CurrentConfigInfo");
+    var configInfo = configInfoObject as TableCraft.Core.ConfigElements.ConfigInfo;
+    if (configInfo == null) throw new Exception("null CurrentConfigInfo received, exit!");
+#>
+// Generated from TableCraft - Test Template
+// Usage: <#= CurrentUsage #>
+
+namespace TestGenerated
+{
+    public class <#= configInfo.GetExportName(CurrentUsage) #>
+    {
+<# 
+    foreach( var info in configInfo.AttributeInfos ){ 
+        if(info.IsValid() && info.HasUsage(CurrentUsage)){
+#>
+        public <#= info.ValueType #> <#= info.GetUsageFieldName(CurrentUsage) #> { get; set; }
+<#
+        }
+    }
+#>
+    }
+}

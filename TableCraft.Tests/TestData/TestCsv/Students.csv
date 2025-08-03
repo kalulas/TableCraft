@@ -1,0 +1,6 @@
+ID,Name,Age,Grade,Courses
+Student ID,Student Name,Age,Grade,Course List
+1,Alice,20,A,Math;Physics;Chemistry
+2,Bob,19,B,English;History
+3,Charlie,21,A,Computer Science;Math
+4,Diana,18,C,Biology;Chemistry;Physics
