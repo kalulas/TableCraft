@@ -27,8 +27,8 @@ All notable changes to this project will be documented in this file. See [standa
 
   <ItemGroup>
     <PackageReference Include="LitJson" Version="0.17.0" />
-    <PackageReference Include="Mono.TextTemplating" Version="2.3.1" />
-    <PackageReference Include="p4api.net" Version="2022.2.242.8247" />
+    <PackageReference Include="Mono.TextTemplating" Version="3.0.0" />
+    <PackageReference Include="p4api.net" Version="2025.1.277.3624" />
   </ItemGroup>
 
   <ItemGroup>
