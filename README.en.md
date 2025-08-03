@@ -6,7 +6,9 @@
 
 TableCraft is a general and extensible solution for parsing configuration source files, generating configuration description files and customizing configuration reading codes.
 
-The project provides a .NET6 runtime library, as well as a command-line tool based on this library, and an [Avalonia](https://avaloniaui.net/) visual editor based on this library as a usage example.
+The project provides a .NET6 runtime library (TableCraft.Core), as well as a command-line tool (TableCraft.Console) based on this library, and an [Avalonia](https://avaloniaui.net/) visual editor (TableCraft.Editor) based on this library as a usage example.
+
+TableCraft.Core is the core of the entire solution. It can extract key information (such as configuration file names and field names) from different types of configuration files based on rules. It also uses additional description files to supplement information about field types and labels, and outputs complete configuration file information in the specified JSON format. In addition, it can use this configuration file information to generate any text you want based on the template you provide (which is very useful for generating code files with repeated rules).
 
 ## Features
 
@@ -27,6 +29,88 @@ The project provides a .NET6 runtime library, as well as a command-line tool bas
 * Configure directories for data source files and data description files
 * Configure export directories for code under different usage scenarios
 * Automated version control with perforce
+
+## Example
+
+Assuming we have a Students.csv file:
+
+| ID   | ClassID | Name   | Age  | Courses                 |
+| ---- | ------- | ------ | ---- | ----------------------- |
+| 0    | 1       | Edward | 24   | CS61A;MIT18.01;MIT18.06 |
+| 1    | 1       | Alex   | 24   | UCB CS61B;MIT 6.006     |
+
+By supplementing field types, tags, etc. through an additional JSON file:
+
+```jsonc
+{
+    "ConfigName" : "Students",
+    "Usage"      : {
+        "usage0" : {
+            "ExportName" : "StudentsTable"
+        }
+    },
+    "Attributes" : [
+        {
+            "AttributeName" : "ID",
+            "Comment"       : "Identifier",
+            "ValueType"     : "int",
+            "DefaultValue"  : "",
+            "CollectionType" : "none",
+            "Usages"         : [
+                {
+                    "Usage" : "usage0",
+                    "FieldName" : "ID"
+                }
+            ],
+            "Tag"            : [
+                "primary"
+            ]
+        },
+        // ...
+    ]
+}
+```
+
+Completing such a JSON configuration file on your own may be frustrating. You can use the TableCraft.Editor visual tool to generate the JSON file.
+
+Now by completing a text template (.tt) to simply describe your generation rules:
+
+```text
+<#@ template debug="true" hostspecific="true" language="C#" #>
+<#@ parameter type="System.String" name="CurrentUsage"#>
+<#
+    var configInfoObject = Host.GetHostOption("CurrentConfigInfo");
+    var configInfo = configInfoObject as ConfigInfo;
+    if (configInfo == null) throw new Exception("null CurrentConfigInfo received, exit!");
+#>
+namespace Foo {
+    public class <#= configInfo.GetExportName(CurrentUsage) #> {
+<# 
+    foreach( var info in configInfo.AttributeInfos ){ 
+        if(info.IsValid() && info.HasUsage(CurrentUsage)){
+#>
+            public <#= info.ValueType #> <#= info.GetUsageFieldName(CurrentUsage) #> { get; private set; }
+<#
+        }
+    }
+#>
+    }
+}
+```
+
+Congratulations! TableCraft.Core will now output the following results for you:
+
+```csharp
+namespace Foo {
+    public class StudentsTable {
+            public int ID { get; private set; }
+            public uint ClassID { get; private set; }
+            public string Name { get; private set; }
+            public uint Age { get; private set; }
+            public string Courses { get; private set; }
+    }
+}
+```
 
 ## Configuration
 

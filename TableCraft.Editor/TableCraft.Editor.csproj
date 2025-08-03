@@ -36,7 +36,6 @@
     <PackageReference Include="Serilog.Settings.Configuration" Version="3.4.0" />
     <PackageReference Include="Serilog.Sinks.Console" Version="4.1.0" />
     <PackageReference Include="Serilog.Sinks.File" Version="5.0.0" />
-    <PackageReference Include="TableCraft.Core" Version="1.0.0" />
   </ItemGroup>
 
   <ItemGroup>
@@ -52,5 +51,9 @@
     <Content Include="list.json">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Content>
+  </ItemGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\TableCraft.Core\TableCraft.Core.csproj" />
   </ItemGroup>
 </Project>

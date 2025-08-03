@@ -8,7 +8,9 @@
 
 TableCraft是一个通用、可拓展的解析配置源文件，生成配置描述文件与客制化配置读取代码解决方案。
 
-项目提供了一个.NET6运行时库，同时也提供了一个基于此库的命令行工具，与一个基于此库的[Avalonia](https://avaloniaui.net/)可视化编辑器作为使用范例。
+项目提供了一个.NET6运行时库（TableCraft.Core），同时也提供了基于此库的命令行工具（TableCraft.Console），与一个基于此库的[Avalonia](https://avaloniaui.net/)可视化编辑器（TableCraft.Editor）作为使用范例。
+
+TableCraft.Core是整个解决方案的核心，它可以根据规则，从不同类型的配置文件提取出关键信息（配置文件名，字段名等），并使用额外的描述文件进行信息补充（字段类型，字段标签），以规定的JSON格式输出一份配置文件的完整信息。同时还能够使用这份配置文件信息，根据你提供的模板生成任何你想要的文本（这在生成一些规则重复的代码文件时非常有用）。
 
 ## 特性
 
@@ -29,6 +31,88 @@ TableCraft是一个通用、可拓展的解析配置源文件，生成配置描�
 * 支持配置数据源文件目录与数据描述文件目录
 * 支持配置不同使用途径下的代码导出目录
 * 自动化版本控制（perforce）
+
+## 示例
+
+现有 Students.csv：
+
+| ID   | ClassID | Name   | Age  | Courses                 |
+| ---- | ------- | ------ | ---- | ----------------------- |
+| 0    | 1       | Edward | 24   | CS61A;MIT18.01;MIT18.06 |
+| 1    | 1       | Alex   | 24   | UCB CS61B;MIT 6.006     |
+
+通过额外的一份JSON文件加以描述，补充字段类型，标签等：
+
+```jsonc
+{
+    "ConfigName" : "Students",
+    "Usage"      : {
+        "usage0" : {
+            "ExportName" : "StudentsTable"
+        }
+    },
+    "Attributes" : [
+        {
+            "AttributeName" : "ID",
+            "Comment"       : "Identifier",
+            "ValueType"     : "int",
+            "DefaultValue"  : "",
+            "CollectionType" : "none",
+            "Usages"         : [
+                {
+                    "Usage" : "usage0",
+                    "FieldName" : "ID"
+                }
+            ],
+            "Tag"            : [
+                "primary"
+            ]
+        },
+        // ...
+    ]
+}
+```
+
+自己完成这样一份JSON文件的配置可能让人比较沮丧，你可以使用TableCraft.Editor可视化工具来完成JSON文件的生成。
+
+现在通过完成一份文本模板（.tt）来简单描述你的生成规则：
+
+```text
+<#@ template debug="true" hostspecific="true" language="C#" #>
+<#@ parameter type="System.String" name="CurrentUsage"#>
+<#
+    var configInfoObject = Host.GetHostOption("CurrentConfigInfo");
+    var configInfo = configInfoObject as ConfigInfo;
+    if (configInfo == null) throw new Exception("null CurrentConfigInfo received, exit!");
+#>
+namespace Foo {
+    public class <#= configInfo.GetExportName(CurrentUsage) #> {
+<# 
+    foreach( var info in configInfo.AttributeInfos ){ 
+        if(info.IsValid() && info.HasUsage(CurrentUsage)){
+#>
+            public <#= info.ValueType #> <#= info.GetUsageFieldName(CurrentUsage) #> { get; private set; }
+<#
+        }
+    }
+#>
+    }
+}
+```
+
+大功告成，现在TableCraft.Core将会为你输出以下结果：
+
+```csharp
+namespace Foo {
+    public class StudentsTable {
+            public int ID { get; private set; }
+            public uint ClassID { get; private set; }
+            public string Name { get; private set; }
+            public uint Age { get; private set; }
+            public string Courses { get; private set; }
+    }
+}
+```
 
 ## 配置方式
 
@@ -113,7 +197,7 @@ TableCraft是一个通用、可拓展的解析配置源文件，生成配置描�
 
 3. 选择已加入到工具中的配置表
 4. 选中配置表后，此处会显示配置表的字段信息
-5. 展示当前配置表的原文件名，在“Usage”选中使用途径后，可在“ExportName”指定该途径下的客制化名称
+5. 展示当前配置表的原文件名，在"Usage"选中使用途径后，可在"ExportName"指定该途径下的客制化名称
 
 ![image-20230504223332644](https://s2.loli.net/2023/05/04/J8R2q1uhjpsDGoz.png)
 
@@ -123,7 +207,7 @@ TableCraft是一个通用、可拓展的解析配置源文件，生成配置描�
 
 7. 指定生成文件的单一目标使用途径或途径组
 8. 点击此按钮导出文件（如选择单一途径，导出路径显示按钮下方）
-9. 点击此按钮将数据描述文件保存至“JsonHome”
+9. 点击此按钮将数据描述文件保存至"JsonHome"
 
 ## 第三方依赖
 

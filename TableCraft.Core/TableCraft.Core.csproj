@@ -1,0 +1,42 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <TargetFramework>net6.0</TargetFramework>
+    <Authors>edwardchen</Authors>
+    <Description>TableCraft.Core is a .NET class library that helps you describe configuration files and generate text(could be code) with your own rules.</Description>
+    <RepositoryUrl>https://github.com/kalulas/TableCraft.Core</RepositoryUrl>
+    <PackageReadmeFile>README.en.md</PackageReadmeFile>
+    <PackageLicenseFile>LICENSE</PackageLicenseFile>
+    <Version>1.0.2</Version>
+    <PackageIcon>crafting-table-128.png</PackageIcon>
+    <PackageTags>code-generation</PackageTags>
+    <PackageReleaseNotes># Changelog
+
+All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
+
+### 1.0.2 (2023-07-13)
+
+
+### Bug Fixes
+
+* remove duplicated README.md ([a032ce2](https://github.com/kalulas/TableCraft.Core/commit/a032ce2d833d648d563037e6c87e2e6ba48673a7))
+
+### 1.0.1 (2023-07-12)
+</PackageReleaseNotes>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <PackageReference Include="LitJson" Version="0.17.0" />
+    <PackageReference Include="Mono.TextTemplating" Version="2.3.1" />
+    <PackageReference Include="p4api.net" Version="2022.2.242.8247" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <Service Include="{508349b6-6b84-4df5-91f0-309beebad82d}" />
+    <None Include="..\README.md" Pack="true" PackagePath="" />
+    <None Include="..\README.en.md" Pack="true" PackagePath="" />
+    <None Include="..\LICENSE" Pack="true" PackagePath="" />
+    <None Include="Assets\crafting-table-128.png" Pack="true" PackagePath="" />
+  </ItemGroup>
+
+</Project>

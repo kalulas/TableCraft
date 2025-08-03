@@ -7,6 +7,8 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "TableCraft.Console", "Table
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "TableCraft.Editor", "TableCraft.Editor\TableCraft.Editor.csproj", "{9ECB2F46-4642-4FDC-B734-7C5754D5D432}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "TableCraft.Core", "TableCraft.Core\TableCraft.Core.csproj", "{33E64FC6-0942-495B-842A-9A02A29C78AB}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -21,6 +23,10 @@ Global
 		{9ECB2F46-4642-4FDC-B734-7C5754D5D432}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{9ECB2F46-4642-4FDC-B734-7C5754D5D432}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{9ECB2F46-4642-4FDC-B734-7C5754D5D432}.Release|Any CPU.Build.0 = Release|Any CPU
+		{33E64FC6-0942-495B-842A-9A02A29C78AB}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{33E64FC6-0942-495B-842A-9A02A29C78AB}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{33E64FC6-0942-495B-842A-9A02A29C78AB}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{33E64FC6-0942-495B-842A-9A02A29C78AB}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

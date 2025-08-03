@@ -7,7 +7,6 @@
 
   <ItemGroup>
     <PackageReference Include="Microsoft.Extensions.Hosting" Version="7.0.1" />
-    <PackageReference Include="TableCraft.Core" Version="1.0.0" />
   </ItemGroup>
 
   <ItemGroup>
@@ -24,6 +23,10 @@
     <Content Include="appsettings.json">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Content>
+  </ItemGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\TableCraft.Core\TableCraft.Core.csproj" />
   </ItemGroup>
 
 </Project>
