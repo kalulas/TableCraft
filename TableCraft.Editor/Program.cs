@@ -32,20 +32,22 @@ class Program
     [STAThread]
     public static void Main(string[] args)
     {
-        m_Host = Host.CreateDefaultBuilder(args).Build();
-        m_Configuration = m_Host.Services.GetRequiredService<IConfiguration>();
-
+        // Initialize logger first to ensure error logging works even if appsettings.json is invalid
         Log.Logger = new LoggerConfiguration()
             .MinimumLevel.Debug()
             .WriteTo.Console()
             .WriteTo.File("Logs/log-.txt", rollingInterval: RollingInterval.Day, retainedFileCountLimit: 10)
-            // .ReadFrom.Configuration(m_Configuration)
             .CreateLogger();
 
         Log.Information("Logger is initialized");
 
         try
         {
+            // Move host and configuration initialization into try-catch after logger is ready
+            m_Host = Host.CreateDefaultBuilder(args).Build();
+            m_Configuration = m_Host.Services.GetRequiredService<IConfiguration>();
+            Log.Information("Configuration loaded successfully");
+            
             var libEnvJsonFilePath = AppContext.BaseDirectory + LibEnvJsonFilename;
             if (!File.Exists(libEnvJsonFilePath))
                 throw new FileNotFoundException("library configuration file not found", LibEnvJsonFilename);
