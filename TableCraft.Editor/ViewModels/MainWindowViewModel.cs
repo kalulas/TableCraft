@@ -43,8 +43,7 @@ public class MainWindowViewModel : ViewModelBase
     #region Propreties
 
     public string AssemblyVersion =>
-        Assembly.GetEntryAssembly()?.GetCustomAttribute<AssemblyInformationalVersionAttribute>()
-            ?.InformationalVersion ?? string.Empty;
+        Assembly.GetEntryAssembly()?.GetName().Version?.ToString(3) ?? string.Empty;
 
     public string ListJsonFilename => Program.ListJsonFilename;
 
