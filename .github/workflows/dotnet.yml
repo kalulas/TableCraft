@@ -25,4 +25,4 @@ jobs:
     - name: Build
       run: dotnet build .\TableCraft.Editor\TableCraft.Editor.csproj --configuration Release --runtime win10-x64 --self-contained false
     - name: Test
-      run: dotnet test --no-build --verbosity normal
+      run: dotnet test .\TableCraft.Tests\TableCraft.Tests.csproj --verbosity normal
