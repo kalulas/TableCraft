@@ -5,19 +5,12 @@ namespace TableCraft.Editor.Models;
 
 /// <summary>
 /// <para> File information for an existed config file(data source) </para>
-/// <para> For LitJson reflection used </para>
+/// <para> Compatible with System.Text.Json serialization </para>
 /// </summary>
 public class ConfigFileElement : IComparable<ConfigFileElement>
 {
-    // public / CamelCase for LitJson reflection
-    public readonly string ConfigFileRelativePath;
-    public string JsonFileRelativePath;
-
-    public ConfigFileElement()
-    {
-        ConfigFileRelativePath = string.Empty;
-        JsonFileRelativePath = string.Empty;
-    }
+    public string ConfigFileRelativePath { get; init; }
+    public string JsonFileRelativePath { get; set; }
 
     public ConfigFileElement(string configFileRelativePath, string jsonFileRelativePath)
     {

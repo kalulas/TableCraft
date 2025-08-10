@@ -24,11 +24,11 @@ public class CsvSource : IDataSource
         /// <summary>
         /// Read Attribute name from header line, this is a must-have
         /// </summary>
-        public int HeaderLineIndex;
+        public int HeaderLineIndex { get; set; }
         /// <summary>
         /// -1 if no comment line
         /// </summary>
-        public int CommentLineIndex = -1;
+        public int CommentLineIndex { get; set; } = -1;
 
         public Configuration Fix()
         {

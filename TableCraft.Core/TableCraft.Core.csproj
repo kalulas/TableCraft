@@ -7,7 +7,7 @@
     <RepositoryUrl>https://github.com/kalulas/TableCraft.Core</RepositoryUrl>
     <PackageReadmeFile>README.en.md</PackageReadmeFile>
     <PackageLicenseFile>LICENSE</PackageLicenseFile>
-    <Version>1.0.2</Version>
+    <Version>1.1.0</Version>
     <PackageIcon>crafting-table-128.png</PackageIcon>
     <PackageTags>code-generation</PackageTags>
     <PackageReleaseNotes># Changelog
@@ -23,10 +23,11 @@ All notable changes to this project will be documented in this file. See [standa
 
 ### 1.0.1 (2023-07-12)
 </PackageReleaseNotes>
+    <AssemblyVersion>1.1.0</AssemblyVersion>
+    <FileVersion>1.1.0</FileVersion>
   </PropertyGroup>
 
   <ItemGroup>
-    <PackageReference Include="LitJson" Version="0.17.0" />
     <PackageReference Include="Mono.TextTemplating" Version="3.0.0" />
     <PackageReference Include="p4api.net" Version="2025.1.277.3624" />
   </ItemGroup>

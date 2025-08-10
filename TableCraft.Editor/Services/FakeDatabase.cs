@@ -2,9 +2,8 @@
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
-using System.Text;
+using System.Text.Json;
 using System.Threading.Tasks;
-using LitJson;
 using Serilog;
 using TableCraft.Core.IO;
 using TableCraft.Editor.Models;
@@ -13,7 +12,7 @@ namespace TableCraft.Editor.Services;
 
 public class FakeDatabase
 {
-    private string m_ListJsonFilePath;
+    private readonly string m_ListJsonFilePath;
 
     public FakeDatabase(string listJsonFilePath)
     {
@@ -32,19 +31,23 @@ public class FakeDatabase
         }
 
         var listJsonFileContent = FileHelper.ReadAllText(m_ListJsonFilePath);
-        var jsonData = JsonMapper.ToObject(listJsonFileContent);
-        if (!jsonData.IsArray)
+        using var jsonDoc = JsonDocument.Parse(listJsonFileContent);
+        var jsonData = jsonDoc.RootElement;
+        
+        if (jsonData.ValueKind != JsonValueKind.Array)
         {
             return Array.Empty<ConfigFileElement>();
         }
 
-        var arraySize = jsonData.Count;
         var elements = new List<ConfigFileElement>();
-        for (int i = 0; i < arraySize; i++)
+        
+        foreach (var jsonElement in jsonData.EnumerateArray())
         {
-            var element = JsonMapper.ToObject<ConfigFileElement>(jsonData[i].ToJson());
+            var element = JsonSerializer.Deserialize<ConfigFileElement>(
+                jsonElement.GetRawText());
+            
             // invalid configuration
-            if (string.IsNullOrEmpty(element.ConfigFileRelativePath))
+            if (element == null || string.IsNullOrEmpty(element.ConfigFileRelativePath))
             {
                 continue;
             }
@@ -58,17 +61,15 @@ public class FakeDatabase
 
     public async Task WriteTableElements(IEnumerable<ConfigFileElement> elements)
     {
-        var builder = new StringBuilder();
-        var writer = new JsonWriter(builder)
-        {
-            PrettyPrint = true
-        };
-
         var elementList = elements.ToList();
         elementList.Sort();
         
-        JsonMapper.ToJson(elementList, writer);
-        await FileHelper.WriteAsync(m_ListJsonFilePath, builder.ToString());
-        Log.Information("write ListJsonFile {Path} finished", m_ListJsonFilePath);
+        var jsonString = JsonSerializer.Serialize(elementList, new JsonSerializerOptions 
+        { 
+            WriteIndented = true
+        });
+        
+        await FileHelper.WriteAsync(m_ListJsonFilePath, jsonString);
+        Log.Information("write ListJsonFile '{Path}' finished", m_ListJsonFilePath);
     }
 }
