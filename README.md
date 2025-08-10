@@ -209,14 +209,6 @@ namespace Foo {
 8. 点击此按钮导出文件（如选择单一途径，导出路径显示按钮下方）
 9. 点击此按钮将数据描述文件保存至"JsonHome"
 
-## 第三方依赖
-
-### TableCraft.Core 依赖
-
-* [LitJson](https://github.com/LitJSON/litjson)：json序列化与反序列化
-* [Mono.TextTemplating](https://github.com/mono/t4)：.NET 6.0 可用的T4 Templating 语言引擎
-* [p4api.net](https://www.nuget.org/packages/p4api.net)：支持Perforce版本控制
-
 ## License
 
 [MIT](http://opensource.org/licenses/MIT)

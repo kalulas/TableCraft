@@ -204,14 +204,6 @@ Before following the steps below, please ensure that the two JSON files mentione
 8. Click this button to export files (if a target usage is selected, export path is shown below button).
 9. Click this button to save data description file to "JsonHome".
 
-## Third-party dependencies
-
-### Dependencies of TableCraft.Core 
-
-* [LitJson](https://github.com/LitJSON/litjson): JSON serialization and deserialization 
-* [Mono.TextTemplating](https://github.com/Microsoft/t4): T4 Templating language engine available for .NET 6.0 
-* [p4api.net](https://www.nuget.org/packages/p4api.net): Supports Perforce version control 
-
 ## License
 
 [MIT](http://opensource.org/licenses/MIT)
