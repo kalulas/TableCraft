@@ -1,6 +1,6 @@
 {
   "name": "tablecraft",
-  "version": "1.4.2",
+  "version": "1.4.3",
   "description": "A configuration-based generation tool",
   "devDependencies": {
     "cz-conventional-changelog": "^3.3.0"
