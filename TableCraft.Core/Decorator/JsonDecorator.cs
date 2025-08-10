@@ -10,7 +10,8 @@
 using System.Collections.Generic;
 using System.IO;
 using System.Text;
-using LitJson;
+using System.Text.Json;
+using System.Text.Json.Nodes;
 using TableCraft.Core.Attributes;
 using TableCraft.Core.ConfigElements;
 using TableCraft.Core.IO;
@@ -51,15 +52,24 @@ public class JsonDecorator : IDataDecorator
 
     #region Private Methods
     
-    private static void DecorateConfigUsage(ConfigInfo configInfo, JsonData usageJsonData)
+    private static void DecorateConfigUsage(ConfigInfo configInfo, JsonObject usageJsonObject)
     {
-        foreach (var usageConfig in usageJsonData)
+        foreach (var usageConfig in usageJsonObject)
         {
-            var (usage, usageInfoJsonData) = (KeyValuePair<string, JsonData>) usageConfig;
-            var usageInfo = JsonMapper.ToObject<ConfigUsageInfo>(usageInfoJsonData.ToJson());
-            if (!configInfo.TryGetUsageInfo(usage, out var existedUsageInfo))
+            if (usageConfig.Value == null) continue;
+            
+            var configUsageInfoContent = usageConfig.Value.ToString();
+            var usageInfo = JsonSerializer.Deserialize<ConfigUsageInfo>(configUsageInfoContent);
+            if (usageInfo == null)
             {
-                Debugger.LogWarning($"[JsonDecorator.DecorateConfigUsage] Usage '{usage}' is not available under current configuration, ignore");
+                Debugger.LogWarning(
+                    $"[JsonDecorator.DecorateConfigUsage] Failed to deserialize ConfigUsageInfo from key '{usageConfig.Key}' value '{configUsageInfoContent}'");
+                continue;
+            }
+            
+            if (!configInfo.TryGetUsageInfo(usageConfig.Key, out var existedUsageInfo))
+            {
+                Debugger.LogWarning($"[JsonDecorator.DecorateConfigUsage] Usage '{usageConfig.Key}' is not available under current configuration, ignore");
                 continue;
             }
 
@@ -68,9 +78,14 @@ public class JsonDecorator : IDataDecorator
     }
 
     private static (ConfigAttributeUsageInfo, bool) DecorateConfigAttributeUsage(ConfigAttributeUsageInfo attributeUsageInfo,
-        JsonData attributeUsageJsonData)
+        JsonObject attributeUsageJsonObject)
     {
-        attributeUsageInfo.Usage = attributeUsageJsonData[USAGE_KEY].ToString();
+        if (!attributeUsageJsonObject.TryGetPropertyValue(USAGE_KEY, out var usageNode))
+        {
+            return (attributeUsageInfo, false);
+        }
+        
+        attributeUsageInfo.Usage = usageNode?.ToString() ?? string.Empty;
         if (!Configuration.IsUsageValid(attributeUsageInfo.Usage))
         {
             Debugger.LogError("[JsonDecorator.DecorateConfigAttributeUsage] usage '{0}' is not valid",
@@ -78,77 +93,99 @@ public class JsonDecorator : IDataDecorator
             return (attributeUsageInfo, false);
         }
 
-        attributeUsageInfo.FieldName = attributeUsageJsonData[ATTRIBUTE_USAGE_FIELD_NAME_KEY].ToString();
+        if (attributeUsageJsonObject.TryGetPropertyValue(ATTRIBUTE_USAGE_FIELD_NAME_KEY, out var fieldNameNode))
+        {
+            attributeUsageInfo.FieldName = fieldNameNode?.ToString() ?? string.Empty;
+        }
+        
         return (attributeUsageInfo, true);
     }
 
-    private static bool DecorateConfigAttribute(ConfigInfo configInfo, JsonData attributeJsonData)
+    private static bool DecorateConfigAttribute(ConfigInfo configInfo, JsonObject attributeJsonObject)
     {
-        var name = attributeJsonData[ATTRIBUTE_NAME_KEY].ToString();
+        if (!attributeJsonObject.TryGetPropertyValue(ATTRIBUTE_NAME_KEY, out var nameNode))
+        {
+            return false;
+        }
+        
+        var name = nameNode?.ToString() ?? string.Empty;
         if (!configInfo.TryGetAttribute(name, out var attributeInfo))
         {
             Debugger.LogError($"[JsonDecorator.DecorateConfigAttribute] attribute '{name}' not found in config file {configInfo.ConfigName}");
             return false;
         }
-        
-        attributeInfo.ValueType = attributeJsonData[ATTRIBUTE_VALUE_TYPE_KEY].ToString();
-        attributeInfo.DefaultValue = attributeJsonData[ATTRIBUTE_DEFAULT_VALUE_KEY].ToString();
-        attributeInfo.CollectionType = attributeJsonData[ATTRIBUTE_COLLECTION_TYPE_KEY].ToString();
-        // overwriting previous comment from data source
-        attributeInfo.Comment = attributeJsonData[ATTRIBUTE_COMMENT_KEY].ToString();
+
+        attributeInfo.ValueType = attributeJsonObject[ATTRIBUTE_VALUE_TYPE_KEY].ToString();
+        attributeInfo.DefaultValue = attributeJsonObject[ATTRIBUTE_DEFAULT_VALUE_KEY].ToString();
+        attributeInfo.CollectionType = attributeJsonObject[ATTRIBUTE_COLLECTION_TYPE_KEY].ToString();
+        attributeInfo.Comment = attributeJsonObject[ATTRIBUTE_COMMENT_KEY].ToString();
         
         attributeInfo.UsageList.Clear();
-        foreach (var usage in attributeJsonData[ATTRIBUTE_USAGE_KEY])
+        if (attributeJsonObject.TryGetPropertyValue(ATTRIBUTE_USAGE_KEY, out var usageArrayNode) &&
+            usageArrayNode is JsonArray usageArray)
         {
-            var (newUsageInfo, success) = DecorateConfigAttributeUsage(new ConfigAttributeUsageInfo(), (JsonData)usage);
-            if (success)
+            foreach (var usage in usageArray)
             {
-                attributeInfo.AddUsageInfo(newUsageInfo);
+                if (usage is JsonObject usageObject)
+                {
+                    var (newUsageInfo, success) =
+                        DecorateConfigAttributeUsage(new ConfigAttributeUsageInfo(), usageObject);
+                    if (success)
+                    {
+                        attributeInfo.AddUsageInfo(newUsageInfo);
+                    }
+                }
             }
         }
         
         attributeInfo.TagList.Clear();
-        foreach (var tag in attributeJsonData[ATTRIBUTE_TAG_KEY])
+        if (attributeJsonObject.TryGetPropertyValue(ATTRIBUTE_TAG_KEY, out var tagArrayNode) &&
+            tagArrayNode is JsonArray tagArray)
         {
-            attributeInfo.AddTag(tag.ToString());
+            foreach (var tag in tagArray)
+            {
+                if (tag != null)
+                {
+                    attributeInfo.AddTag(tag.ToString());
+                }
+            }
         }
 
         return true;
     }
 
-    private static void WriteConfigAttributeToJson(ConfigAttributeInfo attributeInfo, JsonWriter writer)
+    private static JsonObject WriteConfigAttributeToJson(ConfigAttributeInfo attributeInfo)
     {
-        writer.WriteObjectStart();
-        writer.WritePropertyName(ATTRIBUTE_NAME_KEY);
-        writer.Write(attributeInfo.AttributeName);
-        writer.WritePropertyName(ATTRIBUTE_COMMENT_KEY);
-        writer.Write(attributeInfo.Comment);
-        writer.WritePropertyName(ATTRIBUTE_VALUE_TYPE_KEY);
-        writer.Write(attributeInfo.ValueType);
-        writer.WritePropertyName(ATTRIBUTE_DEFAULT_VALUE_KEY);
-        writer.Write(attributeInfo.DefaultValue);
-        writer.WritePropertyName(ATTRIBUTE_COLLECTION_TYPE_KEY);
-        writer.Write(attributeInfo.CollectionType);
-        writer.WritePropertyName(ATTRIBUTE_USAGE_KEY);
-        JsonMapper.ToJson(attributeInfo.UsageList, writer);
-        // writer.WriteArrayStart();
-        // foreach (var usage in attributeInfo.UsageList)
-        // {
-        //     JsonMapper.ToJson(usage, writer);
-        // }
-        //
-        // writer.WriteArrayEnd();
-        writer.WritePropertyName(ATTRIBUTE_TAG_KEY);
-        // for HastSet, ToJson will save information(Count / Comparer) we don't need
-        // JsonMapper.ToJson(attributeInfo.TagList, writer);
-        writer.WriteArrayStart();
+        var attributeObject = new JsonObject
+        {
+            [ATTRIBUTE_NAME_KEY] = attributeInfo.AttributeName,
+            [ATTRIBUTE_COMMENT_KEY] = attributeInfo.Comment,
+            [ATTRIBUTE_VALUE_TYPE_KEY] = attributeInfo.ValueType,
+            [ATTRIBUTE_DEFAULT_VALUE_KEY] = attributeInfo.DefaultValue,
+            [ATTRIBUTE_COLLECTION_TYPE_KEY] = attributeInfo.CollectionType
+        };
+        
+        var usageArray = new JsonArray();
+        foreach (var usage in attributeInfo.UsageList)
+        {
+            var usageJson = JsonSerializer.Serialize(usage);
+            var usageNode = JsonNode.Parse(usageJson);
+            if (usageNode != null)
+            {
+                usageArray.Add(usageNode);
+            }
+        }
+
+        attributeObject[ATTRIBUTE_USAGE_KEY] = usageArray;
+        
+        var tagArray = new JsonArray();
         foreach (var tag in attributeInfo.TagList)
         {
-            writer.Write(tag);
+            tagArray.Add(tag);
         }
-        
-        writer.WriteArrayEnd();
-        writer.WriteObjectEnd();
+
+        attributeObject[ATTRIBUTE_TAG_KEY] = tagArray;
+        return attributeObject;
     }
 
     #endregion
@@ -164,47 +201,50 @@ public class JsonDecorator : IDataDecorator
         }
 
         var jsonContent = FileHelper.ReadAllText(m_FilePath);
-        var jsonData = JsonMapper.ToObject(jsonContent);
-        if (!jsonData.ContainsKey(CONFIG_NAME_KEY))
+        if (JsonNode.Parse(jsonContent) is not JsonObject jsonObject)
         {
-            Debugger.LogError($"[JsonDecorator.Decorate] '{CONFIG_NAME_KEY}' not found in json file {m_FilePath}");
+            Debugger.LogError($"[JsonDecorator.Decorate] Failed to parse JSON as object from: {m_FilePath}");
+            return configInfo;
+        }
+        
+        if (!jsonObject.TryGetPropertyValue(CONFIG_NAME_KEY, out var configNameNode))
+        {
+            Debugger.LogError($"[JsonDecorator.Decorate] '{CONFIG_NAME_KEY}' not found in json file: {m_FilePath}");
             return configInfo;
         }
 
-        var configName = jsonData[CONFIG_NAME_KEY].ToString();
+        var configName = configNameNode?.ToString() ?? string.Empty;
         if (configName != configInfo.ConfigName)
         {
             Debugger.LogWarning($"[JsonDecorator.Decorate] ConfigName doesn't match: json({configName}), runtime({configInfo.ConfigName})");
         }
 
-        if (!jsonData.ContainsKey(USAGE_KEY))
+        if (!jsonObject.TryGetPropertyValue(USAGE_KEY, out var usageNode) || usageNode is not JsonObject usageObject)
         {
             Debugger.LogError($"[JsonDecorator.Decorate] '{USAGE_KEY}' not found in json file {m_FilePath}");
             return configInfo;
         }
 
-        var usageJsonData = jsonData[USAGE_KEY];
-        DecorateConfigUsage(configInfo, usageJsonData);
+        DecorateConfigUsage(configInfo, usageObject);
 
-        if (!jsonData.ContainsKey(ATTRIBUTES_KEY))
+        if (!jsonObject.TryGetPropertyValue(ATTRIBUTES_KEY, out var attributesNode) || attributesNode is not JsonArray attributesArray)
         {
             Debugger.LogError($"[JsonDecorator.Decorate] '{ATTRIBUTES_KEY}' not found in json file {m_FilePath}");
             return configInfo;
         }
 
-        var attributesJsonData = jsonData[ATTRIBUTES_KEY];
-        foreach (var attributeJson in attributesJsonData)
+        foreach (var attributeNode in attributesArray)
         {
-            if (attributeJson is not JsonData attributeJsonData)
+            if (attributeNode is JsonObject attributeObject)
             {
-                continue;
-            }
-            
-            var success = DecorateConfigAttribute(configInfo, attributeJsonData);
-            if (!success)
-            {
-                Debugger.LogError(
-                    $"[JsonDecorator.Decorate] failed to decorate attribute {attributeJsonData[ATTRIBUTE_NAME_KEY]}");
+                var success = DecorateConfigAttribute(configInfo, attributeObject);
+                if (!success)
+                {
+                    if (attributeObject.TryGetPropertyValue(ATTRIBUTE_NAME_KEY, out var nameNode) && nameNode != null)
+                    {
+                        Debugger.LogError($"[JsonDecorator.Decorate] failed to decorate attribute '{nameNode}' in config file {configName}");
+                    }
+                }
             }
         }
 
@@ -213,37 +253,40 @@ public class JsonDecorator : IDataDecorator
 
     public bool SaveToFile(ConfigInfo configInfo)
     {
-        var builder = new StringBuilder();
-        var writer = new JsonWriter(builder)
+        var rootObject = new JsonObject
         {
-            PrettyPrint = true
+            [CONFIG_NAME_KEY] = configInfo.ConfigName
         };
 
-        writer.WriteObjectStart();
-        writer.WritePropertyName(CONFIG_NAME_KEY);
-        writer.Write(configInfo.ConfigName);
-            
-        writer.WritePropertyName(USAGE_KEY);
-        JsonMapper.ToJson(configInfo.ConfigUsageDict, writer);
-
-        writer.WritePropertyName(ATTRIBUTES_KEY);
-        writer.WriteArrayStart();
-        foreach (var attribute in configInfo.ConfigAttributeDict)
+        var usageJson = JsonSerializer.Serialize(configInfo.ConfigUsageDict);
+        var usageNode = JsonNode.Parse(usageJson);
+        if (usageNode != null)
         {
-            WriteConfigAttributeToJson(attribute.Value, writer);
+            rootObject[USAGE_KEY] = usageNode;
         }
 
-        writer.WriteArrayEnd();
-        writer.WriteObjectEnd();
+        var attributesArray = new JsonArray();
+        foreach (var attribute in configInfo.ConfigAttributeDict)
+        {
+            var attributeObject = WriteConfigAttributeToJson(attribute.Value);
+            attributesArray.Add(attributeObject);
+        }
 
-        // make sure the directory existed
+        rootObject[ATTRIBUTES_KEY] = attributesArray;
+
         var directoryName = Path.GetDirectoryName(m_FilePath);
         if (directoryName != null)
         {
             Directory.CreateDirectory(directoryName);
         }
-        
-        FileHelper.Write(m_FilePath, builder.ToString());
+
+        var options = new JsonSerializerOptions
+        {
+            WriteIndented = true
+        };
+
+        var jsonString = rootObject.ToJsonString(options);
+        FileHelper.Write(m_FilePath, jsonString);
         return true;
     }
 

@@ -3,7 +3,8 @@ using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using System.Text;
-using LitJson;
+using System.Text.Json;
+using System.Text.Json.Nodes;
 using TableCraft.Core.ConfigElements;
 
 namespace TableCraft.Core
@@ -94,16 +95,20 @@ namespace TableCraft.Core
 
         private static readonly Dictionary<string, ConfigUsageInformation> m_UsageToInformation = new();
 
-        private static JsonData m_LibEnvJsonData;
+        private static JsonObject m_LibEnvJsonData;
 
-        private static void ReadStringArrayFromJson(JsonData data, string key, List<string> destination)
+        private static void ReadStringArrayFromJson(JsonObject data, string key, List<string> destination)
         {
-            if (data.ContainsKey(key) && data[key].IsArray)
+            if (data.TryGetPropertyValue(key, out var arrayNode) && 
+                arrayNode is JsonArray jsonArray)
             {
                 destination.Clear();
-                foreach (var valueType in data[key])
+                foreach (var arrayElement in jsonArray)
                 {
-                    destination.Add(valueType.ToString());
+                    if (arrayElement != null)
+                    {
+                        destination.Add(arrayElement.ToString());
+                    }
                 }
             }
             else
@@ -118,7 +123,7 @@ namespace TableCraft.Core
         /// </summary>
         /// <param name="usage"></param>
         /// <param name="information"></param>
-        private static void AddConfigUsageType(string usage, JsonData information)
+        private static void AddConfigUsageType(string usage, JsonNode information)
         {
             if (m_ConfigUsageType.Contains(usage))
             {
@@ -128,10 +133,16 @@ namespace TableCraft.Core
 
             m_ConfigUsageType.Add(usage);
             m_UsageToInformation.Remove(usage);
-            m_UsageToInformation.Add(usage, JsonMapper.ToObject<ConfigUsageInformation>(information.ToJson()));
+            
+            // Deserialize JsonNode to ConfigUsageInformation
+            var informationObj = JsonSerializer.Deserialize<ConfigUsageInformation>(information.ToJsonString());
+            if (informationObj != null)
+            {
+                m_UsageToInformation.Add(usage, informationObj);
+            }
         }
 
-        private static void AddConfigUsageGroup(string groupName, JsonData groupJsonData)
+        private static void AddConfigUsageGroup(string groupName, JsonArray groupJsonArray)
         {
             if (m_ConfigUsageGroups.ContainsKey(groupName))
             {
@@ -139,18 +150,18 @@ namespace TableCraft.Core
                 return;
             }
             
-            // groupJsonData is array of usage string
-            var usages = new string[groupJsonData.Count];
-            for (var i = 0; i < groupJsonData.Count; i++)
+            // Process array of usage strings
+            var usages = new string[groupJsonArray.Count];
+            for (var i = 0; i < groupJsonArray.Count; i++)
             {
-                var definedUsage = (string)groupJsonData[i];
-                if (!m_ConfigUsageType.Contains(definedUsage))
+                var definedUsage = groupJsonArray[i]?.ToString();
+                if (string.IsNullOrEmpty(definedUsage) || !m_ConfigUsageType.Contains(definedUsage))
                 {
                     throw new Exception(
                         $"usage '{definedUsage}' of group '{groupName}' is not defined in `ConfigUsageType`");
                 }
                 
-                usages[i] = (string)groupJsonData[i];
+                usages[i] = definedUsage;
             }
 
             var newUsageGroup = new ConfigUsageGroup(groupName, usages);
@@ -173,31 +184,49 @@ namespace TableCraft.Core
 
             // notice: configuration unknown, cannot use FileHelper.ReadAllText now
             var jsonContent = File.ReadAllText(libEnvJsonFile, Encoding.UTF8);
-            var configData = JsonMapper.ToObject(jsonContent);
+            var configData = JsonNode.Parse(jsonContent) as JsonObject;
+            
+            if (configData == null)
+            {
+                throw new InvalidOperationException($"Failed to parse JSON as object from {libEnvJsonFile}");
+            }
 
             ReadStringArrayFromJson(configData, "DataValueType", m_DataValueType);
             ReadStringArrayFromJson(configData, "DataCollectionType", m_DataCollectionType);
             ReadStringArrayFromJson(configData, "AttributeTag", m_AttributeTag);
             
             CodeTemplatePath = Path.Combine(libEnvDir, m_TemplatesPath);
-            UseUTF8WithBOM = (bool)configData["UTF8BOM"];
+            
+            if (configData.TryGetPropertyValue("UTF8BOM", out var utf8BomNode))
+            {
+                UseUTF8WithBOM = utf8BomNode?.GetValue<bool>() ?? true;
+            }
 
             m_ConfigUsageType.Clear();
-            foreach (var usageConfig in configData["ConfigUsageType"])
+            if (configData.TryGetPropertyValue("ConfigUsageType", out var configUsageTypeNode) &&
+                configUsageTypeNode is JsonObject configUsageTypeObject)
             {
-                var usage = (KeyValuePair<string,JsonData>)usageConfig;
-                AddConfigUsageType(usage.Key, usage.Value);
+                foreach (var usageConfig in configUsageTypeObject)
+                {
+                    if (usageConfig.Value != null)
+                    {
+                        AddConfigUsageType(usageConfig.Key, usageConfig.Value);
+                    }
+                }
             }
             
             m_ConfigUsageGroups.Clear();
             const string configUsageGroupKey = "ConfigUsageGroup";
             // config usage group is optional
-            if (configData.ContainsKey(configUsageGroupKey) && configData[configUsageGroupKey].IsObject)
+            if (configData.TryGetPropertyValue(configUsageGroupKey, out var configUsageGroupNode) &&
+                configUsageGroupNode is JsonObject configUsageGroupObject)
             {
-                foreach (var groupConfig in configData[configUsageGroupKey])
+                foreach (var groupConfig in configUsageGroupObject)
                 {
-                    var groupDefine = (KeyValuePair<string,JsonData>)groupConfig;
-                    AddConfigUsageGroup(groupDefine.Key, groupDefine.Value);
+                    if (groupConfig.Value is JsonArray groupArray)
+                    {
+                        AddConfigUsageGroup(groupConfig.Key, groupArray);
+                    }
                 }
             }
 
@@ -218,16 +247,19 @@ namespace TableCraft.Core
                 Debugger.LogWarning($"[Configuration.GetDataSourceConfiguration] type '{dataSourceType}' is not a data source type");
             }
             
-            if (!m_LibEnvJsonData.ContainsKey(dataSourceType.Name))
+            if (!m_LibEnvJsonData.TryGetPropertyValue(dataSourceType.Name, out var dataSourceNode) || 
+                dataSourceNode == null)
             {
                 Debugger.LogWarning($"[Configuration.GetDataSourceConfiguration] configuration for data source type '{dataSourceType}' not found");
                 return Activator.CreateInstance<T>(); // return a default one
             }
             
-            return JsonMapper.ToObject<T>(m_LibEnvJsonData[dataSourceType.Name].ToJson());
+            var result = JsonSerializer.Deserialize<T>(dataSourceNode.ToJsonString());
+            return result ?? Activator.CreateInstance<T>();
         }
 
         #region Validation
+        
 
         public static bool IsDefinedUsageGroup(string groupName)
         {
