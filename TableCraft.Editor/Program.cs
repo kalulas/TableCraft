@@ -3,9 +3,10 @@ using Avalonia.ReactiveUI;
 using System;
 using System.IO;
 using System.Linq;
+using System.Text.Json;
+using System.Text.Json.Nodes;
 using System.Threading.Tasks;
 using Avalonia.Logging;
-using LitJson;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
@@ -151,12 +152,8 @@ class Program
     }
     
     /// <summary>
-    /// <para> This is a bad approach to update perforce configuration in appsettings.json:
+    /// <para> This is (still) a bad approach to update perforce configuration in appsettings.json:
     /// we deserialize the whole appsettings json file, update / add related content, then serialize and write it back </para>
-    /// 
-    /// <para> Update appsettings.json can be done by ConfigurationBuilder, but we dont have a config class
-    /// (also we dont want Serilog information in that class).
-    /// Hoping that we can still replace LitJson with Newtonsoft.Json in the future. </para>
     /// </summary>
     /// <param name="config"></param>
     /// <returns></returns>
@@ -166,38 +163,68 @@ class Program
         var appSettingsFilePath = Path.Combine(AppContext.BaseDirectory, AppSettingsFilename);
         if (!File.Exists(appSettingsFilePath))
         {
+            Log.Error("[UpdateVersionControlConfig] AppSettings file not found: {FilePath}", appSettingsFilePath);
             return false;
         }
 
-        var appSettingsContent = await Core.IO.FileHelper.ReadToEnd(appSettingsFilePath);
+        var appSettingsContent = await FileHelper.ReadToEnd(appSettingsFilePath);
         if (string.IsNullOrEmpty(appSettingsContent))
         {
+            Log.Error("[UpdateVersionControlConfig] AppSettings file is empty or could not be read: {FilePath}", appSettingsFilePath);
             return false;
         }
 
-        var appSettingsJsonData = JsonMapper.ToObject(appSettingsContent);
+        var appSettingsJsonData = JsonNode.Parse(appSettingsContent);
+        if (appSettingsJsonData == null)
+        {
+            Log.Error("[UpdateVersionControlConfig] Failed to parse appsettings.json as valid JSON");
+            return false;
+        }
         
-        var p4ConfigJsonStr = JsonMapper.ToJson(config);
-        var p4ConfigJsonData = JsonMapper.ToObject(p4ConfigJsonStr);
-        // something that we don't want to save in clear text
-        p4ConfigJsonData.Remove(nameof(config.P4Passwd));
-        // overwrite or create new configuration, update appsettings.json
-        appSettingsJsonData["P4Config"] = p4ConfigJsonData;
+        var p4ConfigJsonStr = JsonSerializer.Serialize(config);
+        var p4ConfigJsonNode = JsonNode.Parse(p4ConfigJsonStr);
+        if (p4ConfigJsonNode == null)
+        {
+            Log.Error("[UpdateVersionControlConfig] Failed to serialize PerforceUserConfig to JSON");
+            return false;
+        }
         
+        // remove sensitive information
+        if (p4ConfigJsonNode is JsonObject p4ConfigObject)
+        {
+            p4ConfigObject.Remove(nameof(config.P4Passwd));
+        }
+        
+        if (appSettingsJsonData is JsonObject appSettingsObject)
+        {
+            appSettingsObject["P4Config"] = p4ConfigJsonNode;
+        }
+        else
+        {
+            Log.Error("[UpdateVersionControlConfig] AppSettings root is not a JSON object, cannot update P4Config");
+            return false;
+        }
+
         try
         {
-            var writer = new JsonWriter
+            var jsonOptions = new JsonSerializerOptions
             {
-                PrettyPrint = true
+                WriteIndented = true
             };
 
-            appSettingsJsonData.ToJson(writer);
-            await FileHelper.WriteAsync(appSettingsFilePath, writer.ToString());
+            var updatedJson = JsonSerializer.Serialize(appSettingsJsonData, jsonOptions);
+            await FileHelper.WriteAsync(appSettingsFilePath, updatedJson);
         }
         catch (UnauthorizedAccessException exception)
         {
+            Log.Error(exception, "[UpdateVersionControlConfig] UnauthorizedAccessException when writing to appsettings.json: {FilePath}", appSettingsFilePath);
             await MessageBoxManager.ShowStandardMessageBoxDialog("UnauthorizedAccessException",
                 $"Failed to write '{appSettingsFilePath}', checkout the file yourself if you're using Perforce \n\nstack trace:\n{exception}");
+            return false;
+        }
+        catch (Exception exception)
+        {
+            Log.Error(exception, "[UpdateVersionControlConfig] Unexpected exception when writing to appsettings.json: {FilePath}", appSettingsFilePath);
             return false;
         }
         
