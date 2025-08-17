@@ -6,6 +6,7 @@
 #endregion
 
 using System;
+using System.Text.Json.Serialization;
 
 namespace TableCraft.Core.VersionControl;
 
@@ -16,6 +17,7 @@ public class PerforceUserConfig
     public string P4CLIENT { get; set; }
     public string P4PASSWDBASE64 { get; set; }
 
+    [JsonIgnore]
     public string P4Passwd { get; private set; } = string.Empty;
 
     public bool IsReady()

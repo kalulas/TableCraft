@@ -9,7 +9,7 @@
         Width="480" Height="270"
         CanResize="False"
         WindowStartupLocation="CenterOwner"
-        Icon="/Assets/avalonia-logo.ico"
+        Icon="/Assets/CraftingTable_256.ico"
         Title="Perforce">
     
     <Window.Resources>

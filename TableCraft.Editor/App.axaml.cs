@@ -4,6 +4,7 @@ using System.Threading.Tasks;
 using Avalonia;
 using Avalonia.Controls.ApplicationLifetimes;
 using Avalonia.Markup.Xaml;
+using Microsoft.Extensions.DependencyInjection;
 using TableCraft.Editor.Services;
 using TableCraft.Editor.ViewModels;
 using TableCraft.Editor.Views;
@@ -34,14 +35,14 @@ public partial class App : Application
             var listJsonFilePath = AppContext.BaseDirectory + Program.ListJsonFilename;
             if (!File.Exists(listJsonFilePath))
             {
-                throw new FileNotFoundException(listJsonFilePath + " not found, construct database failed");
+                throw new FileNotFoundException(listJsonFilePath + " not found, construct config file registry failed");
             }
 
-            var db = new FakeDatabase(listJsonFilePath);
+            var configFileRegistry = new ConfigFileRegistry(listJsonFilePath);
 
             desktop.MainWindow = new MainWindow
             {
-                DataContext = new MainWindowViewModel(db),
+                DataContext = new MainWindowViewModel(configFileRegistry),
             };
         }
 
@@ -51,7 +52,7 @@ public partial class App : Application
 
     private static void LoadAndRegisterVersionControl()
     {
-        var versionControlConfig = Program.GetVersionControlConfig();
+        var versionControlConfig = Program.Host.Services.GetRequiredService<IP4ConfigManager>().GetVersionControlConfig();
         if (!versionControlConfig.IsReady())
         {
             Log.Information("[App.LoadAndRegisterVersionControl] perforce config not ready, exit");

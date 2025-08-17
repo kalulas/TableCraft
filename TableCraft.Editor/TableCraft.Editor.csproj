@@ -6,9 +6,9 @@
     <BuiltInComInteropSupport>true</BuiltInComInteropSupport>
     <ApplicationManifest>app.manifest</ApplicationManifest>
     <ApplicationIcon>Assets\CraftingTable_256.ico</ApplicationIcon>
-    <Version>1.4.3</Version>
-    <AssemblyVersion>1.4.3</AssemblyVersion>
-    <FileVersion>1.4.3</FileVersion>
+    <Version>1.4.4</Version>
+    <AssemblyVersion>1.4.4</AssemblyVersion>
+    <FileVersion>1.4.4</FileVersion>
   </PropertyGroup>
 
   <ItemGroup>

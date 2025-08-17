@@ -1,4 +1,5 @@
 ﻿using System;
+using Microsoft.Extensions.DependencyInjection;
 using Path = System.IO.Path;
 
 namespace TableCraft.Editor.Models;
@@ -20,7 +21,8 @@ public class ConfigFileElement : IComparable<ConfigFileElement>
 
     public string GetConfigFileFullPath()
     {
-        return Path.Combine(Program.GetConfigHomePath(), ConfigFileRelativePath);
+        var appSettings = Program.Host.Services.GetRequiredService<AppSettings>();
+        return Path.Combine(appSettings.ConfigHomePath, ConfigFileRelativePath);
     }
 
     public string GetJsonFileFullPath()
@@ -30,7 +32,8 @@ public class ConfigFileElement : IComparable<ConfigFileElement>
             return string.Empty;
         }
 
-        return Path.Combine(Program.GetJsonHomePath(), JsonFileRelativePath);
+        var appSettings = Program.Host.Services.GetRequiredService<AppSettings>();
+        return Path.Combine(appSettings.JsonHomePath, JsonFileRelativePath);
     }
 
     public int CompareTo(ConfigFileElement? other)

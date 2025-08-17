@@ -9,6 +9,7 @@ using System.Threading.Tasks;
 using Avalonia.Controls;
 using Avalonia.Platform.Storage;
 using FuzzySharp;
+using Microsoft.Extensions.DependencyInjection;
 using TableCraft.Core;
 using TableCraft.Editor.Models;
 using TableCraft.Editor.Services;
@@ -28,7 +29,7 @@ public class MainWindowViewModel : ViewModelBase
     private static readonly FilePickerFileType m_DataSourceType = new("sources")
         {Patterns = Configuration.GetDataSourceExtensions().Select(extension => $"*.{extension}").ToArray()};
     
-    private readonly FakeDatabase m_Database;
+    private readonly ConfigFileRegistry m_ConfigFileRegistry;
     /// <summary>
     /// ConfigFileRelativeFilePath -> ConfigInfoViewModel, create on selected
     /// </summary>
@@ -47,9 +48,9 @@ public class MainWindowViewModel : ViewModelBase
 
     public string ListJsonFilename => Program.ListJsonFilename;
 
-    public string ConfigHomePath => Program.GetConfigHomePath();
+    public string ConfigHomePath => Program.Host.Services.GetRequiredService<AppSettings>().ConfigHomePath;
 
-    public string JsonHomePath => Program.GetJsonHomePath();
+    public string JsonHomePath => Program.Host.Services.GetRequiredService<AppSettings>().JsonHomePath;
 
     private string m_ExportCodeUsage = string.Empty;
 
@@ -165,17 +166,17 @@ public class MainWindowViewModel : ViewModelBase
 
     #region Private Methods
 
-    public MainWindowViewModel(FakeDatabase db)
+    public MainWindowViewModel(ConfigFileRegistry configFileRegistry)
     {
-        m_Database = db;
-        CreateSubViewModels(db);
+        m_ConfigFileRegistry = configFileRegistry;
+        CreateSubViewModels(configFileRegistry);
         CreateCommands();
         ShowPerforceWindow = new Interaction<PerforceUserConfigViewModel, PerforceUserConfigViewModel?>();
     }
 
-    private void CreateSubViewModels(FakeDatabase fakeDatabase)
+    private void CreateSubViewModels(ConfigFileRegistry configFileRegistry)
     {
-        foreach (var tableElement in fakeDatabase.ReadTableElements())
+        foreach (var tableElement in configFileRegistry.ReadTableElements())
         {
             var viewModel = new ConfigFileElementViewModel(tableElement);
             TableList.Add(viewModel);
@@ -217,10 +218,10 @@ public class MainWindowViewModel : ViewModelBase
         ExportCodeUsage = methods[0]; // default selection
     }
     
-    private async Task FlushTableListToDatabase()
+    private async Task FlushTableListToRegistry()
     {
         var updatedTableList = TableList.Select(viewModel => viewModel.GetElement()).ToList();
-        await m_Database.WriteTableElements(updatedTableList);
+        await m_ConfigFileRegistry.WriteTableElements(updatedTableList);
     }
 
     private async Task AddNewSelectedTableFile(string newTableFilePath)
@@ -268,7 +269,7 @@ public class MainWindowViewModel : ViewModelBase
         //     createdTableViewModel.JsonFilePath, createdTableViewModel.GetConfigType());
         
         // write to local file, we make it async
-        await FlushTableListToDatabase();
+        await FlushTableListToRegistry();
     }
 
     private void UpdateSelectedConfigInfoWithTable(ConfigFileElementViewModel? selectedTable)
@@ -293,7 +294,8 @@ public class MainWindowViewModel : ViewModelBase
         if (configInfo == null)
         {
             Log.Error("Failed to create config info for '{identifier}' under '{HomePath}'",
-                selectedTable.ConfigFileRelativePath, Program.GetConfigHomePath());
+                selectedTable.ConfigFileRelativePath,
+                Program.Host.Services.GetRequiredService<AppSettings>().ConfigHomePath);
             SelectedConfigInfo = null;
             return;
         }
@@ -366,7 +368,7 @@ public class MainWindowViewModel : ViewModelBase
         
         // step2 update and save list.json
         m_SelectedTable.SetJsonFileRelativePath(jsonFileName);
-        await FlushTableListToDatabase();
+        await FlushTableListToRegistry();
         Log.Information("Save table list to list.json finished");
         
         // step3 update 'json file found' status
@@ -435,7 +437,8 @@ public class MainWindowViewModel : ViewModelBase
         var isUsageGroup = Configuration.IsDefinedUsageGroup(m_ExportCodeUsage);
         if (!isUsageGroup) // single usage
         {
-            var codeExportHomePath = Program.GetCodeExportPath(m_ExportCodeUsage);
+            var appSettings = Program.Host.Services.GetRequiredService<Models.AppSettings>();
+            var codeExportHomePath = appSettings.GetCodeExportPath(m_ExportCodeUsage);
             ExportCodePath = SelectedConfigInfo != null
                 ? Path.Combine(codeExportHomePath, Configuration.GetTargetFilenameForUsage(m_ExportCodeUsage, SelectedConfigInfo.GetConfigInfo()))
                 : codeExportHomePath;
@@ -451,7 +454,7 @@ public class MainWindowViewModel : ViewModelBase
 
     private async Task OnOpenPerforceWindowButtonClicked()
     {
-        var config = Program.GetVersionControlConfig();
+        var config = Program.Host.Services.GetRequiredService<IP4ConfigManager>().GetVersionControlConfig();
         var viewModel = new PerforceUserConfigViewModel(config);
         await ShowPerforceWindow.Handle(viewModel);
 
@@ -506,18 +509,20 @@ public class MainWindowViewModel : ViewModelBase
         var isUsageGroup = Configuration.IsDefinedUsageGroup(m_ExportCodeUsage);
         if (!isUsageGroup)
         {
-            var outputDir = Program.GetCodeExportPath(m_ExportCodeUsage);
+            var appSettings = Program.Host.Services.GetRequiredService<Models.AppSettings>();
+            var outputDir = appSettings.GetCodeExportPath(m_ExportCodeUsage);
             // if 'ConfigInfo' is null, GenerateCodeForUsage will handle it and return false
             success =
                 await ConfigManager.singleton.GenerateCodeForUsage(m_ExportCodeUsage, configInfo, outputDir);
         }
         else
         {
+            var appSettings = Program.Host.Services.GetRequiredService<Models.AppSettings>();
             var usages = Configuration.GetUsagesForGroup(m_ExportCodeUsage);
             var outputDirectories = new string[usages.Length];
             for (var i = 0; i < usages.Length; i++)
             {
-                outputDirectories[i] = Program.GetCodeExportPath(usages[i]);
+                outputDirectories[i] = appSettings.GetCodeExportPath(usages[i]);
             }
             
             // generate multiple code files for each usage

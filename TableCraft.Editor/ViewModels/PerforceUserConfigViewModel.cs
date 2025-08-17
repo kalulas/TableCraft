@@ -8,6 +8,7 @@
 using System;
 using System.Reactive;
 using System.Threading.Tasks;
+using Microsoft.Extensions.DependencyInjection;
 using ReactiveUI;
 using TableCraft.Core.VersionControl;
 using TableCraft.Editor.Services;
@@ -113,7 +114,7 @@ public class PerforceUserConfigViewModel : ViewModelBase
 
     private async Task OnSaveButtonClicked()
     {
-        var result = await Program.UpdateVersionControlConfig(m_PerforceUserConfig);
+        var result = await Program.Host.Services.GetRequiredService<IP4ConfigManager>().UpdateVersionControlConfig(m_PerforceUserConfig);
         var popupTitle = result ? MessageBoxManager.SuccessTitle : MessageBoxManager.ErrorTitle;
         var popupContent = result ? "Perforce configuration saved!" : "Failed to save Perforce configuration";
         await MessageBoxManager.ShowStandardMessageBoxDialog(popupTitle, popupContent);
