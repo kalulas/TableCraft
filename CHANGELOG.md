@@ -2,6 +2,18 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+### [1.4.4](https://github.com/kalulas/TableCraft/compare/v1.4.3...v1.4.4) (2025-08-17)
+
+
+### Features
+
+* **editor:** move perforce related configuration outside of appsettings.json ([be89838](https://github.com/kalulas/TableCraft/commit/be898385834147a5eca198e9328f3890e3c0c3ce))
+
+
+### Bug Fixes
+
+* add missing PerforceUserConfig.cs with JsonIgnore attribute ([7b125f3](https://github.com/kalulas/TableCraft/commit/7b125f3001218f33e7bdcae081f9aa23f5032236))
+
 ### [1.4.3](https://github.com/kalulas/TableCraft/compare/v1.4.2...v1.4.3) (2025-08-10)
 
 ### [1.4.2](https://github.com/kalulas/TableCraft/compare/v1.4.0...v1.4.2) (2025-08-03)
