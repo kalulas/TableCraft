@@ -1,5 +1,9 @@
 # TableCraft
 
+[![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
+![Build](https://img.shields.io/github/actions/workflow/status/kalulas/TableCraft/dotnet.yml?branch=master)
+[![ReleaseDate](https://img.shields.io/github/release-date/kalulas/TableCraft)](https://github.com/kalulas/TableCraft/releases)
+[![Release](https://img.shields.io/github/v/release/kalulas/TableCraft)](https://github.com/kalulas/TableCraft/releases)
 [![Commitizen friendly](https://img.shields.io/badge/commitizen-friendly-brightgreen.svg)](http://commitizen.github.io/cz-cli/)
 
 [README.en.md](README.en.md)
