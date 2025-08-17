@@ -162,7 +162,7 @@ namespace Foo {
 
 #### appsettings.json
 
-`appsettings.json`中配置了一些重要的文件目录，也用于保存版本控制相关的用户信息
+`appsettings.json`中配置了一些重要的文件目录
 
 ```jsonc
 {
@@ -173,16 +173,17 @@ namespace Foo {
     // 生成目录
     "ExportPath": {
         "usage0": ""
-    },
-    // Perforce版本控制相关信息，不需要在此处手动配置，在应用内编辑后进行保存即可
-    "P4Config": {
-        "P4PORT": "",
-        "P4USER": "",
-        "P4CLIENT": "",
-        "P4PASSWDBASE64": ""
     }
 }
 ```
+
+#### Perforce 版本控制配置
+
+Perforce 版本控制相关信息现在存储在用户配置目录中，无需手动编辑配置文件。配置位置：
+- Windows: `%APPDATA%\TableCraft\p4config.json`
+- macOS/Linux: `~/.config/TableCraft/p4config.json`
+
+你可以在应用内的设置界面中配置 Perforce 连接信息，配置将自动保存到用户目录中。
 
 ## TableCraft.Editor使用方式
 

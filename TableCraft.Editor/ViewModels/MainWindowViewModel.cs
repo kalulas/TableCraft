@@ -9,6 +9,7 @@ using System.Threading.Tasks;
 using Avalonia.Controls;
 using Avalonia.Platform.Storage;
 using FuzzySharp;
+using Microsoft.Extensions.DependencyInjection;
 using TableCraft.Core;
 using TableCraft.Editor.Models;
 using TableCraft.Editor.Services;
@@ -451,7 +452,7 @@ public class MainWindowViewModel : ViewModelBase
 
     private async Task OnOpenPerforceWindowButtonClicked()
     {
-        var config = Program.GetVersionControlConfig();
+        var config = Program.Host.Services.GetRequiredService<IP4ConfigManager>().GetVersionControlConfig();
         var viewModel = new PerforceUserConfigViewModel(config);
         await ShowPerforceWindow.Handle(viewModel);
 
