@@ -10,25 +10,25 @@ namespace TableCraft.Editor.Models;
 public class AppSettings
 {
     /// <summary>
+    /// Fallback export path when specific usage is not configured
+    /// </summary>
+    public static string FallbackCodeExportPath => Path.Combine(AppContext.BaseDirectory, "GeneratedCode");
+
+    /// <summary>
     /// Common root directory of configuration files for reading configuration files
     /// </summary>
     public string ConfigHomePath { get; set; } = string.Empty;
-    
+
     /// <summary>
     /// Common root directory of configuration description files for saving description files
     /// </summary>
     public string JsonHomePath { get; set; } = string.Empty;
-    
+
     /// <summary>
     /// Export directories for different usage types
     /// </summary>
     public Dictionary<string, string> ExportPath { get; set; } = new();
-    
-    /// <summary>
-    /// Fallback export path when specific usage is not configured
-    /// </summary>
-    public static string FallbackCodeExportPath => Path.Combine(AppContext.BaseDirectory, "GeneratedCode");
-    
+
     /// <summary>
     /// Try get the export path for code generation, if not found, use fallback path
     /// </summary>
@@ -40,7 +40,7 @@ public class AppSettings
         {
             return exportPath;
         }
-        
+
         return FallbackCodeExportPath;
     }
 }
