@@ -29,7 +29,7 @@ public class MainWindowViewModel : ViewModelBase
     private static readonly FilePickerFileType m_DataSourceType = new("sources")
         {Patterns = Configuration.GetDataSourceExtensions().Select(extension => $"*.{extension}").ToArray()};
     
-    private readonly FakeDatabase m_Database;
+    private readonly ConfigFileRegistry m_ConfigFileRegistry;
     /// <summary>
     /// ConfigFileRelativeFilePath -> ConfigInfoViewModel, create on selected
     /// </summary>
@@ -166,17 +166,17 @@ public class MainWindowViewModel : ViewModelBase
 
     #region Private Methods
 
-    public MainWindowViewModel(FakeDatabase db)
+    public MainWindowViewModel(ConfigFileRegistry configFileRegistry)
     {
-        m_Database = db;
-        CreateSubViewModels(db);
+        m_ConfigFileRegistry = configFileRegistry;
+        CreateSubViewModels(configFileRegistry);
         CreateCommands();
         ShowPerforceWindow = new Interaction<PerforceUserConfigViewModel, PerforceUserConfigViewModel?>();
     }
 
-    private void CreateSubViewModels(FakeDatabase fakeDatabase)
+    private void CreateSubViewModels(ConfigFileRegistry configFileRegistry)
     {
-        foreach (var tableElement in fakeDatabase.ReadTableElements())
+        foreach (var tableElement in configFileRegistry.ReadTableElements())
         {
             var viewModel = new ConfigFileElementViewModel(tableElement);
             TableList.Add(viewModel);
@@ -218,10 +218,10 @@ public class MainWindowViewModel : ViewModelBase
         ExportCodeUsage = methods[0]; // default selection
     }
     
-    private async Task FlushTableListToDatabase()
+    private async Task FlushTableListToRegistry()
     {
         var updatedTableList = TableList.Select(viewModel => viewModel.GetElement()).ToList();
-        await m_Database.WriteTableElements(updatedTableList);
+        await m_ConfigFileRegistry.WriteTableElements(updatedTableList);
     }
 
     private async Task AddNewSelectedTableFile(string newTableFilePath)
@@ -269,7 +269,7 @@ public class MainWindowViewModel : ViewModelBase
         //     createdTableViewModel.JsonFilePath, createdTableViewModel.GetConfigType());
         
         // write to local file, we make it async
-        await FlushTableListToDatabase();
+        await FlushTableListToRegistry();
     }
 
     private void UpdateSelectedConfigInfoWithTable(ConfigFileElementViewModel? selectedTable)
@@ -368,7 +368,7 @@ public class MainWindowViewModel : ViewModelBase
         
         // step2 update and save list.json
         m_SelectedTable.SetJsonFileRelativePath(jsonFileName);
-        await FlushTableListToDatabase();
+        await FlushTableListToRegistry();
         Log.Information("Save table list to list.json finished");
         
         // step3 update 'json file found' status

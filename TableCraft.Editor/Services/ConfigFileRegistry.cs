@@ -10,11 +10,11 @@ using TableCraft.Editor.Models;
 
 namespace TableCraft.Editor.Services;
 
-public class FakeDatabase
+public class ConfigFileRegistry
 {
     private readonly string m_ListJsonFilePath;
 
-    public FakeDatabase(string listJsonFilePath)
+    public ConfigFileRegistry(string listJsonFilePath)
     {
         m_ListJsonFilePath = listJsonFilePath;
     }
@@ -70,6 +70,6 @@ public class FakeDatabase
         });
         
         await FileHelper.WriteAsync(m_ListJsonFilePath, jsonString);
-        Log.Information("write ListJsonFile '{Path}' finished", m_ListJsonFilePath);
+        Log.Information("write list.json file '{Path}' finished", m_ListJsonFilePath);
     }
 }

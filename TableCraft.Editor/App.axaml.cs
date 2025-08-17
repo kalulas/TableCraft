@@ -35,14 +35,14 @@ public partial class App : Application
             var listJsonFilePath = AppContext.BaseDirectory + Program.ListJsonFilename;
             if (!File.Exists(listJsonFilePath))
             {
-                throw new FileNotFoundException(listJsonFilePath + " not found, construct database failed");
+                throw new FileNotFoundException(listJsonFilePath + " not found, construct config file registry failed");
             }
 
-            var db = new FakeDatabase(listJsonFilePath);
+            var configFileRegistry = new ConfigFileRegistry(listJsonFilePath);
 
             desktop.MainWindow = new MainWindow
             {
-                DataContext = new MainWindowViewModel(db),
+                DataContext = new MainWindowViewModel(configFileRegistry),
             };
         }
 
