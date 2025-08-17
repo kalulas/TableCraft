@@ -110,7 +110,7 @@ public class P4ConfigManager : IP4ConfigManager
         }
         catch (Exception ex)
         {
-            Log.Error(ex, " Unexpected error saving P4 config: {FilePath}", m_P4ConfigFilePath);
+            Log.Error(ex, "Unexpected error saving P4 config: {FilePath}", m_P4ConfigFilePath);
             return false;
         }
     }
