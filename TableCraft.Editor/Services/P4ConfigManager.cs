@@ -105,7 +105,7 @@ public class P4ConfigManager : IP4ConfigManager
             var configJson = JsonSerializer.Serialize(config, options);
             await FileHelper.WriteAsync(m_P4ConfigFilePath, configJson);
 
-            Log.Information(" Successfully saved P4 config to: {FilePath}", m_P4ConfigFilePath);
+            Log.Information("Successfully saved P4 config to: {FilePath}", m_P4ConfigFilePath);
             return true;
         }
         catch (Exception ex)
