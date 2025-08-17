@@ -48,9 +48,9 @@ public class MainWindowViewModel : ViewModelBase
 
     public string ListJsonFilename => Program.ListJsonFilename;
 
-    public string ConfigHomePath => Program.GetConfigHomePath();
+    public string ConfigHomePath => Program.Host.Services.GetRequiredService<AppSettings>().ConfigHomePath;
 
-    public string JsonHomePath => Program.GetJsonHomePath();
+    public string JsonHomePath => Program.Host.Services.GetRequiredService<AppSettings>().JsonHomePath;
 
     private string m_ExportCodeUsage = string.Empty;
 
@@ -294,7 +294,8 @@ public class MainWindowViewModel : ViewModelBase
         if (configInfo == null)
         {
             Log.Error("Failed to create config info for '{identifier}' under '{HomePath}'",
-                selectedTable.ConfigFileRelativePath, Program.GetConfigHomePath());
+                selectedTable.ConfigFileRelativePath,
+                Program.Host.Services.GetRequiredService<AppSettings>().ConfigHomePath);
             SelectedConfigInfo = null;
             return;
         }
@@ -436,7 +437,8 @@ public class MainWindowViewModel : ViewModelBase
         var isUsageGroup = Configuration.IsDefinedUsageGroup(m_ExportCodeUsage);
         if (!isUsageGroup) // single usage
         {
-            var codeExportHomePath = Program.GetCodeExportPath(m_ExportCodeUsage);
+            var appSettings = Program.Host.Services.GetRequiredService<Models.AppSettings>();
+            var codeExportHomePath = appSettings.GetCodeExportPath(m_ExportCodeUsage);
             ExportCodePath = SelectedConfigInfo != null
                 ? Path.Combine(codeExportHomePath, Configuration.GetTargetFilenameForUsage(m_ExportCodeUsage, SelectedConfigInfo.GetConfigInfo()))
                 : codeExportHomePath;
@@ -507,18 +509,20 @@ public class MainWindowViewModel : ViewModelBase
         var isUsageGroup = Configuration.IsDefinedUsageGroup(m_ExportCodeUsage);
         if (!isUsageGroup)
         {
-            var outputDir = Program.GetCodeExportPath(m_ExportCodeUsage);
+            var appSettings = Program.Host.Services.GetRequiredService<Models.AppSettings>();
+            var outputDir = appSettings.GetCodeExportPath(m_ExportCodeUsage);
             // if 'ConfigInfo' is null, GenerateCodeForUsage will handle it and return false
             success =
                 await ConfigManager.singleton.GenerateCodeForUsage(m_ExportCodeUsage, configInfo, outputDir);
         }
         else
         {
+            var appSettings = Program.Host.Services.GetRequiredService<Models.AppSettings>();
             var usages = Configuration.GetUsagesForGroup(m_ExportCodeUsage);
             var outputDirectories = new string[usages.Length];
             for (var i = 0; i < usages.Length; i++)
             {
-                outputDirectories[i] = Program.GetCodeExportPath(usages[i]);
+                outputDirectories[i] = appSettings.GetCodeExportPath(usages[i]);
             }
             
             // generate multiple code files for each usage
