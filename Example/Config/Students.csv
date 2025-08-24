@@ -1,0 +1,6 @@
+ID,ClassID,Name,Age,IsActive,GPA,Courses,Tags
+Student ID,Class ID,Student Name,Student Age,Is Active Student,Grade Point Average,Course List,Student Tags
+0,1,Edward,24,true,3.8,"CS61A;MIT18.01;MIT18.06","honor;scholarship"
+1,1,Alex,24,false,3.2,"UCB CS61B;MIT 6.006","regular"
+2,2,Sarah,22,true,3.9,"MATH101;PHYS201;CHEM301","honor;lab_assistant"
+3,2,Mike,23,true,3.5,"ENG101;HIST202","regular;debate_team"
