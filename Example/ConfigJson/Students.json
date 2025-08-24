@@ -1,0 +1,122 @@
+{
+  "ConfigName": "Students",
+  "Usage": {
+    "csharp": {
+      "ExportName": "Students"
+    }
+  },
+  "Attributes": [
+    {
+      "AttributeName": "ID",
+      "Comment": "Student ID",
+      "ValueType": "uint",
+      "DefaultValue": "",
+      "CollectionType": "none",
+      "Usages": [
+        {
+          "Usage": "csharp",
+          "FieldName": "ID"
+        }
+      ],
+      "Tag": []
+    },
+    {
+      "AttributeName": "ClassID",
+      "Comment": "Class ID",
+      "ValueType": "uint",
+      "DefaultValue": "",
+      "CollectionType": "none",
+      "Usages": [
+        {
+          "Usage": "csharp",
+          "FieldName": "ClassID"
+        }
+      ],
+      "Tag": []
+    },
+    {
+      "AttributeName": "Name",
+      "Comment": "Student Name",
+      "ValueType": "string",
+      "DefaultValue": "",
+      "CollectionType": "none",
+      "Usages": [
+        {
+          "Usage": "csharp",
+          "FieldName": "Name"
+        }
+      ],
+      "Tag": []
+    },
+    {
+      "AttributeName": "Age",
+      "Comment": "Student Age",
+      "ValueType": "uint",
+      "DefaultValue": "",
+      "CollectionType": "none",
+      "Usages": [
+        {
+          "Usage": "csharp",
+          "FieldName": "Age"
+        }
+      ],
+      "Tag": []
+    },
+    {
+      "AttributeName": "IsActive",
+      "Comment": "Is Active Student",
+      "ValueType": "boolean",
+      "DefaultValue": "",
+      "CollectionType": "none",
+      "Usages": [
+        {
+          "Usage": "csharp",
+          "FieldName": "IsActive"
+        }
+      ],
+      "Tag": []
+    },
+    {
+      "AttributeName": "GPA",
+      "Comment": "Grade Point Average",
+      "ValueType": "float",
+      "DefaultValue": "",
+      "CollectionType": "none",
+      "Usages": [
+        {
+          "Usage": "csharp",
+          "FieldName": "GPA"
+        }
+      ],
+      "Tag": []
+    },
+    {
+      "AttributeName": "Courses",
+      "Comment": "Course List",
+      "ValueType": "string",
+      "DefaultValue": "",
+      "CollectionType": "array",
+      "Usages": [
+        {
+          "Usage": "csharp",
+          "FieldName": "Courses"
+        }
+      ],
+      "Tag": []
+    },
+    {
+      "AttributeName": "Tags",
+      "Comment": "Student Tags",
+      "ValueType": "string",
+      "DefaultValue": "",
+      "CollectionType": "array",
+      "Usages": [
+        {
+          "Usage": "csharp",
+          "FieldName": "Tags"
+        }
+      ],
+      "Tag": []
+    }
+  ]
+}

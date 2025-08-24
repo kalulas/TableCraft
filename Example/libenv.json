@@ -1,0 +1,17 @@
+{
+    "DataValueType": ["int", "uint", "float", "boolean", "string"],
+    "DataCollectionType": ["none", "array"],
+    "AttributeTag": ["primary", "comma-separate", "semicolon-separate"],
+    "UTF8BOM": false,
+    "CsvSource": {
+        "HeaderLineIndex": 0,
+        "CommentLineIndex": 1
+    },
+    "ConfigUsageType": {
+        "csharp": {
+            "CodeTemplateName": "csharp-template.tt",
+            "TargetFileType": ".cs",
+            "OutputFormat": "{0}Table"
+        }
+    }
+}

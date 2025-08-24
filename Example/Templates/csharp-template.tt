@@ -1,0 +1,116 @@
+<#@ template debug="true" hostspecific="true" language="C#" #>
+<#@ parameter type="System.String" name="CurrentUsage"#>
+<#@ import namespace="System.Collections.Generic" #>
+<#@ import namespace="System.Linq" #>
+<#
+    var configInfoObject = Host.GetHostOption("CurrentConfigInfo");
+    var configInfo = configInfoObject as ConfigInfo;
+    if (configInfo == null) throw new Exception("null CurrentConfigInfo received, exit!");
+    
+    // Helper function to get C# type for value type and collection type combination
+    string GetCSharpType(string valueType, string collectionType)
+    {
+        string csharpType = valueType switch
+        {
+            "int" => "int",
+            "uint" => "uint", 
+            "float" => "float",
+            "boolean" => "bool",
+            "string" => "string",
+            _ => "object"
+        };
+        
+        return collectionType switch
+        {
+            "array" => $"List<{csharpType}>",
+            "none" => csharpType,
+            _ => csharpType
+        };
+    }
+    
+    // Helper function to get default value for type
+    string GetDefaultValue(string valueType, string collectionType)
+    {
+        if (collectionType == "array")
+        {
+            return "new()";
+        }
+        
+        return valueType switch
+        {
+            "int" => "0",
+            "uint" => "0u",
+            "float" => "0.0f", 
+            "boolean" => "false",
+            "string" => "string.Empty",
+            _ => "default"
+        };
+    }
+#>
+using System;
+using System.Collections.Generic;
+
+namespace TableCraft.Generated
+{
+    /// <summary>
+    /// Auto-generated data table class for <#= configInfo.ConfigName #>
+    /// Generated on: <#= DateTime.Now.ToString("yyyy-MM-dd HH:mm:ss") #>
+    /// </summary>
+    public class <#= configInfo.GetExportName(CurrentUsage) #>
+    {
+<# 
+    foreach(var info in configInfo.AttributeInfos)
+    { 
+        if(info.IsValid() && info.HasUsage(CurrentUsage))
+        {
+            var csharpType = GetCSharpType(info.ValueType, info.CollectionType);
+            var fieldName = info.GetUsageFieldName(CurrentUsage);
+            var defaultValue = GetDefaultValue(info.ValueType, info.CollectionType);
+            var comment = !string.IsNullOrEmpty(info.Comment) ? info.Comment : $"{fieldName} field";
+#>
+        /// <summary>
+        /// <#= comment #>
+        /// Type: <#= info.ValueType #>, Collection: <#= info.CollectionType #>
+<#          if (info.Tags.Any()) { #>
+        /// Tags: <#= string.Join(", ", info.Tags) #>
+<#          } #>
+        /// </summary>
+        public <#= csharpType #> <#= fieldName #> { get; set; } = <#= defaultValue #>;
+
+<#
+        }
+    }
+#>
+        /// <summary>
+        /// String representation of this data row
+        /// </summary>
+        /// <returns>Formatted string with all field values</returns>
+        public override string ToString()
+        {
+<# 
+    var allFields = new List<string>();
+    foreach(var info in configInfo.AttributeInfos)
+    { 
+        if(info.IsValid() && info.HasUsage(CurrentUsage))
+        {
+            allFields.Add(info.GetUsageFieldName(CurrentUsage));
+        }
+    }
+    
+    if (allFields.Count > 0)
+    {
+        var formatString = string.Join(", ", allFields.Select(field => $"{field}: {{{field}}}"));
+#>
+            return $"<#= formatString #>";
+<#
+    }
+    else
+    {
+#>
+            return $"<#= configInfo.GetExportName(CurrentUsage) #> instance";
+<#
+    }
+#>
+        }
+    }
+}
