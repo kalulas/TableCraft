@@ -2,6 +2,15 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+## [1.5.0](https://github.com/kalulas/TableCraft/compare/v1.4.4...v1.5.0) (2025-11-30)
+
+
+### Features
+
+* **editor:** add new version release check / auto download & install for TableCraf.Editor ([319d2c2](https://github.com/kalulas/TableCraft/commit/319d2c291378b84d833ca541ba1342d9cf1e2cbf))
+* **editor:** allow user to diable auto check for updates behaviour with appsettings.json ([63c4aa2](https://github.com/kalulas/TableCraft/commit/63c4aa2a379e96d59d04c91d1156aaa68ed87f0d))
+* **editor:** make sure the check for updates behaviour is only available on windows ([23ac4a6](https://github.com/kalulas/TableCraft/commit/23ac4a6d5d6a58d5606de78273db49feb75608de))
+
 ### [1.4.4](https://github.com/kalulas/TableCraft/compare/v1.4.3...v1.4.4) (2025-08-17)
 
 
