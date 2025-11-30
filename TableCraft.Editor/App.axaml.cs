@@ -1,5 +1,6 @@
 using System;
 using System.IO;
+using System.Runtime.InteropServices;
 using System.Threading.Tasks;
 using Avalonia;
 using Avalonia.Controls.ApplicationLifetimes;
@@ -70,6 +71,13 @@ public partial class App : Application
 
     private static async void CheckForUpdatesOnStartup()
     {
+        // Auto-update is only supported on Windows (downloads .exe installer)
+        if (!RuntimeInformation.IsOSPlatform(OSPlatform.Windows))
+        {
+            Log.Information("[App.CheckForUpdatesOnStartup] Auto-update is only supported on Windows, skipping");
+            return;
+        }
+
         try
         {
             var autoUpdateService = Program.Host.Services.GetRequiredService<IAutoUpdateService>();
