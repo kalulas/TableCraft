@@ -9,6 +9,7 @@ using TableCraft.Editor.Services;
 using TableCraft.Editor.ViewModels;
 using TableCraft.Editor.Views;
 using Serilog;
+using TableCraft.Editor.Models;
 
 namespace TableCraft.Editor;
 
@@ -48,7 +49,10 @@ public partial class App : Application
 
         base.OnFrameworkInitializationCompleted();
         Task.Run(LoadAndRegisterVersionControl);
-        Task.Run(CheckForUpdatesOnStartup);
+        if (Program.Host.Services.GetRequiredService<AppSettings>().CheckForUpdates)
+        {
+            Task.Run(CheckForUpdatesOnStartup);
+        }
     }
 
     private static void LoadAndRegisterVersionControl()

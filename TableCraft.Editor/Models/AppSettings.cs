@@ -15,6 +15,11 @@ public class AppSettings
     public static string FallbackCodeExportPath => Path.Combine(AppContext.BaseDirectory, "GeneratedCode");
 
     /// <summary>
+    /// If true, the application will check for updates on startup
+    /// </summary>
+    public bool CheckForUpdates { get; set; } = true;
+
+    /// <summary>
     /// Common root directory of configuration files for reading configuration files
     /// </summary>
     public string ConfigHomePath { get; set; } = string.Empty;
