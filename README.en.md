@@ -251,6 +251,6 @@ set _inno_compiler=C:\Users\[YourUsername]\AppData\Local\Programs\Inno Setup 6\I
 
 ## License
 
-[MIT](http://opensource.org/licenses/MIT)
+This project is licensed under the [MIT License](LICENSE).
 
-Copyright (c) 2023 - Boming Chen
+Copyright (c) 2023-2025 Boming Chen
