@@ -209,6 +209,46 @@ Before following the steps below, please ensure that the two JSON files mentione
 8. Click this button to export files (if a target usage is selected, export path is shown below button).
 9. Click this button to save data description file to "JsonHome".
 
+## Building TableCraft.Editor
+
+### Using Build Script (Windows)
+
+The project provides a `build.cmd` script for automated building and packaging of TableCraft.Editor.
+
+**Prerequisites:**
+
+- .NET 6.0 SDK
+- (Optional) [7-Zip](https://www.7-zip.org/) - for creating zip archives
+- (Optional) [Inno Setup](https://jrsoftware.org/isinfo.php) - for creating Windows installer
+
+**Usage:**
+
+```cmd
+# Build and create zip archive
+# "--no-copy-config" disables copying Example directory contents
+build.cmd --no-copy-config --zip
+
+# Build and create installer
+build.cmd --no-copy-config --installer
+
+# Create both zip and installer
+build.cmd --no-copy-config --zip --installer
+
+# View all available options
+build.cmd --help
+```
+
+Build output is located in the `publish\[version]\` directory.
+
+**Customizing Tool Paths:**
+
+If 7-Zip or Inno Setup is installed in a non-default location, you can edit the following variables in the `build.cmd` file:
+
+```cmd
+set _7z_path=C:\Program Files\7-Zip\7z.exe
+set _inno_compiler=C:\Users\[YourUsername]\AppData\Local\Programs\Inno Setup 6\ISCC.exe
+```
+
 ## License
 
 [MIT](http://opensource.org/licenses/MIT)

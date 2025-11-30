@@ -214,6 +214,45 @@ Perforce 版本控制相关信息现在存储在用户配置目录中，无需�
 8. 点击此按钮导出文件（如选择单一途径，导出路径显示按钮下方）
 9. 点击此按钮将数据描述文件保存至"JsonHome"
 
+## 构建 TableCraft.Editor
+
+### 使用构建脚本（Windows）
+
+项目提供了 `build.cmd` 脚本用于自动化构建和打包 TableCraft.Editor。
+
+**前置要求：**
+- .NET 6.0 SDK
+- （可选）[7-Zip](https://www.7-zip.org/) - 用于创建 zip 压缩包
+- （可选）[Inno Setup](https://jrsoftware.org/isinfo.php) - 用于创建 Windows 安装程序
+
+**使用方法：**
+
+```cmd
+# 构建并创建 zip 压缩包
+# "--no-copy-config" 用于禁用复制 Example 目录内容的行为
+build.cmd --no-copy-config --zip
+
+# 构建并创建安装程序
+build.cmd --no-copy-config --installer
+
+# 同时创建 zip 和安装程序
+build.cmd --no-copy-config --zip --installer
+
+# 查看所有可用选项
+build.cmd --help
+```
+
+构建输出位于 `publish\[version]\` 目录下。
+
+**自定义工具路径：**
+
+如果 7-Zip 或 Inno Setup 安装在非默认位置，可以编辑 `build.cmd` 文件中的以下变量：
+
+```cmd
+set _7z_path=C:\Program Files\7-Zip\7z.exe
+set _inno_compiler=C:\Users\[YourUsername]\AppData\Local\Programs\Inno Setup 6\ISCC.exe
+```
+
 ## License
 
 [MIT](http://opensource.org/licenses/MIT)
