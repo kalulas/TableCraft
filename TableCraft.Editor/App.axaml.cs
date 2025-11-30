@@ -1,5 +1,6 @@
 using System;
 using System.IO;
+using System.Runtime.InteropServices;
 using System.Threading.Tasks;
 using Avalonia;
 using Avalonia.Controls.ApplicationLifetimes;
@@ -9,6 +10,7 @@ using TableCraft.Editor.Services;
 using TableCraft.Editor.ViewModels;
 using TableCraft.Editor.Views;
 using Serilog;
+using TableCraft.Editor.Models;
 
 namespace TableCraft.Editor;
 
@@ -48,6 +50,10 @@ public partial class App : Application
 
         base.OnFrameworkInitializationCompleted();
         Task.Run(LoadAndRegisterVersionControl);
+        if (Program.Host.Services.GetRequiredService<AppSettings>().CheckForUpdates)
+        {
+            Task.Run(CheckForUpdatesOnStartup);
+        }
     }
 
     private static void LoadAndRegisterVersionControl()
@@ -61,5 +67,25 @@ public partial class App : Application
 
         var versionControl = new Core.VersionControl.Perforce(versionControlConfig);
         Core.IO.FileHelper.RegisterFileEvent(versionControl);
+    }
+
+    private static async void CheckForUpdatesOnStartup()
+    {
+        // Auto-update is only supported on Windows (downloads .exe installer)
+        if (!RuntimeInformation.IsOSPlatform(OSPlatform.Windows))
+        {
+            Log.Information("[App.CheckForUpdatesOnStartup] Auto-update is only supported on Windows, skipping");
+            return;
+        }
+
+        try
+        {
+            var autoUpdateService = Program.Host.Services.GetRequiredService<IAutoUpdateService>();
+            await autoUpdateService.CheckLocalDownloadedUpdatesAsync();
+        }
+        catch (Exception ex)
+        {
+            Log.Error(ex, "[App.CheckForUpdatesOnStartup] Failed to check for updates");
+        }
     }
 }

@@ -2,6 +2,7 @@
 using Avalonia.ReactiveUI;
 using System;
 using System.IO;
+using System.Net.Http;
 using Avalonia.Logging;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
@@ -16,6 +17,11 @@ class Program
 {
     public const string ListJsonFilename = "list.json";
     public const string LibEnvJsonFilename = "libenv.json";
+    
+    public static readonly string AppDataDirectory = Path.Combine(
+        Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData), 
+        "TableCraft");
+
     public static IHost Host { get; private set; } = null!;
 
     // Initialization code. Don't use any Avalonia, third-party APIs or any
@@ -40,6 +46,18 @@ class Program
                 .ConfigureServices(services =>
                 {
                     services.AddSingleton<IP4ConfigManager, P4ConfigManager>();
+                    services.AddSingleton<IReleaseService>(provider => new GitHubReleaseService(new HttpClient()));
+                    services.AddSingleton<IDownloadService>(provider => new DownloadService(new HttpClient()));
+                    services.AddSingleton<IVersionService, VersionService>();
+                    services.AddSingleton<IFileManagementService, FileManagementService>();
+                    services.AddSingleton<IInstallerService, InstallerService>();
+                    services.AddSingleton<IAutoUpdateService>(provider => new AutoUpdateService(
+                        provider.GetRequiredService<IReleaseService>(),
+                        provider.GetRequiredService<IVersionService>(),
+                        provider.GetRequiredService<IDownloadService>(),
+                        provider.GetRequiredService<IFileManagementService>(),
+                        provider.GetRequiredService<IInstallerService>()
+                    ));
                     services.AddSingleton<AppSettings>(provider =>
                     {
                         var configuration = provider.GetRequiredService<IConfiguration>();
@@ -56,7 +74,7 @@ class Program
             // Trigger AppSettings registration to validate configuration early
             Host.Services.GetRequiredService<AppSettings>();
             Log.Information("Configuration is ready");
-            
+
             var libEnvJsonFilePath = Path.Combine(AppContext.BaseDirectory, LibEnvJsonFilename);
             if (!File.Exists(libEnvJsonFilePath))
             {
@@ -71,6 +89,10 @@ class Program
             Log.Information("try setup TableCraft.Core with: {LibEnvJson}", libEnvJsonFilePath);
             Core.Configuration.ReadConfigurationFromJson(libEnvJsonFilePath);
             Log.Information("TableCraft.Core is ready");
+
+            // Ensure application data directory exists
+            Directory.CreateDirectory(AppDataDirectory);
+            Log.Information("Application data directory ready: {AppDataDirectory}", AppDataDirectory);
 
             BuildAvaloniaApp().StartWithClassicDesktopLifetime(args);
         }
