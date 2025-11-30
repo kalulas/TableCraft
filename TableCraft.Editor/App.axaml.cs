@@ -48,6 +48,7 @@ public partial class App : Application
 
         base.OnFrameworkInitializationCompleted();
         Task.Run(LoadAndRegisterVersionControl);
+        Task.Run(CheckForUpdatesOnStartup);
     }
 
     private static void LoadAndRegisterVersionControl()
@@ -61,5 +62,18 @@ public partial class App : Application
 
         var versionControl = new Core.VersionControl.Perforce(versionControlConfig);
         Core.IO.FileHelper.RegisterFileEvent(versionControl);
+    }
+
+    private static async void CheckForUpdatesOnStartup()
+    {
+        try
+        {
+            var autoUpdateService = Program.Host.Services.GetRequiredService<IAutoUpdateService>();
+            await autoUpdateService.CheckLocalDownloadedUpdatesAsync();
+        }
+        catch (Exception ex)
+        {
+            Log.Error(ex, "[App.CheckForUpdatesOnStartup] Failed to check for updates");
+        }
     }
 }

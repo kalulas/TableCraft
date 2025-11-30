@@ -13,13 +13,7 @@ namespace TableCraft.Editor.Services;
 /// </summary>
 public class P4ConfigManager : IP4ConfigManager
 {
-    private static readonly string m_ConfigDirectory = Path.Combine(
-        Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData),
-        m_ConfigDirectoryName);
-
-    private static readonly string m_P4ConfigFilePath = Path.Combine(m_ConfigDirectory, m_P4ConfigFileName);
-
-    private const string m_ConfigDirectoryName = "TableCraft";
+    private static readonly string m_P4ConfigFilePath = Path.Combine(Program.AppDataDirectory, m_P4ConfigFileName);
     private const string m_P4ConfigFileName = "p4config.json";
 
     /// <summary>
@@ -94,9 +88,6 @@ public class P4ConfigManager : IP4ConfigManager
 
         try
         {
-            // ensure directory exists
-            Directory.CreateDirectory(m_ConfigDirectory);
-
             var options = new JsonSerializerOptions
             {
                 WriteIndented = true
